@@ -15,6 +15,8 @@ import {
   Dropdown,
 
 } from 'reactstrap';
+import { gql, withApollo, compose } from 'react-apollo'
+
 
 class GetTask extends Component {
   constructor(props) {
@@ -22,8 +24,67 @@ class GetTask extends Component {
     this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: new Array(6).fill(false),
+      showText: "",
+      showTable: ''
     };
   }
+
+
+  queryGettesk = () => {
+    this.props.client.query({
+      query: queryGettesk,
+      variables: {
+        "DocumentSet":this.state.showText,
+      }
+    }).then((result) => {
+      console.log("result", result)
+      var arrData = []
+      var tblData
+      result.data.queryGettesk.forEach(function (val, i) {
+        tblData = <tbody>
+          <tr>
+            <td> <center>{i+1}</center></td>
+            <td><center><input id="invoice" placeholder={val.INVOICEID} required= "" type="text" class="form-control" ></input> </center></td>
+            <td><center>{val.QTYbox}</center></td>
+            <td><center>{val.CustomerName}</center></td>
+          </tr>
+        </tbody>
+        arrData.push(tblData)
+      });
+      this.setState({
+        showTable: arrData
+      })
+    }).catch((err) => {
+
+    });
+  }
+
+
+  
+  queryGetteskUpdate = () => {
+    if(window.confirm("กรุณายืนยัน")){
+    this.props.client.mutate({
+      mutation: queryGetteskUpdate,
+      variables: {
+        "DocumentSet":this.state.showText,
+      }
+    }).then((result) => {
+      console.log("result", result)
+      window.alert("รับงานสำเร็จ")
+      window.location.reload()
+      
+    }).catch((err) => {
+      
+    });
+  }
+ 
+}
+
+  ChangeText = (e) => {
+    this.setState({
+        showText: e.target.value
+    })
+}
 
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => {
@@ -50,14 +111,14 @@ class GetTask extends Component {
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
                           <label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>
-                          &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control"></input>
+                          &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" onChange={this.ChangeText}></input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <button aria-pressed="true" class="btn-pill btn btn-success btn-block">ค้นหา</button>
+                          <button  type="button" class="btn btn-success" onClick={this.queryGettesk}>ค้นหา</button>
                         </div>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                         &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
+                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value= {this.state.showText} disabled>
                           </input>
                         </div>
                       </form>
@@ -73,16 +134,9 @@ class GetTask extends Component {
                         <th><center>ผู้รับ</center></th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                      </tr>
-                    </tbody>
+                    {this.state.showTable}
                   </Table>
-                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg">เทียบ</button></div>
+                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg"onClick={this.queryGetteskUpdate} >เทียบ</button></div>
                 </center>
               </CardBody>
             </Card>
@@ -93,4 +147,25 @@ class GetTask extends Component {
   }
 }
 
-export default GetTask;
+const queryGettesk = gql`
+query queryGettesk($DocumentSet:String!){
+  queryGettesk(DocumentSet:$DocumentSet){
+    INVOICEID
+    QTYbox
+    CustomerName
+  }
+}
+`
+
+const queryGetteskUpdate = gql`
+mutation queryGettesk($DocumentSet:String!){
+  queryGettesk(DocumentSet:$DocumentSet){
+    Status
+  }
+}
+`
+
+
+const GraphQL = compose(
+)(GetTask)
+export default withApollo(GraphQL)
