@@ -42,8 +42,8 @@ const TrackingOrder = Loadable({
   loading: Loading,
 });
 
-const TrackingMas = Loadable({
-  loader: () => import('./views/Tracking/TrackingMas/TrackingMas'),
+const TrackingMess = Loadable({
+  loader: () => import('./views/Tracking/TrackingMess/TrackingMess'),
   loading: Loading,
 });
 
@@ -111,7 +111,7 @@ const routes = [{
   { path: '/Transport/GetTask', name: 'GetTask', component: GetTask },
   { path: '/Transport/ClearTask', name: 'ClearTask', component: ClearTask },
   { path: '/Tracking/TrackingOrder', name: 'TrackingOrder', component: TrackingOrder },
-  { path: '/Tracking/TrackingMas', name: 'TrackingMas', component: TrackingMas },
+  { path: '/Tracking/TrackingMess', name: 'TrackingMess', component: TrackingMess },
   { path: '/PayMas/Monthly', name: 'Monthly', component: Monthly },
   { path: '/PayMas/Daily', name: 'Daily', component: Daily },
   { path: '/Report/AccountReport', name: 'AccountReport', component: AccountReport },

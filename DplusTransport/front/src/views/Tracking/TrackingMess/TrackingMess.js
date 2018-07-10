@@ -17,22 +17,32 @@ import {
   Input,
   form,
 } from 'reactstrap';
+import { withApollo, gql, compose } from 'react-apollo';
 
-class TrackingMas extends Component {
+class TrackingMess extends Component {
   constructor(props) {
     super(props);
-    this.toggle = this.toggle.bind(this);
     this.state = {
-      dropdownOpen: new Array(6).fill(false),
+      
     };
   }
 
-  toggle(i) {
-    const newArray = this.state.dropdownOpen.map((element, index) => {
-      return (index === i ? !element : false);
-    });
-    this.setState({
-      dropdownOpen: newArray,
+  selectMess=()=>{
+    this.props.client.query({
+        query:selectMess
+    }).then((result) => {
+        console.log("result",result)
+        var arrMess = []
+        var DropdownMess
+        result.data.selectMess.forEach(function (val,i) {
+          DropdownMess = <option>{val.IDMess}</option>
+          arrMess.push(DropdownMess)
+        });
+        this.setState({
+          showDropdown:arrMess
+        })
+    }).catch((err) => {
+
     });
   }
 
@@ -52,36 +62,22 @@ class TrackingMas extends Component {
                       <form action="" method="post" class="form-inline" margin="auto auto">
 
                         <div class="pr-1 form-group">
-                          <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
-                            this.toggle(0);
-                          }}>
-                            <DropdownToggle caret>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Messanger</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem header>Header</DropdownItem>
-                              <DropdownItem>Massanger 1</DropdownItem>
-                              <DropdownItem>Massanger 2</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
+                        <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
+                        <Input type="select" name="select" id="exampleSelect" onChange={this.selectMess}>
+                          {this.state.showDropdown}
+                        </Input>
                         </div>
                         <div class="pr-1 form-group">
                         &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>วันที่</strong></label>
                         &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="date" class="form-control"></input>
                         </div>
                         <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
-                            this.toggle(1);
-                          }}>
-                            <DropdownToggle caret>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>รอบ</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem header>Header</DropdownItem>
-                              <DropdownItem> 1</DropdownItem>
-                              <DropdownItem> 2</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
+                        &nbsp;&nbsp;<Label for="exampleSelect"><strong>Trip</strong></Label>&nbsp;&nbsp;
+                        <Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                        </Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
                           <button aria-pressed="true" class="btn-pill btn btn-success btn-block">ค้นหา</button>
@@ -142,4 +138,14 @@ class TrackingMas extends Component {
   }
 }
 
-export default TrackingMas;
+const selectMess = gql`
+  query selectMess{
+    selectMess{
+      IDMess
+    }
+  }
+`
+
+const GraphQL = compose(
+)(TrackingMess)
+export default withApollo (GraphQL)
