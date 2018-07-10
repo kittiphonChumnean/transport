@@ -13,17 +13,44 @@ import {
   Table,
   Badge,
   Dropdown,
+  Label,
+  Input
 }
   from 'reactstrap';
-
+  import { gql, withApollo, compose } from 'react-apollo'
 class Assignment extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
     this.state = {
+      showMess:'',
+      showDropdown:'',
+      showText: "",
+      showtrip: "",
       dropdownOpen: new Array(6).fill(false),
     };
   }
+
+  
+  queryAssingmentIDmess=()=>{
+    this.props.client.query({
+        query:queryAssingmentIDmess
+    }).then((result) => {
+        console.log("result",result)
+        var arrMess = []
+        var DropdownMess
+        result.data.queryAssingmentIDmess.forEach(function (val,i) {
+          DropdownMess = <option>{val.IDMess}</option>
+          arrMess.push(DropdownMess)
+        });
+        this.setState({
+          showDropdown:arrMess
+        })
+    }).catch((err) => {
+
+    });
+  }
+
 
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => {
@@ -34,7 +61,22 @@ class Assignment extends Component {
     });
   }
 
+  chooseMess=(e)=>{
+    this.setState({
+      showMess:e.target.value,
+      showText: e.target.value
+    })
+ }
+ ChangeText = (e) => {
+  this.setState({
+      showtrip: e.target.value
+  })
+}
+ 
 
+ componentWillMount(){
+  this.queryAssingmentIDmess()
+}
   render() {
     return (
       <div className="animated fadeIn">
@@ -50,44 +92,31 @@ class Assignment extends Component {
                     <div class="card-body">
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
-                          <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
-                            this.toggle(0);
-                          }}>
-                            <DropdownToggle caret>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Messanger</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem header>Header</DropdownItem>
-                              <DropdownItem>Messanger 1</DropdownItem>
-                              <DropdownItem>Messanger 2</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
+                        <Label for="exampleSelect"><strong>Messenger</strong></Label>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect"  onChange={this.chooseMess}>
+                          {this.state.showDropdown}
+                        </Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
-                            this.toggle(1);
-                          }}>
-                            <DropdownToggle caret>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>trip</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem header>Header</DropdownItem>
-                              <DropdownItem>trip 1</DropdownItem>
-                              <DropdownItem>trip 2</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
+                        <Label for="exampleSelect"><strong>Trip</strong></Label>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange= {this.ChangeText} >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+
+                        </Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
                           <button aria-pressed="true" class="btn-pill btn btn-success btn-block">&nbsp;&nbsp;&nbsp;&nbsp;ค้นหา&nbsp;&nbsp;&nbsp;&nbsp;</button>
                         </div>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                         &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
+                          <input id="exampleInputName2" placeholder="" required=""  type="text" class="form-control" value= {this.state.showText} disabled>
                           </input>
                         </div>
                         &nbsp;<div class="pr-1 form-group">
                         &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Trip</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
+                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showtrip} disabled >
                           </input>
                         </div>
                         &nbsp;<div class="pr-1 form-group">
@@ -130,4 +159,15 @@ class Assignment extends Component {
   }
 }
 
-export default Assignment;
+const queryAssingmentIDmess = gql`
+  query queryAssingmentIDmess{
+    queryAssingmentIDmess{
+      IDMess
+    }
+  }
+`
+
+const GraphQL = compose(
+)(Assignment)
+export default withApollo (GraphQL)
+
