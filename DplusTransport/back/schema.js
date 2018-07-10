@@ -30,6 +30,9 @@ const QueryType = new GraphQLObjectType({
 const mutationtype = new GraphQLObjectType({
     name: 'mutation',
     fields: {
+<<<<<<< HEAD
+        insertBill: queryComfrimBill.insertBill,
+=======
         
         insertData: insertdata_.insertData,
        queryGettesk: queryGettesk.upDateStateGetTesk,
@@ -37,6 +40,7 @@ const mutationtype = new GraphQLObjectType({
       queryAssingment2:queryAssingment2.insertInvoice,
 
        
+>>>>>>> master
     }
 })
 
