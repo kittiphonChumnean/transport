@@ -4,12 +4,15 @@ const {
  GraphQLObjectType,
  GraphQLSchema,
  GraphQLString,
+ GraphQLInt,
 } = graphql
 
 var queryComfrimBill = require ("./query/comfrimBill/comfrimBill.js")
 var insertdata_ = require ("./mutation/mutation.js")
 var queryGettesk= require("./query/GetTesk/GetTesk")
 var queryAssingment = require("./query/Assignment/Assignment")
+var queryAssingmentIDmess = require("./query/Assignment/Assignment")
+var queryAssingment2 = require("./query/Assignment/Assignment")
 
 const QueryType = new GraphQLObjectType({
     name: 'Query',
@@ -17,7 +20,7 @@ const QueryType = new GraphQLObjectType({
         selectSale: queryComfrimBill.selectSale,
         selectAllBill: queryComfrimBill.selectAllBill,
         queryGettesk : queryGettesk.selectGetTesk,
-        queryAssingment : queryAssingment.selectIDMess,
+        queryAssingmentIDmess : queryAssingmentIDmess.selectIDMess,
         queryAssingment : queryAssingment.selecMess,
         queryAssingment : queryAssingment.selectinvoice,
    
@@ -29,13 +32,17 @@ const mutationtype = new GraphQLObjectType({
     fields: {
         
         insertData: insertdata_.insertData,
-       queryGettesk: queryGettesk.upDateStateGetTesk
+       queryGettesk: queryGettesk.upDateStateGetTesk,
+       queryAssingment:queryAssingment.insertBilltoApp,
+      queryAssingment2:queryAssingment2.insertInvoice,
+
        
     }
 })
 
 const schema = new GraphQLSchema({
     query: QueryType,
-    mutation:mutationtype
+    mutation:mutationtype,
+    
 })
 module.exports = schema
