@@ -12,6 +12,11 @@ const ConfirmBill = Loadable({
   loading: Loading,
 });
 
+const ConfirmDetail = Loadable({
+  loader: () => import('./views/Confirm/ConfirmBill/ConfirmDetail'),
+  loading: Loading,
+});
+
 const ConfirmClaim = Loadable({
   loader: () => import('./views/Confirm/ConfirmClaim/ConfirmClaim'),
   loading: Loading,
@@ -100,6 +105,7 @@ const routes = [{
   childRoutes:[
   { path: '/', exact: true, name: 'ConfirmBill', component: ConfirmBill },  
   { path: '/Confirm/ConfirmBill', name: 'ConfirmBill', component: ConfirmBill },
+  { path: '/Confirm/ConfirmDetail', name: 'ConfirmDetail', component: ConfirmDetail },
   { path: '/Confirm/ConfirmClaim', name: 'ConfirmClaim', component: ConfirmClaim },
   { path: '/Transport/Assignment', name: 'Assignment', component: Assignment },
   { path: '/Transport/GetTask', name: 'GetTask', component: GetTask },

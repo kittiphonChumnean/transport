@@ -20,8 +20,7 @@ const QueryType = new GraphQLObjectType({
 const mutationtype = new GraphQLObjectType({
     name: 'mutation',
     fields: {
-        
-        insertData: insertdata_.insertData,
+        insertBill: queryComfrimBill.insertBill,
     }
 })
 
