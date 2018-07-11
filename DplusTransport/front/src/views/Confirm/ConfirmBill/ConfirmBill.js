@@ -158,6 +158,7 @@ class ConfirmBill extends Component {
                         <div class="pr-1 form-group ">
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
                         &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.selectSale}>
+                        <option value="">---</option>
                           {this.state.showDropdown}
                         </Input>
                         </div>
