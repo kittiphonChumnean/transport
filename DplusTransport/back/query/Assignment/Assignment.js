@@ -6,7 +6,7 @@ var moment = require('moment')
 
 const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLInputObjectType, } = graphql
 
-//selectIDMess
+//-----------selectIDMess--------------//
 var IDMessmodel = new GraphQLObjectType({
     name: 'IDMessmodel',
     fields: () => ({
@@ -39,7 +39,7 @@ var fnselectIDMess = function (callback) {
     })
 }
 
-//Search  meses
+//----------Search  meses--------------//
 var Messmodel = new GraphQLObjectType({
     name: 'Messmodel',
     fields: () => ({
@@ -65,7 +65,7 @@ var selecMess = {
 
 var fnSelecMess = function (IDMess, callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
-        // console.log("DB Connected")
+        console.log("DB Connected")
         return pool.request()
             .input('IDMess', sql.VarChar, IDMess)
             .query('SELECT [Zone] FROM [Messenger] WHERE IDMess = @IDMess')
@@ -77,7 +77,7 @@ var fnSelecMess = function (IDMess, callback) {
 }
 
 
-//Search  DataInvoice
+//------------Search  DataInvoice-------------//
 var invoiceModel = new GraphQLObjectType({
     name: 'invoiceModel',
     fields: () => ({
@@ -89,6 +89,7 @@ var invoiceModel = new GraphQLObjectType({
         SaleID: { type: GraphQLString },
         Sale_Name: { type: GraphQLString },
         StoreZone: { type: GraphQLString },
+        DELIVERYNAME :{ type: GraphQLString },
 
     })
 })
@@ -113,7 +114,7 @@ var fnSelectinvoice = function (INVOICEID, callback) {
         // console.log("DB Connected")
         return pool.request()
             .input('INVOICEID', sql.VarChar, INVOICEID)
-            .query('SELECT [INVOICEID],[DocumentSet],[CustomerID],[CustomerName],[AddressShipment],[SaleID],[Sale_Name],[StoreZone]FROM [ConfirmBill] WHERE Status=2 AND INVOICEID = @INVOICEID')
+            .query('SELECT [INVOICEID],[DocumentSet],[CustomerID],[CustomerName],[AddressShipment],[SaleID],[Sale_Name],[StoreZone],[DELIVERYNAME]FROM [ConfirmBill] WHERE Status=2 AND INVOICEID = @INVOICEID')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
@@ -193,9 +194,9 @@ var fninsertBilltoApp = function (inData, callback) {
             .then(res => {
                 // console.log("test", res);
                 sql.close();
-                if (res.rowsAffected > 0) {
+                
                     callback({ status: "2" })
-                }
+                
             })
     })
 }
@@ -245,13 +246,14 @@ var fninsertInvoice = function (callback) {
                    ' SaleID= ConfirmBill.SaleID, '+
                     ' Sale_Name = ConfirmBill.Sale_Name, '+
                     ' StoreZone=ConfirmBill.StoreZone ,'+
-                    ' Status=3 '+
+                    ' Status=3 , '+
+                    ' DELIVERYNAME=ConfirmBill.DELIVERYNAME '+
                 ' FROM '+
                     ' BillToApp '+
                 ' INNER JOIN '+
                     ' ConfirmBill '+
                 ' ON '+
-                    ' BillToApp.INVOICEID = ConfirmBill.INVOICEID '
+                    ' BillToApp.INVOICEID = ConfirmBill.INVOICEID'
             )
     }).then(res => {
         console.log("555555555555", res);

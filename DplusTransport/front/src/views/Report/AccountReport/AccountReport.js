@@ -16,6 +16,7 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import { withApollo, gql, compose } from 'react-apollo';
 
 class AccountReport extends Component {
 
@@ -24,9 +25,16 @@ class AccountReport extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
+      showSale:'',
+      showDate:'',
+      showTable: '',
+    
       dropdownOpen: new Array(6).fill(false),
     };
   }
+
+  
+
 
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => {
@@ -35,6 +43,80 @@ class AccountReport extends Component {
     this.setState({
       dropdownOpen: newArray,
     });
+  }
+
+
+
+  QueryAccountReport = () => {
+    this.props.client.query({
+      query: QueryAccountReport,
+      variables: {
+        "SaleID":this.state.showSale,
+        "Date":this.state.showDate,
+
+      }
+    }).then((result) => {
+      console.log("result", result)
+      var arrData = []
+      var tblData
+      result.data.QueryAccountReport.forEach(function (val, i) {
+        tblData = 
+        <tr>
+                        <td><center>{i+1}</center></td>
+                        <td><center>{val.INVOICEID}</center></td>
+                        <td><center>{val.CustomerID}</center></td>
+                        <td><center>{val.AmountBill}</center></td>
+                        <td><center>{val.AmountActual}</center></td>
+                        <td><center>{(val.AmountBill)-(val.AmountActual)}</center></td>
+                       
+                      </tr>
+        
+        
+      
+        arrData.push(tblData)
+      });
+      this.setState({
+        showTable: arrData
+      })
+    }).catch((err) => {
+
+    });
+  }
+
+  selectSale=()=>{
+    this.props.client.query({
+        query:selectSale
+    }).then((result) => {
+        console.log("result",result)
+        var arrSale = []
+        var DropdownSale
+        result.data.selectSale.forEach(function (val,i) {
+          DropdownSale = <option>{val.SaleID}</option>
+          arrSale.push(DropdownSale)
+        });
+        this.setState({
+          showDropdown:arrSale
+        })
+    }).catch((err) => {
+
+    });
+  }
+
+  chooseSale=(e)=>{
+    this.setState({
+      showSale:e.target.value
+    })
+ }
+
+ chooseDate=(e)=>{
+  this.setState({
+    showDate:e.target.value
+  })
+}
+
+
+  componentWillMount(){
+    this.selectSale()
   }
 
   render() {
@@ -58,36 +140,29 @@ class AccountReport extends Component {
                       <form action="" method="post" class="form-inline">
                         <div class="pr-1 form-group ">
 
-                          <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
-                            this.toggle(0);
-                          }}>
+                          <Label for="exampleSelect"><strong>Sale</strong></Label>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                        <option value="">---</option>
+                          {this.state.showDropdown}
+                        </Input>
 
-                            <DropdownToggle caret>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Sale</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem header>Header</DropdownItem>
-                              <DropdownItem>Sale 1</DropdownItem>
-                              <DropdownItem>Sale 2</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <label for="exampleInputName2" class="pr-1"><strong>วันที่</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="date" class="form-control"></input>
+                        <Label for="date" class="pr-1"><strong>วันที่</strong></Label>
+                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.chooseDate} ></Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <button aria-pressed="true" class="btn-pill btn btn-success btn-block">ค้นหา</button>
+                        <button  type="button" class="btn btn-success" onClick={this.QueryAccountReport}>ค้นหา</button>
                       </div>
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
-                        <label for="exampleInputName2" class="pr-1"><strong>Sale</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
-                        </input>
+                      <Label for="exampleInputName2" class="pr-1"><strong>Sale</strong></Label>
+                      &nbsp;&nbsp;<Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showSale} disabled>
+                          </Input>
                       </div>
                       <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>วันที่</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
-                          </input>
+                      &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>วันที่</strong></label>&nbsp;&nbsp;
+                      <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.showDate} disabled>
+                          </Input>
                       </div>
                       </form>
                     </div>
@@ -107,14 +182,9 @@ class AccountReport extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                      </tr>
+                      
+                    {this.state.showTable}
+
                     </tbody>
                   </Table>
                 </center>
@@ -127,4 +197,28 @@ class AccountReport extends Component {
   }
 }
 
-export default AccountReport;
+
+const selectSale = gql`
+  query selectSale{
+    selectSale{
+      SaleID
+    }
+  }
+`
+
+const QueryAccountReport = gql`
+query QueryAccountReport($SaleID:String!,$Date:String!){
+  QueryAccountReport(SaleID:$SaleID,Date:$Date){
+    INVOICEID
+    CustomerID
+    AmountBill
+    AmountActual
+    SaleID
+  }
+}
+`
+
+const GraphQL = compose(
+)(AccountReport)
+export default withApollo (GraphQL)
+
