@@ -160,7 +160,7 @@ class AccountReport extends Component {
                           </Input>
                       </div>
                       <div class="pr-1 form-group">
-                      &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>วันที่</strong></label>&nbsp;&nbsp;
+                      &nbsp;&nbsp;<Label for="exampleInputName3" class="pr-1"><strong>วันที่</strong></Label>&nbsp;&nbsp;
                       <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.showDate} disabled>
                           </Input>
                       </div>

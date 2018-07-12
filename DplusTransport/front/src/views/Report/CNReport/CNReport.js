@@ -16,6 +16,10 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import { withApollo, gql, compose } from 'react-apollo';
+
+
+
 
 class CNReport extends Component {
   constructor(props) {
@@ -23,9 +27,97 @@ class CNReport extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
+      showSale:'',
+      showstartDate:'',
+      showendDate:'',
+      showTable:'',
+      
       dropdownOpen: new Array(6).fill(false),
     };
   }
+
+
+  choosestartDate=(e)=>{
+    this.setState({
+      showstartDate:e.target.value
+    })
+  }
+
+  chooseendDate=(e)=>{
+    this.setState({
+      showendDate:e.target.value
+    })
+  }
+
+  
+  QueryCNReport = () => {
+    this.props.client.query({
+      query: QueryCNReport,
+      variables: {
+        "SaleID":this.state.showSale,
+        "DateStart":this.state.showstartDate,
+        "DateEnd":this.state.showendDate,
+      }
+    }).then((result) => {
+      console.log("result", result)
+      var arrData = []
+      var tblData
+      result.data.QueryCNReport.forEach(function (val, i) {
+        tblData = 
+        <tr>
+                        <td><center>{i+1}</center></td>
+                        <td><center>{val.SaleID}</center></td>
+                        <td><center>{val.INVOICEID}</center></td>
+                        <td><center>{val.CustomerID}</center></td>
+                        <td><center>{val.QtyBill}</center></td>
+                        <td><center>{val.AmountBill}</center></td>
+                        <td><center>{val.Datetime}</center></td>
+                        <td><center>{val.AmountActual}</center></td>
+                        <td><center>{(val.QtyBill)-(val.QtyActual)}</center></td>
+                        <td><center>{(val.AmountBill)-(val.AmountActual)}</center></td>
+                        <td><center>{(val.QtyBill)- ((val.QtyBill)-(val.QtyActual))}</center></td>
+                        <td><center>{val.ReasonCN}</center></td>
+                        
+                      </tr>
+        
+
+        arrData.push(tblData)
+      });
+      this.setState({
+        showTable: arrData
+      })
+    }).catch((err) => {
+
+    });
+  }
+
+
+
+
+  selectSale=()=>{
+    this.props.client.query({
+        query:selectSale
+    }).then((result) => {
+        console.log("result",result)
+        var arrSale = []
+        var DropdownSale
+        result.data.selectSale.forEach(function (val,i) {
+          DropdownSale = <option>{val.SaleID}</option>
+          arrSale.push(DropdownSale)
+        });
+        this.setState({
+          showDropdown:arrSale
+        })
+    }).catch((err) => {
+
+    });
+  }
+
+  chooseSale=(e)=>{
+    this.setState({
+      showSale:e.target.value
+    })
+ }
 
 
   toggle(i) {
@@ -37,9 +129,13 @@ class CNReport extends Component {
     });
   }
 
+  componentWillMount(){
+    this.selectSale()
+  }
 
   render() {
     return (
+     
       <div className="animated fadeIn">
         <Row>
           <Col xs="12" sm="12">
@@ -57,48 +153,40 @@ class CNReport extends Component {
                     <form action="" method="post" class="form-inline">
                       <div class="pr-1 form-group ">
 
-                        <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
-                          this.toggle(0);
-                        }}>
-
-                          <DropdownToggle caret>
-                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Sale</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </DropdownToggle>
-                          <DropdownMenu>
-                            <DropdownItem header>Header</DropdownItem>
-                            <DropdownItem>Sale 1</DropdownItem>
-                            <DropdownItem>Sale 2</DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
+                      <Label for="exampleSelect"><strong>Sale</strong></Label>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                        <option value="">---</option>
+                          {this.state.showDropdown}
+                        </Input>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <label for="exampleInputName2" class="pr-1"><strong>วันที่เริ่ม</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="date" class="form-control"></input>
+                      <Label for="date" class="pr-1"><strong>วันที่เริ่ม</strong></Label>
+                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.choosestartDate} ></Input>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <label for="exampleInputName2" class="pr-1"><strong>วันที่สิ้นสุด</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="date" class="form-control"></input>
+                      <Label for="date" class="pr-1"><strong>วันที่สิ้นสุด</strong></Label>
+                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.chooseendDate} ></Input>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
-                      <button aria-pressed="true" class="btn-pill btn btn-success btn-block">ค้นหา</button>
+                      <button  type="button" class="btn btn-success" onClick={this.QueryCNReport}>ค้นหา</button>
                       </div>
                     </form>
                     <br/>
                     <form action="" method="post" class="form-inline">
                     <div class="pr-1 form-group">
-                        <label for="exampleInputName2" class="pr-1"><strong>Sale</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
-                        </input>
+                    <Label for="exampleInputName2" class="pr-1"><strong>Sale</strong></Label>
+                      &nbsp;&nbsp;<Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showSale} disabled>
+                          </Input>
                       </div>
                       <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>วันที่</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
-                          </input>
+                      &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>วันที่เริ่ม</strong></label>&nbsp;&nbsp;
+                      <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.showstartDate} disabled>
+                          </Input>
                       </div>
-                      <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>ถึง</strong></label>
-                        &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value=" " disabled>
-                          </input>
+                      <div   class="pr-1 form-group" >
+                      &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>ถึง</strong></label>&nbsp;&nbsp;
+                      <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.showendDate} disabled>
+                          </Input>
                       </div>
                       </form>
                   </div>
@@ -124,27 +212,9 @@ class CNReport extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                        <td><center>1</center></td>
-                      </tr>
-
-
-
-
+                    {this.state.showTable}
                     </tbody>
                   </Table>
-
 
                 </center>
               </CardBody>
@@ -154,7 +224,39 @@ class CNReport extends Component {
       </div>
 
     );
+   
   }
 }
 
-export default CNReport;
+
+
+const selectSale = gql`
+  query selectSale{
+    selectSale{
+      SaleID
+    }
+  }
+`
+
+const QueryCNReport = gql`
+query QueryCNReport($SaleID:String!,$DateStart:String!,$DateEnd:String!){
+  QueryCNReport(SaleID:$SaleID,DateStart:$DateStart,DateEnd:$DateEnd){
+    SaleID
+    INVOICEID
+    CustomerID
+    QtyBill
+    QtyActual
+    AmountBill
+    AmountActual
+    Datetime
+    ReasonCN
+  }
+}
+`
+
+const GraphQL = compose(
+)(CNReport)
+export default withApollo (GraphQL)
+
+
+//export default CNReport;
