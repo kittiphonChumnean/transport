@@ -248,6 +248,8 @@ var fninsertInvoice = function (callback) {
                     ' StoreZone=ConfirmBill.StoreZone ,'+
                     ' Status=3 , '+
                     ' DELIVERYNAME=ConfirmBill.DELIVERYNAME '+
+                    ' DELIVERYNAME=ConfirmBill.DELIVERYNAME, '+
+                    ' datetime = GETDATE ( ) '+
                 ' FROM '+
                     ' BillToApp '+
                 ' INNER JOIN '+
