@@ -8,8 +8,7 @@ var Order = new GraphQLObjectType({
     name: 'Order',
     fields: () => ({
         invoice: { type: GraphQLString },
-        Date: { type: GraphQLString },
-        Time: { type: GraphQLString },
+        DateTime: { type: GraphQLString },
         status: { type: GraphQLString },
         location: { type: GraphQLString },
         MessengerID: { type: GraphQLString },
@@ -38,7 +37,7 @@ var fnSelectOrder = function (INVOICEID,callback) {
         // console.log("DB Connected")
         return pool.request()
         .input('INVOICEID',sql.VarChar,INVOICEID)
-            .query('SELECT BillToApp.MessengerID,BillToApp.CustomerName,BillToApp.AddressShipment,Tracking.invoice,Tracking.Date,Tracking.Time,Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.INVOICEID = Tracking.invoice AND Tracking.invoice=@INVOICEID ORDER BY Date ,Time')
+            .query('SELECT BillToApp.MessengerID,BillToApp.CustomerName,BillToApp.AddressShipment,Tracking.invoice,DateTime =CONVERT(varchar,Tracking.DateTime), Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.INVOICEID = Tracking.invoice AND Tracking.invoice=@INVOICEID ORDER BY DateTime')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()

@@ -17,6 +17,8 @@ import {
   Input,
   form,
 } from 'reactstrap';
+import moment from 'moment';
+import 'moment-timezone';
 import { withApollo, gql, compose } from 'react-apollo';
 
 class TrackingOrder extends Component {
@@ -69,11 +71,12 @@ class TrackingOrder extends Component {
           }else if(val.status == 'B1'){
             status[i] = 'ไม่สามารถส่งของได้ เนื่องจากร้านปิด'   
           }
+          
           tblData = <tbody>
             <tr>
               <th><center>{i+1}</center></th>
-              <th width="15%"><center>{val.Date}</center></th>
-              <th width="15%"><center>{val.Time}</center></th>
+              <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
+              <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss a")}</center></th>
               <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
               <th width="20%"><center>{status[i]}</center></th>
               <th><center>{val.location}</center></th>
@@ -142,10 +145,16 @@ class TrackingOrder extends Component {
                   </div>
                   <br/>
                   <h3><strong>สถานะปัจจุบัน : เสร็จสิ้น </strong></h3>
-                  <Table responsive>
-                    <div class="table table-striped">
+                  <Table striped>
+                    <tr>
+                      <th><center>ลำดับ</center></th>
+                      <th><center>วันที่ </center></th>
+                      <th><center>เวลา</center></th>
+                      <th><center> </center></th>
+                      <th><center>สถานะ</center></th>
+                      <th><center>สถานที่</center></th>
+                    </tr>
                       {this.state.showTable}
-                    </div>
                   </Table>
                 </center>
               </CardBody>
@@ -162,8 +171,7 @@ const selectOrder = gql`
 query selectOrder($INVOICEID:String!){
     selectOrder(INVOICEID:$INVOICEID){
       invoice
-      Date
-      Time
+      DateTime
       status
       location
       MessengerID

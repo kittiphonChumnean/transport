@@ -77,7 +77,7 @@ class ConfirmBill extends Component {
           "invoicedate":this.state.showDate
         }
       }).then((result) => {
-        console.log("3333",result)
+        //console.log("3333",result)
         var arrData = []
         var tblData
         result.data.selectAllBill.forEach(function (val,i) {
@@ -102,7 +102,12 @@ class ConfirmBill extends Component {
     });
 }
 
-  confirm() {
+  ConfrimBill(e){
+    this.SaveBill(this.state, this.props)
+  }
+
+  SaveBill(self, props) {
+    console.log("กดคอนเฟริม")
     var arrData = []
     this.state.showTable.forEach(function (val,i) {
       arrData.push({
@@ -113,12 +118,13 @@ class ConfirmBill extends Component {
         StoreZone: val.StoreZone,
         CustomerID: val.CustomerID,
         CustomerName: val.CustomerName
-    })
+      })
     });
-    this.saveData(arrData)
+    this.state.saveData(self, props, arrData)
   }
 
   saveData(data) {
+    console.log("save bill",data)
     this.props.client.mutate({
         mutation: insertBill,
         variables: {
@@ -126,7 +132,7 @@ class ConfirmBill extends Component {
         }
     }).then(res => {
         console.log("Client Res", res)
-        if (res.data.insertMaster_And_Transaction.status === "2") {
+        if (res.data.insertBill.status === "2") {
             alert("บันทึกข้อมูลเรียบร้อย")
             window.location.reload()
         } else {
@@ -157,7 +163,8 @@ class ConfirmBill extends Component {
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.selectSale}>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                          <option>---</option>
                           {this.state.showDropdown}
                         </Input>
                         </div>
@@ -194,7 +201,7 @@ class ConfirmBill extends Component {
                     </thead>
                     {this.state.showTable}
                   </Table>
-                  <Button color="success" onclick={this.confirm}>คอนเฟริมทั้งหมด</Button>
+                  <Button color="success" onclick={this.ConfrimBill}>คอนเฟริมทั้งหมด</Button>
                 </center>
               </CardBody>
             </Card>

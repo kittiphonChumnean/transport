@@ -13,6 +13,8 @@ var queryGettesk= require("./query/GetTesk/GetTesk")
 var queryAssingment = require("./query/Assignment/Assignment")
 var queryAssingmentIDmess = require("./query/Assignment/Assignment")
 var queryAssingment2 = require("./query/Assignment/Assignment")
+var TrackingOrder = require("./query/Tracking/TrackingOrder")
+var TrackingMess = require("./query/Tracking/TrackingMess")
 
 const QueryType = new GraphQLObjectType({
     name: 'Query',
@@ -23,24 +25,22 @@ const QueryType = new GraphQLObjectType({
         queryAssingmentIDmess : queryAssingmentIDmess.selectIDMess,
         queryAssingment : queryAssingment.selecMess,
         queryAssingment : queryAssingment.selectinvoice,
-   
+        selectOrder : TrackingOrder.selectOrder,
+        selectMess : TrackingMess.selectMess,
+        trackingMess : TrackingMess.trackingMess
     }
 })
 
 const mutationtype = new GraphQLObjectType({
     name: 'mutation',
     fields: {
-<<<<<<< HEAD
-        insertBill: queryComfrimBill.insertBill,
-=======
-        
-        insertData: insertdata_.insertData,
-       queryGettesk: queryGettesk.upDateStateGetTesk,
-       queryAssingment:queryAssingment.insertBilltoApp,
-      queryAssingment2:queryAssingment2.insertInvoice,
 
-       
->>>>>>> master
+        //insertBill: queryComfrimBill.insertBill,       
+        insertData: insertdata_.insertData,
+        queryGettesk: queryGettesk.upDateStateGetTesk,
+        queryAssingment:queryAssingment.insertBilltoApp,
+        queryAssingment2:queryAssingment2.insertInvoice,
+
     }
 })
 

@@ -26,6 +26,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "flag-icon-css": "^3.0.0",
     "font-awesome": "^4.7.0",
+    "moment-timezone": "^0.5.21",
     "prop-types": "^15.6.1",
     "react": "^16.4.0",
     "react-apollo": "^1.4.16",
