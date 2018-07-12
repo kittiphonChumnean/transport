@@ -37,14 +37,14 @@ class TrackingMess extends Component {
     };
   }
 
-  selectMess=()=>{
+  queryAssingmentIDmess=()=>{
     this.props.client.query({
-        query:selectMess
+        query:queryAssingmentIDmess
     }).then((result) => {
         console.log("result",result)
         var arrMess = []
         var DropdownMess
-        result.data.selectMess.forEach(function (val,i) {
+        result.data.queryAssingmentIDmess.forEach(function (val,i) {
           DropdownMess = <option>{val.IDMess}</option>
           arrMess.push(DropdownMess)
         });
@@ -78,7 +78,7 @@ class TrackingMess extends Component {
 
   trackingMess=()=>{
     console.log("1234567890")
-    dateTime = moment(this.state.showDate).format("DD-MM-YYYY hh:mm:ss")
+    dateTime = moment(this.state.showDate).format("YYYY-MM-DD")
     trip = parseInt(this.state.showTrip)
     //console.log("ค่า",this.state.showTrip)
     //console.log("ค่า2",this.state.showDate)
@@ -99,21 +99,21 @@ class TrackingMess extends Component {
           var DateTime
           var Zone
           var Trip
-          result.data.selectOrder.forEach(function (val,i) {
+          result.data.trackingMess.forEach(function (val,i) {
             tblData = <tbody>
               <tr>
                 <th><center>{i+1}</center></th>
-                <th width="15%"><center>{moment(val.DateTime).format("วันที่ DD-MM-YYYY")}</center></th> 
-                <th width="15%"><center>{moment(val.DateTime).format("เวลา hh:mm:ss")}</center></th>
+                <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
+                <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss")}</center></th>
                 <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-                <th width="20%"><center>{status}</center></th>
+                <th width="20%"><center>{val.status}</center></th>
                 <th><center>{val.location}</center></th>
               </tr>
             </tbody>
             Mess = val.MessengerID
             Zone =val.StoreZone
             Trip = val.Trip
-            DateTime = val.DateTime
+            DateTime = moment(val.DateTime).format("DD-MM-YYYY")
           arrData.push(tblData)
           });
           this.setState({
@@ -129,7 +129,7 @@ class TrackingMess extends Component {
   }
 
   componentWillMount(){
-    this.selectMess()
+    this.queryAssingmentIDmess()
   }
 
   render() {
@@ -168,7 +168,7 @@ class TrackingMess extends Component {
                         </Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <Button onClick={this.trackingMess} >ค้นหา</Button>
+                          <Button color="success" onClick={this.trackingMess} >ค้นหา</Button>
                         </div>
                       </form>
                       <br/>
@@ -220,9 +220,9 @@ class TrackingMess extends Component {
   }
 }
 
-const selectMess = gql`
-  query selectMess{
-    selectMess{
+const queryAssingmentIDmess = gql`
+  query queryAssingmentIDmess{
+    queryAssingmentIDmess{
       IDMess
     }
   }

@@ -78,7 +78,7 @@ class TrackingOrder extends Component {
               <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
               <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss a")}</center></th>
               <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-              <th width="20%"><center>{status[i]}</center></th>
+              <th width="20%"><center>{val.status[i]}</center></th>
               <th><center>{val.location}</center></th>
             </tr>
           </tbody>

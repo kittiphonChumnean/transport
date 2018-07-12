@@ -37,7 +37,7 @@ class ConfirmBill extends Component {
   }
 
 
-  selectSale=()=>{
+  selectSale=(e)=>{
     this.props.client.query({
         query:selectSale
     }).then((result) => {
@@ -170,10 +170,10 @@ class ConfirmBill extends Component {
                         </div>
                         <div class="pr-1 form-group">
                           &nbsp;<Label for="date" class="pr-1"><strong>วันที่</strong></Label>
-                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.chooseDate} ></Input>
+                          &nbsp;&nbsp;<Input id="date" name="date" type="date" onChange={this.chooseDate} ></Input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Button onClick={this.seachBill}>ค้นหา</Button>
+                        <Button color="success" onClick={this.seachBill}>ค้นหา</Button>
                         </div>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                           &nbsp;&nbsp;<Label for="exampleInputName2" class="pr-1"><strong>Sale</strong></Label>&nbsp;&nbsp;

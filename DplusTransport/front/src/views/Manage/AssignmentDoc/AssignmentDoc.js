@@ -16,26 +16,17 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import { withApollo, gql, compose } from 'react-apollo';
 
-class AddMas extends Component {
+class AssignmentDoc extends Component {
 
   constructor(props) {
     super(props);
-
-    this.toggle = this.toggle.bind(this);
     this.state = {
-      dropdownOpen: new Array(6).fill(false),
+      
     };
   }
 
-  toggle(i) {
-    const newArray = this.state.dropdownOpen.map((element, index) => {
-      return (index === i ? !element : false);
-    });
-    this.setState({
-      dropdownOpen: newArray,
-    });
-  }
   
   render() {
     return (
@@ -49,66 +40,50 @@ class AddMas extends Component {
               <CardBody>
               <div class="col-12">
                 <center>
-                <div class="col-6">
+                <div class="col-4">
                   <form action="" method="post" class="form-inline" margin="auto auto">
-                    <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
-                      this.toggle(0);
-                    }}>                
-                      <DropdownToggle caret>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Messenger</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem header>Messenger</DropdownItem>
-                        <DropdownItem>DP1243424</DropdownItem>
-                        <DropdownItem>DP8675735</DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown> &nbsp;&nbsp;
-
-                    <label for="exampleInputName2" class="pr-1">&nbsp;&nbsp;<strong>วันที่</strong>&nbsp;&nbsp;</label>
-                    <input id="exampleInputName2" placeholder="" required="" type="date" class="form-control"></input>&nbsp;&nbsp;&nbsp;
-
-                    <Dropdown isOpen={this.state.dropdownOpen[2]} toggle={() => {
-                      this.toggle(2);
-                    }}>                
-                      <DropdownToggle caret>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>ประเภทงาน</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem header>ประเภท</DropdownItem>
-                        <DropdownItem>รับของเคลม</DropdownItem>
-                        <DropdownItem>รับ-ส่งเอกสาร</DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown> &nbsp;&nbsp;&nbsp;
-                  </form>
-                </div>
-                    <br/>
-                <div class="col-6">
-                  <form action="" method="post" class="form-inline" margin="auto auto">
-                      <div class="pr-1 form-group">
-                        <label for="name" class=""><strong>ต้นทาง</strong></label>&nbsp;&nbsp;
-                        <input id="name" placeholder="" required="" type="text" class="form-control"></input>
-                      </div>
-
-                  
-                  &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <label for="name" class=""><strong>ปลายทาง</strong></label>&nbsp;&nbsp;
-                        <input id="name" placeholder="" required="" type="text" class="form-control"></input>
-                      </div>
-
-                      </form>
-                  <br/>
-                  </div>
-                <div class="col-6">
-                  <form action="" method="post" class="form-inline" margin="auto auto">
-                      <div class="pr-1 form-group">
-                        <label for="name" class=""><strong>รายละเอียด</strong></label>&nbsp;&nbsp;
-                        <textarea rows="10" cols="55" id="name" ></textarea>
-                      </div>
+                    <div class="pr-1 form-group">
+                      <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
+                      <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
+                        <option>---</option>
+                        {this.state.showDropdown}
+                      </Input>
+                    </div>
+                    <div class="pr-1 form-group">
+                      &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
+                      &nbsp;&nbsp;<Input id="exampleInputName2" type="date" onChange={this.ChooseDate}></Input>
+                    </div>
                   </form>
                 </div>
                 <br/>
                 <div class="col-4">
-                <button class="btn btn-success ">บันทึก</button>
+                  <form action="" method="post" class="form-inline" margin="auto auto">
+                      <div class="pr-1 form-group">
+                        <Label for="exampleSelect"><strong>ประเภท</strong></Label>&nbsp;&nbsp;
+                        <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
+                          <option>---</option>
+                          <option value="รับของเคลม">รับของเคลม</option>
+                          <option value="รับ-ส่งเอกสาร">รับ-ส่งเอกสาร</option>
+                        </Input>
+                      </div>
+                      <div class="pr-1 form-group">
+                      &nbsp;&nbsp;<Label for="name" class=""><strong>สถานที่</strong></Label>&nbsp;&nbsp;
+                        <Input id="name" type="text"></Input>
+                      </div>
+                  </form>
+                  <br/>
+                </div>
+                <div class="col-4">
+                  <form action="" method="post" class="form-inline" margin="auto auto">
+                      <div class="pr-1 form-group">
+                        <label for="name" class=""><strong>รายละเอียด</strong></label>&nbsp;&nbsp;
+                        <textarea rows="10" cols="45" id="name" ></textarea>
+                      </div>
+                  </form>
+                </div>
+                <br/>
+                <div class="col-5">
+                <Button color="success">บันทึก</Button>
                 </div>
                 </center>
               </div>
@@ -121,4 +96,6 @@ class AddMas extends Component {
   }
 }
 
-export default AddMas;
+const GraphQL = compose(
+)(AssignmentDoc)
+export default withApollo (GraphQL)
