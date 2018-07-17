@@ -35,9 +35,8 @@ var QueryClearTask =require("./query/ClearTask/ClearTask")
 
 
 //jar import
-
-
-
+var AssignmentDoc = require("./query/AssignmentDoc/AssignmentDoc")
+var TransportReport = require("./query/TransportReport/TransportReport")
 
 
 
@@ -78,10 +77,9 @@ const QueryType = new GraphQLObjectType({
 
 
         //jar query 
-
-
-
-
+        selectOrder: TrackingOrder.selectOrder,
+        trackingMess: TrackingMess.trackingMess,
+        transportReport: TransportReport.transportReport
 
 
 
@@ -121,8 +119,7 @@ const mutationtype = new GraphQLObjectType({
 
 
         //jar muta
-
-
+        insertDoc: AssignmentDoc.insertDoc
 
 
 
