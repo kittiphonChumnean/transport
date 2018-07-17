@@ -21,6 +21,8 @@ import {
 
 import { gql, withApollo, compose } from 'react-apollo'
 
+
+
 class ClearTask extends Component {
   constructor(props) {
     super(props);
@@ -40,6 +42,8 @@ class ClearTask extends Component {
      
     })
  }
+
+
 
  chooseDate=(e)=>{
   this.setState({
@@ -155,6 +159,7 @@ QueryClearTask = () => {
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
                         <button  type="button" class="btn btn-success" onClick={this.QueryClearTask}>ค้นหา</button>
+                       
                         </div>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                         &nbsp;&nbsp;<Label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></Label>&nbsp;&nbsp;
