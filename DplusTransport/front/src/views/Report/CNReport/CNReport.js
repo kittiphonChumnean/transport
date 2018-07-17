@@ -17,7 +17,59 @@ import {
   Input,
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
+import Workbook from 'react-excel-workbook'//excel
 
+//------------------//pdf------------------//
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+var arrDataPDF = []
+var datePDF
+var datePDFend
+
+
+function buildTableBody(data, columns) {
+  var body = [];
+
+  body.push(columns);
+
+  data.forEach(function(row) {
+      var dataRow = [];
+
+      columns.forEach(function(column) {
+          dataRow.push(row[column].toString());
+      })
+
+      body.push(dataRow);
+  });
+
+  return body;
+}
+
+function table(data, columns) {
+  return {
+      table: {
+          headerRows: 1,
+          body: buildTableBody(data, columns)
+      }
+  };
+}
+
+
+pdfMake.fonts = {
+  THSarabun: {
+    normal: 'THSarabun.ttf',
+    bold: 'THSarabun Bold',
+    italics: 'THSarabun Italic',
+    bolditalics: 'THSarabun Bold Italic.ttf'
+  },
+  Roboto: {
+    normal: 'Roboto-Regular.ttf',
+    bold: 'Roboto-Medium.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-MediumItalic.ttf'
+  }
+}
 
 
 
@@ -35,6 +87,31 @@ class CNReport extends Component {
       dropdownOpen: new Array(6).fill(false),
     };
   }
+
+//-----pdf-----//
+printPDF(){
+  var docDefinition = {
+      
+    content: [
+      { text: 'รายงานคืนสินค้า', style: 'header' ,fontSize:20},
+      { text:'วันที่  '+datePDF+' ถึง '+datePDFend, style: 'header' ,fontSize:18},
+        table(arrDataPDF, ['ลำดับ','Sale','invoice','ลูกค้า','Qtyยอดจริง','ยอดเงินจริง','วันที่เคลียร์บิล','ยอดเงินที่เก็บได้','จำนวนCN','ยอดCN','จำนวนคงเหลือ','เหตุผล'])
+       
+       // table(externalDataRetrievedFromServer, ['ลำดับ', 'เลขที่ invoice', 'รหัสลูกค้า', 'จำนวนเงิน (invoice)','เงินสดที่เก็บได้','ค้างจ่าย'])
+      ],
+  defaultStyle:{
+    font: 'THSarabun',
+    fontSize:12
+  }
+  
+    };
+
+    
+
+    pdfMake.createPdf(docDefinition).open()
+   
+  }
+
 
 
   choosestartDate=(e)=>{
@@ -62,6 +139,7 @@ class CNReport extends Component {
       console.log("result", result)
       var arrData = []
       var tblData
+      var arrDataPDF_
       result.data.QueryCNReport.forEach(function (val, i) {
         tblData = 
         <tr>
@@ -82,7 +160,36 @@ class CNReport extends Component {
         
 
         arrData.push(tblData)
-      });
+      },
+    result.data.QueryCNReport.forEach(function (val2, i) {
+        arrDataPDF_ =  {  
+          
+                         ลำดับ:i+1,
+                         Sale:val2.SaleID, 
+                         invoice: val2.INVOICEID,
+                         ลูกค้า:val2.CustomerID,
+                         Qtyยอดจริง:val2.QtyBill,
+                         ยอดเงินจริง:val2.AmountBill,
+                          วันที่เคลียร์บิล:val2.Datetime,
+                          ยอดเงินที่เก็บได้:val2.AmountActual,
+                          จำนวนCN:(val2.QtyBill)-(val2.QtyActual),
+                          ยอดCN:(val2.AmountBill)-(val2.AmountActual),
+                          จำนวนคงเหลือ:(val2.QtyBill)- ((val2.QtyBill)-(val2.QtyActual)),
+                          เหตุผล:val2.ReasonCN,
+                       
+        },
+                        
+                       
+                          
+               
+        arrDataPDF.push(arrDataPDF_)
+       
+      },
+      datePDF=this.state.showstartDate,
+      datePDFend=this.state.showendDate
+      ));
+
+      
       this.setState({
         showTable: arrData
       })
@@ -142,8 +249,26 @@ class CNReport extends Component {
             <Card>
               <CardHeader>
               <h4><strong>รายงานคืนสินค้า</strong>
-                <img src={require('../../../assets/img/brand/pdf.png')} align="right" />
-                &nbsp;&nbsp;<img src={require('../../../assets/img/brand/excel.png')} align="right" />
+              <img src={require('../../../assets/img/brand/pdf.png')} onClick={this.printPDF} align="right" />
+               
+              <Workbook filename="CNReport.xlsx" element={<img src={require('../../../assets/img/brand/excel.png')} align="right" />}>
+                      <Workbook.Sheet data={arrDataPDF} name="Sheet A">
+                        <Workbook.Column label="ลำดับ" value="ลำดับ" />
+                        <Workbook.Column label="Sale" value="Sale" />
+                        <Workbook.Column label="Invoice" value="Invoice" />
+                        <Workbook.Column label="ลูกค้า" value="ลูกค้า" />
+                        <Workbook.Column label="Qtyยอดจริง" value="Qtyยอดจริง" />
+                        <Workbook.Column label="ยอดเงินจริง" value="ยอดเงินจริง" />
+                        <Workbook.Column label="วันที่เคลียร์บิล" value="วันที่เคลียร์บิล" />
+                        <Workbook.Column label="ยอดเงินที่เก็บได้" value="ยอดเงินที่เก็บได้" />
+                        <Workbook.Column label="จำนวนCN" value="จำนวนCN" />
+                        <Workbook.Column label="ยอดCN" value="ยอดCN" />
+                        <Workbook.Column label="จำนวนคงเหลือ" value="จำนวนคงเหลือ" />
+                        <Workbook.Column label="เหตุผล" value="เหตุผล" />
+                       
+                      </Workbook.Sheet>
+
+                    </Workbook>   
               </h4>
               </CardHeader>
               <CardBody>
