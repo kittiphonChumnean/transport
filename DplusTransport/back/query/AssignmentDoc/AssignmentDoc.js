@@ -23,26 +23,29 @@ var insertDoc={
     resolve: function (_, args) {
         return new Promise(function (resolve, reject){
             console.log("ค่า",args)
-            const pool1 = new sql.ConnectionPool(dbConnect, err => {
-                pool1.request()
-                    .input('@Mess',sql.DateTime,args.MessengerID)
-                    .input('@Date',sql.DateTime,args.Date)
-                    .input('@Type',sql.DateTime,args.type)
-                    .input('@Location',sql.DateTime,args.Location)
-                    .input('@Detail',sql.DateTime,args.Detail)
-                        .query("insert into DocumentToApp (MessengerID,Date,Type,Location,Detail) values (@Mess,@Date,@Type,@Location,@Detail)", (err, result) => {
-                        console.log("result", result.rowsAffected);
-                        if(result.rowsAffected[0] > 0){
-                            resolve({status:true})
-                        }else{
-                            resolve({status:false})
-                        }
-                        sql.close();
-                        // resolve ([{name:'testname'}]) คือการคืนค่าเอง
-                    })
+            fninsertDoc(args.MessengerID,args.Date,args.Type,args.Location,args.Detail, function (data) {
+                resolve(data)
             })
         })
     }
+}
+
+var fninsertDoc = function (MessengerID,Date,Type,Location,Detail, callback) {
+    sql.close();
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        var request = new sql.Request(pool)
+        request.input('Mess',sql.VarChar,MessengerID)
+        request.input('Date',sql.VarChar,Date)
+        request.input('Type',sql.VarChar,Type)
+        request.input('Location',sql.VarChar,Location)
+        request.input('Detail',sql.VarChar,Detail)
+        request.query("insert into DocumentToApp (MessengerID,Date,Type,Location,Detail) values (@Mess,@Date,@Type,@Location,@Detail)")
+            .then(res => {
+                 console.log("test", res);
+                sql.close();              
+                    callback({ status: true })              
+            })
+    })
 }
 
 module.exports = {

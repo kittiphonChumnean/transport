@@ -30,7 +30,8 @@ class TrackingOrder extends Component {
       showMessengerID:'',
       showCustomerName:'',
       showAddressShipment:'',
-      showTable:''
+      showTable:'',
+      showLastStatus:''
     };
   }
 
@@ -48,37 +49,37 @@ class TrackingOrder extends Component {
         "INVOICEID":this.state.showInvoice,
       }
     }).then((result) => {
-      var arrData = []
+        var arrData = []
         var tblData
-        var status =[]
+        var Laststatus
         var invoice
         var Mess
         var CusName
         var CusAddess
-        result.data.selectOrder.forEach(function (val,i) {
-          if(val.status[i] == '5'){
-            status[i] = 'Messenger ตรวจของเรียบร้อย'   
-          }else if(val.status[i] == '6'){
-            status[i] = 'Messenger คอนเฟริมออกรอบ'   
-          }else if(val.status[i] == '7'){
-            status[i] = 'Messenger โทรหาลูกค้า'   
-          }else if(val.status[i] == '8'){
-            status[i] = 'Messenger กดโทรหาลูกค้า'   
-          }else if(val.status[i] == '9'){
-            status[i] = 'Messenger แก้ไขการส่งของ'   
-          }else if(val.status[i] == 'A1'){
-            status[i] = 'ส่งของเรียบร้อย'   
-          }else if(val.status == 'B1'){
-            status[i] = 'ไม่สามารถส่งของได้ เนื่องจากร้านปิด'   
-          }
-          
+        var status_list = {
+          '5':'Messenger ตรวจของเรียบร้อย',
+          '6':'Messenger คอนเฟริมออกรอบ',
+          '7':'Messenger โทรหาลูกค้า',
+          '8':'Messenger กดโทรหาลูกค้า',
+          '9':'Messenger แก้ไขการส่งของ',
+          'A1':'ส่งสินค้าเรียบร้อย',
+          'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+          'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+          'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+          'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+          'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+          'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+          'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+          'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+        }
+        result.data.selectOrder.forEach(function (val,i) {          
           tblData = <tbody>
             <tr>
               <th><center>{i+1}</center></th>
               <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
               <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss a")}</center></th>
               <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-              <th width="20%"><center>{val.status[i]}</center></th>
+              <th width="20%"><center>{status_list[val.status]}</center></th>
               <th><center>{val.location}</center></th>
             </tr>
           </tbody>
@@ -94,6 +95,7 @@ class TrackingOrder extends Component {
           showMessengerID:Mess,
           showCustomerName:CusName,
           showAddressShipment:CusAddess,
+          showLastStatus: Laststatus
         })
   }).catch((err) => {
 
@@ -144,7 +146,7 @@ class TrackingOrder extends Component {
                     </div>
                   </div>
                   <br/>
-                  <h3><strong>สถานะปัจจุบัน : เสร็จสิ้น </strong></h3>
+                  <h3><strong>สถานะปัจจุบัน : {this.state.LastStatus}</strong></h3>
                   <Table striped>
                     <tr>
                       <th><center>ลำดับ</center></th>

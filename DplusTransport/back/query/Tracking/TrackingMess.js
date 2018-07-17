@@ -32,7 +32,6 @@ var fnSelectAllData = function (callback) {
         callback(res)
 
     })
-
     sql.on('error', err => {
         // ... error handler
         callback(err)
@@ -85,6 +84,6 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
 }
 
 module.exports = {
-    selectMess: selectMess,
+    //selectMess: selectMess,
     trackingMess: trackingMess
 }

@@ -99,6 +99,22 @@ class TrackingMess extends Component {
           var DateTime
           var Zone
           var Trip
+          var status_list = {
+            '5':'Messenger ตรวจของเรียบร้อย',
+            '6':'Messenger คอนเฟริมออกรอบ',
+            '7':'Messenger โทรหาลูกค้า',
+            '8':'Messenger กดโทรหาลูกค้า',
+            '9':'Messenger แก้ไขการส่งของ',
+            'A1':'ส่งสินค้าเรียบร้อย',
+            'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+            'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+            'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+            'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+            'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+            'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+            'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+            'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+          }
           result.data.trackingMess.forEach(function (val,i) {
             tblData = <tbody>
               <tr>
@@ -106,7 +122,8 @@ class TrackingMess extends Component {
                 <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
                 <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss")}</center></th>
                 <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-                <th width="20%"><center>{val.status}</center></th>
+                <th><center>{val.invoice}</center></th>
+                <th width="20%"><center>{status_list[val.status]}</center></th>
                 <th><center>{val.location}</center></th>
               </tr>
             </tbody>
@@ -197,13 +214,14 @@ class TrackingMess extends Component {
                     </div>
                   </div>
                   <br/>
-                  <h3><strong>สถานะปัจจุบัน : ส่งได้ 2 บิล รอส่ง 3 บิล </strong></h3>
+                  <h3><strong>สถานะปัจจุบัน :  </strong></h3>
                   <Table striped>
                     <tr>
                       <th><center>ลำดับ</center></th>
                       <th><center>วันที่ </center></th>
                       <th><center>เวลา</center></th>
                       <th><center> </center></th>
+                      <th><center>เลข Invoice</center></th>
                       <th><center>สถานะ</center></th>
                       <th><center>สถานที่</center></th>
                     </tr>

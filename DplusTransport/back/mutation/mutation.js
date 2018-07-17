@@ -7,9 +7,7 @@ const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLObjectType, GraphQLSchema,
 var allinsertData = new GraphQLObjectType({
     name: 'allinsertData',
     fields: () => ({
-        
         name: { type: GraphQLString }
-       
     })
 })
 

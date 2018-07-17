@@ -28,7 +28,7 @@ class TransportReport extends Component {
       showSale:'',
       showDateTime:'',
       selectSale:'',
-      selectDate:''
+      selectDate:'',
     };
   }
 
@@ -78,6 +78,18 @@ class TransportReport extends Component {
           var tblData
           var Sale
           var DateTime
+          var LastStatus
+          var status_list = {
+            'A1':'ส่งสินค้าเรียบร้อย',
+            'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+            'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+            'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+            'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+            'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+            'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+            'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+            'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+          }
           result.data.transportReport.forEach(function (val,i) {
             tblData = <tbody>
               <tr>
@@ -86,8 +98,7 @@ class TransportReport extends Component {
                 <td><center>{val.CustomerID}</center></td>
                 <td><center>{val.SaleID}</center></td>
                 <td><center>{val.MessengerID}</center></td>
-                <td><center>{val.Status}</center></td>
-                <td><center>{val.ReasonCN}</center></td>
+                <td><center>{status_list[val.Status]}</center></td>
               </tr>
             </tbody>
             Sale = val.SaleID
@@ -163,7 +174,6 @@ class TransportReport extends Component {
                         <th><center>Sale</center></th>
                         <th><center>Messenger</center></th>
                         <th><center>สถานะ</center></th>
-                        <th><center>หมายเหตุ</center></th>
                       </tr>
                     </thead>
                     {this.state.showTable}
