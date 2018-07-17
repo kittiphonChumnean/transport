@@ -7,9 +7,9 @@ const {
  GraphQLInt,
 } = graphql
 
-var queryComfrimBill = require ("./query/comfrimBill/comfrimBill.js")
+var queryComfrimBill = require ("./query/comfrimBill/comfrimBill.js")//j
 var insertdata_ = require ("./mutation/mutation.js")
-var queryGettesk= require("./query/GetTesk/GetTesk")
+var queryGettesk= require("./query/GetTesk/GetTesk")//n
 var queryAssingment = require("./query/Assignment/Assignment")
 var queryAssingmentIDmess = require("./query/Assignment/Assignment")
 var queryAssingment2 = require("./query/Assignment/Assignment")
@@ -20,9 +20,36 @@ var queryAssingmentInvoice =require("./query/Assignment/Assignment")
 var QueryAccountReport = require("./query/AccountReport/AccountReport")
 var QueryCNReport = require("./query/CNReport/CNReport")
 var QueryClearTask =require("./query/ClearTask/ClearTask")
+
+//nan import
+
+
+
+
+
+
+
+
+
+
+
+
+//jar import
+
+
+
+
+
+
+
+
+
+
+
 const QueryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
+
         selectSale: queryComfrimBill.selectSale,
         selectAllBill: queryComfrimBill.selectAllBill,
         queryGettesk : queryGettesk.selectGetTesk,
@@ -34,6 +61,35 @@ const QueryType = new GraphQLObjectType({
         QueryAccountReport:QueryAccountReport.selectReport,
         QueryCNReport:QueryCNReport.selectReportCN,
         QueryClearTask:QueryClearTask.selectClearTask,
+
+
+        //nan query
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //jar query 
+
+
+
+
+
+
+
+
+
+
+
+
    
     }
 })
@@ -50,6 +106,28 @@ const mutationtype = new GraphQLObjectType({
         queryAssingment:queryAssingment.insertBilltoApp,
         queryAssingment2:queryAssingment2.insertInvoice,
 
+        //nan muta
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //jar muta
+
+
+
+
+
+
+        
        
 
     }
