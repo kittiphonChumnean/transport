@@ -79,10 +79,8 @@ const QueryType = new GraphQLObjectType({
         //jar query 
         selectOrder: TrackingOrder.selectOrder,
         trackingMess: TrackingMess.trackingMess,
-        transportReport: TransportReport.transportReport
-
-
-
+        transportReport: TransportReport.transportReport,
+        trackingStatusMess: TrackingMess.trackingStatusMess,
 
 
 
@@ -96,7 +94,7 @@ const mutationtype = new GraphQLObjectType({
     name: 'mutation',
     fields: {
 
-       // insertBill: queryComfrimBill.insertBill,
+        insertBill: queryComfrimBill.insertBill,
 
         
         insertData: insertdata_.insertData,
@@ -119,9 +117,8 @@ const mutationtype = new GraphQLObjectType({
 
 
         //jar muta
-        insertDoc: AssignmentDoc.insertDoc
-
-
+        insertDoc: AssignmentDoc.insertDoc,
+        updateAX: queryComfrimBill.updateAX
 
 
         

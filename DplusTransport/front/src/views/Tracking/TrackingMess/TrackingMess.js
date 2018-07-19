@@ -29,11 +29,13 @@ class TrackingMess extends Component {
       showMess:'',
       showDate:'',
       showTrip:'',
-      showZone:'',
       showTable:'',
       showDateTime:'',
       showMessID:'',
-      showMessTrip:''
+      showMessTrip:'',
+      test:'',
+      shownotFinish:'',
+      showfinish:''
     };
   }
 
@@ -115,6 +117,7 @@ class TrackingMess extends Component {
             'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
             'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
           }
+          
           result.data.trackingMess.forEach(function (val,i) {
             tblData = <tbody>
               <tr>
@@ -128,7 +131,6 @@ class TrackingMess extends Component {
               </tr>
             </tbody>
             Mess = val.MessengerID
-            Zone =val.StoreZone
             Trip = val.Trip
             DateTime = moment(val.DateTime).format("DD-MM-YYYY")
           arrData.push(tblData)
@@ -136,10 +138,36 @@ class TrackingMess extends Component {
           this.setState({
             showTable:arrData,
             showMessID:Mess,
-            showZone:Zone,
             showMessTrip:Trip,
-            showDateTime:DateTime
+            showDateTime:DateTime,
           })
+    }).catch((err) => {
+  
+    });
+    this.trackingStatusMess()
+  }
+
+  trackingStatusMess(){
+    //console.log("มาแล้ว")
+    dateTime = moment(this.state.showDate).format("YYYY-MM-DD")
+    trip = parseInt(this.state.showTrip)
+    this.props.client.query({
+      query:trackingStatusMess,
+      variables: {
+        "MessengerID":this.state.showMess,
+        "DateTime":dateTime,
+        "Trip": trip,
+      }
+    }).then((result) => {
+      //console.log("status",result)
+      var finish = result.data.trackingStatusMess[0].statusA
+      var allTrack = result.data.trackingStatusMess[0].allinvoice
+      var notFinish =  allTrack - finish
+      console.log("status",finish)
+      this.setState({
+        showfinish: finish,
+        shownotFinish: notFinish
+      })
     }).catch((err) => {
   
     });
@@ -196,11 +224,6 @@ class TrackingMess extends Component {
                         </Input>
                       </div>
                         <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label><strong>Zone</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showZone} disabled>
-                        </Input>
-                        </div>
-                        <div class="pr-1 form-group">
                         &nbsp;&nbsp;<Label><strong>วันที่</strong></Label>
                         &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showDateTime} disabled>
                         </Input>
@@ -214,7 +237,7 @@ class TrackingMess extends Component {
                     </div>
                   </div>
                   <br/>
-                  <h3><strong>สถานะปัจจุบัน :  </strong></h3>
+                  <h3><strong>ยังไม่ได้ส่ง : {this.state.shownotFinish} บิล ส่งแล้ว : {this.state.showfinish} บิล </strong></h3>
                   <Table striped>
                     <tr>
                       <th><center>ลำดับ</center></th>
@@ -238,6 +261,16 @@ class TrackingMess extends Component {
   }
 }
 
+
+const trackingStatusMess = gql`
+query trackingStatusMess($MessengerID:String!,$DateTime:String!,$Trip:Int!){
+  trackingStatusMess(MessengerID:$MessengerID,DateTime:$DateTime,Trip:$Trip){
+      statusA
+      allinvoice
+    }
+  }
+`
+
 const queryAssingmentIDmess = gql`
   query queryAssingmentIDmess{
     queryAssingmentIDmess{
@@ -250,7 +283,6 @@ const trackingMess = gql`
 query trackingMess($MessengerID:String!,$DateTime:String!,$Trip:Int!){
   trackingMess(MessengerID:$MessengerID,DateTime:$DateTime,Trip:$Trip){
       MessengerID
-      StoreZone
       Trip
       invoice
       DateTime
