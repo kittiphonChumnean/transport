@@ -11,7 +11,8 @@ import {
   Table,
   Modal,
   ModalBody,
-  ModalHeader
+  ModalHeader,
+  ModalFooter
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
 import ConfirmDetail from './ConfirmDetail';
@@ -27,9 +28,12 @@ class ConfirmBill extends Component {
       showDate:'',
       showTable:'',
       INVOICEID:false,
-      dataTable:''
+      dataTable:'',
+      showTableModal:''
     };
     this.ConfrimBill = this.ConfrimBill.bind(this)
+    this.toggle = this.toggle.bind(this);
+    
   }
 
   selectSale=(e)=>{
@@ -80,7 +84,7 @@ class ConfirmBill extends Component {
             <tr>
               <td><center><Input type="checkbox" value=""></Input></center></td>
               <td><center>{i+1}</center></td>
-              <td><center><Button color="link" >{val.INVOICEID}</Button></center></td> 
+              <td><center><Button color="link"  onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
               <td> </td>
               <td><center>{val.DELIVERYNAME}</center></td>
               <td><center>{val.Customer_Address}</center></td>
@@ -88,7 +92,7 @@ class ConfirmBill extends Component {
             </tr>
           </tbody>
         arrData.push(tblData)
-        });
+        },this);
         this.setState({
           showTable:arrData,
           dataTable:result
@@ -157,6 +161,39 @@ class ConfirmBill extends Component {
     })
 }
 
+  toggle(INVOICEID) {
+    this.props.client.query({
+      query:selectDetailBill,
+      variables: {
+        "INVOICEID":INVOICEID
+      }
+    }).then((result) => {
+      //onsole.log("3333",result)
+      var arrData = []
+      var tblData
+      result.data.selectDetailBill.forEach(function (val,i) {
+        tblData =<tbody>
+          <tr>
+            <td><center>{i+1}</center></td>
+            <td><center>{val.ITEMID}</center></td>
+            <td><center>{val.ItemName}</center></td>
+            <td><center>{val.QTY}</center></td>
+            <td><center>{val.TotalAmount}</center></td>
+          </tr>
+      </tbody>
+      arrData.push(tblData)
+      },this);
+      this.setState({
+        showTableModal:arrData,
+      })
+  }).catch((err) => {
+
+  });
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
+
   componentWillMount(){
     this.selectSale()
   }
@@ -220,7 +257,29 @@ class ConfirmBill extends Component {
               </CardBody>
             </Card>
           </Col>
-        </Row>       
+        </Row> 
+
+          <Modal bsSize="large" isOpen={this.state.modal} toggle={this.toggle}>
+            <ModalHeader>Modal title</ModalHeader>
+            <ModalBody>
+              <Table responsive>
+                <thead>
+                  <tr>
+                    <th><center>ลำดับ</center></th>
+                    <th><center>รหัสสินค้า</center></th>
+                    <th><center>ชื่อสินค้า</center></th>
+                    <th><center>จำนวน</center></th>
+                    <th><center>ยอดเงินรวม</center></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                {this.state.showTableModal}
+              </Table>
+           </ModalBody>
+          </Modal>
+
+
+         
       </div>
     );
   }
@@ -262,6 +321,18 @@ query selectAllBill($SaleID:String!,$invoicedate:String!){
     CustomerName
     SaleID
     Sale_Name
+  }
+}
+`
+
+const selectDetailBill = gql`
+query selectDetailBill($INVOICEID:String!){
+  selectDetailBill(INVOICEID:$INVOICEID){
+    INVOICEID
+    ITEMID
+    ItemName
+    QTY
+    TotalAmount
   }
 }
 `

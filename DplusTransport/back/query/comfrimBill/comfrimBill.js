@@ -4,7 +4,7 @@ var Request = require('tedious').Request;
 const graphql = require('graphql')
 const { GraphQLList, GraphQLFloat, GraphQLInt,GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLBoolean} = graphql
 
-
+//select sale
 var allSale = new GraphQLObjectType({
     name: 'allSale',
     fields: () => ({
@@ -40,6 +40,7 @@ var fnSelectAllData = function (callback) {
     })
 }
 
+//select bill
 var allBill = new GraphQLObjectType({
     name: 'allBill',
     fields: () => ({
@@ -84,7 +85,7 @@ var fnSelectAllBill = function (SaleID,invoicedate,callback) {
     })
 }
 
-//insert bill
+//insert Allbill
    var inputBill = new GraphQLInputObjectType({
        name: 'inputBillData',
        fields: () => ({
@@ -169,6 +170,7 @@ var fnSelectAllBill = function (SaleID,invoicedate,callback) {
       })
   }
 
+  //updateAX
   var updateAX = {
     type: inputStatusType,//new GraphQLList(inputStatusType),
     args: {
@@ -215,9 +217,51 @@ var fnInsertData2 = function (inData, callback) {
     })
 }
 
+//ดูDetail invoice
+var DetailModal = new GraphQLObjectType({
+    name: 'DetailModal',
+    fields: () => ({
+        INVOICEID: { type: GraphQLString },
+        ITEMID: { type: GraphQLString },
+        ItemName: { type: GraphQLString },
+        QTY: { type: GraphQLString },
+        TotalAmount: { type: GraphQLString }
+    })
+})
+
+var selectDetailBill = {
+    type: new GraphQLList(DetailModal),
+    args:{
+        INVOICEID: { type: GraphQLString },
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject) {
+            console.log("ค่า",args)
+            fnselectDetailBill(args.INVOICEID,function(data){
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fnselectDetailBill = function (INVOICEID,callback) {
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        // console.log("DB Connected")
+        return pool.request()
+        .input('INVOICEID',sql.VarChar,INVOICEID)
+            .query('SELECT INVOICEID ,ITEMID ,ItemName ,QTY ,TotalAmount FROM [AX-ToWebTest2] WHERE INVOICEID = @INVOICEID')
+    }).then(res => {
+        console.log("Detail", res);
+        sql.close()
+        callback(res)
+    })
+}
+
+
 module.exports = {
     selectSale: selectSale,
     selectAllBill: selectAllBill,
     insertBill: insertBill,
-    updateAX: updateAX
+    updateAX: updateAX,
+    selectDetailBill: selectDetailBill
 }

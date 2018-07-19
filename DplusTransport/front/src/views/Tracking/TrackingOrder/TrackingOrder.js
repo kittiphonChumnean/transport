@@ -62,8 +62,8 @@ class TrackingOrder extends Component {
         var status_list = {
           '5':'Messenger ตรวจของเรียบร้อย',
           '6':'Messenger คอนเฟริมออกรอบ',
-          '7':'Messenger โทรหาลูกค้า',
-          '8':'Messenger กดโทรหาลูกค้า',
+          '7':'Messenger กดโทรหาลูกค้า',
+          '8':'Messenger กดนำทาง',
           '9':'Messenger แก้ไขการส่งของ',
           'A1':'ส่งสินค้าเรียบร้อย',
           'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
@@ -79,8 +79,8 @@ class TrackingOrder extends Component {
           tblData = <tbody>
             <tr>
               <th><center>{i+1}</center></th>
-              <th width="15%"><center>{moment(val.DateTime).format("DD-MM-YYYY")}</center></th> 
-              <th width="15%"><center>{moment(val.DateTime).format("hh:mm:ss a")}</center></th>
+              <th width="15%"><center>{val.Date}</center></th> 
+              <th width="15%"><center>{val.Time}</center></th>
               <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
               <th width="20%"><center>{status_list[val.status]}</center></th>
               <th><center>{val.location}</center></th>
@@ -179,7 +179,8 @@ const selectOrder = gql`
 query selectOrder($INVOICEID:String!){
     selectOrder(INVOICEID:$INVOICEID){
       invoice
-      DateTime
+      Date
+      Time
       status
       location
       MessengerID

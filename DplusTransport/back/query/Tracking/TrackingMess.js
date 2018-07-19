@@ -44,7 +44,8 @@ var tackMess = new GraphQLObjectType({
         MessengerID: { type: GraphQLString },
         Trip: { type: GraphQLInt },
         invoice: { type: GraphQLString },
-        DateTime: { type: GraphQLString },
+        Date: { type: GraphQLString },
+        Time: { type: GraphQLString },
         status: { type: GraphQLString },
         location: { type: GraphQLString },
     })
@@ -74,7 +75,7 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
         .input('MessengerID',sql.VarChar,MessengerID)
         .input('DateTime',sql.VarChar,DateTime)
         .input('Trip',sql.Int,Trip)
-            .query('SELECT DISTINCT Tracking.invoice, BillToApp.MessengerID,BillToApp.Trip,DateTime = CONVERT(varchar,Tracking.DateTime),Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.messengerID = Tracking.messengerID AND Tracking.messengerID=@MessengerID AND datediff(day, Tracking.DateTime, @DateTime) = 0 AND Tracking.Trip=@Trip ORDER BY DateTime')
+            .query('SELECT DISTINCT Tracking.invoice, BillToApp.MessengerID,BillToApp.Trip,CONVERT(VARCHAR(10), CONVERT(DATETIME,Tracking.DateTime, 0), 101) as Date,CONVERT(VARCHAR(5),CONVERT(DATETIME,Tracking.DateTime, 0), 108) as Time,Tracking.status,Tracking.location FROM BillToApp,Tracking  WHERE BillToApp.messengerID = Tracking.messengerID AND Tracking.messengerID=@MessengerID AND datediff(day, Tracking.DateTime, @DateTime) = 0 AND Tracking.Trip=@Trip ORDER BY Date,Time')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()

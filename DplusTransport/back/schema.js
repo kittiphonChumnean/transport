@@ -81,8 +81,7 @@ const QueryType = new GraphQLObjectType({
         trackingMess: TrackingMess.trackingMess,
         transportReport: TransportReport.transportReport,
         trackingStatusMess: TrackingMess.trackingStatusMess,
-
-
+        selectDetailBill: queryComfrimBill.selectDetailBill
 
 
 
