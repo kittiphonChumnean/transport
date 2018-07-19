@@ -13,6 +13,8 @@ import {
   Table,
   Badge,
   Dropdown,
+  FormFeedback,
+  Input
 
 } from 'reactstrap';
 import { gql, withApollo, compose } from 'react-apollo'
@@ -25,7 +27,9 @@ class GetTask extends Component {
     this.state = {
       dropdownOpen: new Array(6).fill(false),
       showText: "",
-      showTable: ''
+      showTable: '',
+      num:'',
+      
     };
   }
 
@@ -40,19 +44,26 @@ class GetTask extends Component {
       console.log("result", result)
       var arrData = []
       var tblData
+      
+     
       result.data.queryGettesk.forEach(function (val, i) {
         tblData = <tbody>
           <tr>
             <td> <center>{i+1}</center></td>
-            <td><center><input id="invoice" placeholder={val.INVOICEID} required= "" type="text" class="form-control" ></input> </center></td>
+            <td><center><Input  id="invoice" placeholder={val.INVOICEID} required="required"   type="text" class="form-control" ></Input>
+            </center></td>
             <td><center>{val.QTYbox}</center></td>
             <td><center>{val.CustomerName}</center></td>
           </tr>
         </tbody>
         arrData.push(tblData)
+        
       });
+     
       this.setState({
-        showTable: arrData
+        showTable: arrData,
+        num:arrData.length
+        
       })
     }).catch((err) => {
 
@@ -124,7 +135,7 @@ class GetTask extends Component {
                       </form>
                     </div>
                   </div>
-                  <h5><strong>จำนวนรวม 0 บิล</strong></h5>
+                  <h5><strong>จำนวนรวม {this.state.num} บิล</strong></h5>
                   <Table responsive>
                     <thead>
                       <tr>

@@ -18,7 +18,9 @@ import {
 }
   from 'reactstrap';
   import { gql, withApollo, compose } from 'react-apollo'
-class Assignment extends Component {
+  var IDMess_
+  var Trip_
+class Assignment extends React.Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
@@ -35,28 +37,88 @@ class Assignment extends Component {
       itemIDmess:'',
       itemInvoice:'',
       itemtrip:'',
+      rows: [],
       dropdownOpen: new Array(6).fill(false),
     };
     this.ClickSave = this.ClickSave.bind(this)
   }
 //----------addRow Table----------//
-  addRowTable =()=>{
-    var row
-    row =   
-    <tr>
-      <td><center>2</center></td>
-      <td><center><input id="invoice"  required= "" type="text" class="form-control" ></input></center></td>
-      <td><center></center></td>
-      <td><center></center></td>
-      <td><center><button class="btn btn-outline-danger btn-block">ยกเลิก</button></center></td>
-      <td width="1%"><button class="btn btn-outline-warning btn-block" >ยิง</button></td>
-    </tr>
-    
-    this.setState({
-      addrow: row
-    })
- }
+handleChange = idx => e => {
+  const { name, value } = e.target;
+  const rows = [...this.state.rows];
+  rows[idx] = {
+    [name]: value
 
+  };
+  
+  this.setState({
+    rows
+  });
+};
+
+handleAddRow = () => {
+  const item = {
+    name: "",
+    customer: "",
+    dalivery:""
+  };
+ 
+  this.setState({
+    rows: [...this.state.rows, item]
+  });
+};
+
+
+handleRemoveRow = () => {
+  this.setState({
+    rows: this.state.rows.slice(0, -1)
+  });
+  console.log(this.state.rows)
+};
+
+//-----------------------test------------------------------//
+handleChange = idx => e => {
+  const { name, value } = e.target;
+  const rows = [...this.state.rows];
+  rows[idx] = {
+    [name]: value
+  };
+  this.setState({
+    rows
+  });
+};
+
+queryAssingmentInvoice2= idx => e => {
+  const { test1,test2  } = e.target;
+  const rows = [...this.state.rows];
+  //console.log("1234567890")
+    this.props.client.query({
+      query:queryAssingmentInvoice,
+      variables: {
+        "INVOICEID":rows[idx].name
+       
+      }
+    }).then((result) => {
+      console.log("22222",result,result.data)
+   
+     // rows[idx].mobile = result.data.queryAssingmentInvoice.CustomerName
+      
+      result.data.queryAssingmentInvoice.forEach(function (val,i) {
+        rows[idx].customer = val.CustomerName
+        rows[idx].dalivery = val.DELIVERYNAME
+      });
+     console.log("test"+ rows[idx].customer)
+
+        
+      this.setState({
+     
+        
+      })
+  }).catch((err) => {
+
+  });
+}
+//-----------------------test------------------------------//
  //------------query IDmess with dropdow--------------//
   queryAssingmentIDmess=()=>{
     this.props.client.query({
@@ -146,6 +208,7 @@ class Assignment extends Component {
       showText: e.target.value,
       itemIDmess:e.target.value,
     })
+    IDMess_=this.state.itemIDmess
  }
 
  chooseinvoice=(e)=>{
@@ -161,26 +224,36 @@ class Assignment extends Component {
       itemtrip:e.target.value,
       
   })
+  Trip_=this.state.itemtrip
 }
  
 //---------------insert data to database----------------//
 ClickSave(e) {
   
-  this.setDataSave(this.state, this.props)
+  this.setDataSave( this.state,this.props)
+ 
  
 }
 
-setDataSave(self, props) {
+setDataSave( self, props) {
+  console.log("setDataSave")
   var arrData = []
-  arrData.push({
-    INVOICEID: self.itemInvoice,
-    MessengerID: self.itemIDmess,
-    Trip: self.itemtrip
-  })
-  this.saveData(self, props, arrData)
+  console.log("row=="+ this.state.rows[0])
+  this.state.rows.forEach(function (val,idx) {
+    arrData.push({
+      INVOICEID:val.name,
+      MessengerID: self.itemIDmess,
+      Trip: self.itemtrip
+    })
+  });   
+
+  console.log("arrData")
+  console.log(arrData)
+  this.saveData( props, arrData)
 }
 
-saveData(self, props, data) {
+saveData( props, data) {
+
   props.client.mutate({
       mutation: queryAssingment,
       variables: {
@@ -273,39 +346,81 @@ queryAssingment2=()=>{
                       </form>
                     </div>
                   </div>
-                  <h5><strong>จำนวนรวม 1 บิล</strong></h5>
-                  <Table responsive>
-                    <thead>
-                      <tr>
-                        <th width="10%"><center>ลำดับ</center></th>
-                        <th width="15%"><center>รหัส  invoice</center></th>
-                        <th><center>ผู้รับ</center></th>
-                        <th><center>ห้าง</center></th>
-                        <th width="10%"></th>
-                        <th width="1%"><button class="btn btn-outline-warning btn-block" onClick={this.addRowTable}>+</button></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><center>1</center></td>
-                        <td><center><input id="invoice"  required= "" type="text" class="form-control"  onChange={this.chooseinvoice}></input></center></td>
-                        <td><center>{this.state.DataCustomer}</center></td>
-                        <td><center>{this.state.DataDELIVERYNAME}</center></td>
-                        <td><center><button class="btn btn-outline-danger btn-block">ยกเลิก</button></center></td>
-                        <td width="1%"><button class="btn btn-outline-warning btn-block"  onClick={this.queryAssingmentInvoice} >ยิง</button></td>
-                      </tr>
+                  <h5><strong>จำนวนรวม {this.state.rows.length} บิล</strong></h5>
+                 
+                 
+                
 
-                    
-                      {this.state.addrow}
-                    </tbody>
-                  </Table>
-                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg" onClick={this.ClickSave}>บันทึก</button></div>
+
+<table
+                className="table table-bordered table-hover"
+                id="tab_logic"
+              >
+                <thead>
+                  <tr>
+                    <th width="10%" className="text-center"> ลำดับ </th>
+                    <th width="15%" className="text-center"> รหัส invoice </th>
+                    <th className="text-center"> ผู้รับ </th>
+                    <th className="text-center"> ห้าง </th>
+                    <th width="5%" ></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.rows.map((item, idx) => (
+                    <tr id="addr0" key={idx}>
+                      <td>{idx+1}</td>
+                      <td>
+                        <input
+                          type="text"
+                          name="name"
+                          value={this.state.rows[idx].name}
+                          onChange={this.handleChange(idx)}
+                          className="form-control"
+                        />
+                      </td>
+                      <td>
+                    <center>{this.state.rows[idx].customer } </center>
+                      </td>
+                      <td>
+                    <center>{this.state.rows[idx].dalivery } </center>
+                      </td>
+                      <td>
+                      <button class="btn btn-outline-warning btn-block"  onClick={this.queryAssingmentInvoice2(idx)} >ยิง</button>
+                        </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <button
+                onClick={this.handleAddRow}
+                className="btn btn-default pull-left btn-warning"
+              >
+                Add Row
+              </button>
+             
+              <button
+                onClick={this.handleRemoveRow}
+                className="pull-right btn btn-default btn-danger"
+              >
+                Delete Row
+              </button>
+
+<br/><br/>
+ <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg" onClick={this.ClickSave}>บันทึก</button></div>
+
+
                 </center>
               </CardBody>
             </Card>
           </Col>
         </Row>
       </div>
+
+
+
+
+
+
     );
   }
 }
