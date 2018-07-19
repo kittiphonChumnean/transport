@@ -29,6 +29,7 @@ class GetTask extends Component {
       showText: "",
       showTable: '',
       num:'',
+      showinvoice:0,
       
     };
   }
@@ -44,27 +45,29 @@ class GetTask extends Component {
       console.log("result", result)
       var arrData = []
       var tblData
-      
+     
      
       result.data.queryGettesk.forEach(function (val, i) {
         tblData = <tbody>
           <tr>
             <td> <center>{i+1}</center></td>
-            <td><center><Input  id="invoice" placeholder={val.INVOICEID} required="required"   type="text" class="form-control" ></Input>
+            <td><center><input  id="invoice" placeholder={val.INVOICEID} required="required" onChange={this.ChangeInvoice}   type="text" class="form-control"  ></input>
             </center></td>
             <td><center>{val.QTYbox}</center></td>
             <td><center>{val.CustomerName}</center></td>
           </tr>
         </tbody>
         arrData.push(tblData)
-        
-      });
-     
+      
+      }, this);
+    
       this.setState({
         showTable: arrData,
-        num:arrData.length
-        
+        num:arrData.length,
+       
       })
+      console.log("num == "+this.state.num)
+      console.log("invoice == "+this.state.showinvoice)
     }).catch((err) => {
 
     });
@@ -73,6 +76,9 @@ class GetTask extends Component {
 
   
   queryGetteskUpdate = () => {
+
+if (this.state.showinvoice >= this.state.num){
+
     if(window.confirm("กรุณายืนยัน")){
     this.props.client.mutate({
       mutation: queryGetteskUpdate,
@@ -88,13 +94,19 @@ class GetTask extends Component {
       
     });
   }
- 
+}else
+{ alert('Invoice ไม่ครบ' )}
 }
 
   ChangeText = (e) => {
     this.setState({
         showText: e.target.value
     })
+}
+ChangeInvoice = (e) => {
+  this.setState({
+      showinvoice: this.state.showinvoice+1
+  })
 }
 
   toggle(i) {
