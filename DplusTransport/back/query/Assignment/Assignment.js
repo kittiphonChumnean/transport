@@ -255,8 +255,8 @@ var fninsertInvoice = function (callback) {
                     ' ConfirmBill '+
                 ' ON '+
                     ' BillToApp.INVOICEID = ConfirmBill.INVOICEID '+
-                ' WHERE '+
-                        ' BillToApp.CustomerID IS NULL '
+                ' where'+
+                ' BillToApp.CustomerID is null '   
             )
     }).then(res => {
         console.log("555555555555", res);
