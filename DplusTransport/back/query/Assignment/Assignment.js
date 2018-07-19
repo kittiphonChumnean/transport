@@ -254,7 +254,9 @@ var fninsertInvoice = function (callback) {
                 ' INNER JOIN '+
                     ' ConfirmBill '+
                 ' ON '+
-                    ' BillToApp.INVOICEID = ConfirmBill.INVOICEID '
+                    ' BillToApp.INVOICEID = ConfirmBill.INVOICEID '+
+                ' WHERE '+
+                        ' BillToApp.CustomerID IS NULL '
             )
     }).then(res => {
         console.log("555555555555", res);

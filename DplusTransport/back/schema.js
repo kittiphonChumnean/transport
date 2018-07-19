@@ -117,11 +117,9 @@ const mutationtype = new GraphQLObjectType({
 
         //jar muta
         insertDoc: AssignmentDoc.insertDoc,
-        updateAX: queryComfrimBill.updateAX
-
-
-        
-       
+        updateAX: queryComfrimBill.updateAX,
+        insertInvoice: queryComfrimBill.insertInvoice,
+        insert1InvoiceToComfrimBill: queryComfrimBill.insert1InvoiceToComfrimBill      
 
     }
 })

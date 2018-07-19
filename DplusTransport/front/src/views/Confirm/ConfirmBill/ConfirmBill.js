@@ -29,7 +29,8 @@ class ConfirmBill extends Component {
       showTable:'',
       INVOICEID:false,
       dataTable:'',
-      showTableModal:''
+      showTableModal:'',
+      showINVOICEID:''
     };
     this.ConfrimBill = this.ConfrimBill.bind(this)
     this.toggle = this.toggle.bind(this);
@@ -84,11 +85,11 @@ class ConfirmBill extends Component {
             <tr>
               <td><center><Input type="checkbox" value=""></Input></center></td>
               <td><center>{i+1}</center></td>
-              <td><center><Button color="link"  onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
+              <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
               <td> </td>
               <td><center>{val.DELIVERYNAME}</center></td>
               <td><center>{val.Customer_Address}</center></td>
-              <td><center><Button color="success">คอนเฟริม</Button></center></td>
+              <td><center><Button color="success" onClick={()=>this.SaveInvoice(val.INVOICEID)}>คอนเฟริม</Button></center></td>
             </tr>
           </tbody>
         arrData.push(tblData)
@@ -171,6 +172,7 @@ class ConfirmBill extends Component {
       //onsole.log("3333",result)
       var arrData = []
       var tblData
+      var invoice
       result.data.selectDetailBill.forEach(function (val,i) {
         tblData =<tbody>
           <tr>
@@ -182,9 +184,11 @@ class ConfirmBill extends Component {
           </tr>
       </tbody>
       arrData.push(tblData)
+      invoice = val.INVOICEID
       },this);
       this.setState({
         showTableModal:arrData,
+        showINVOICEID:invoice
       })
   }).catch((err) => {
 
@@ -193,6 +197,40 @@ class ConfirmBill extends Component {
       modal: !this.state.modal
     });
   }
+
+  SaveInvoice=(INVOICEID)=>{
+    console.log("save",INVOICEID)
+    if(window.confirm("กรุณายืนยันการคอนเฟริม INVOICEID: "+INVOICEID)){
+      this.props.client.mutate({
+        mutation:insertInvoice,
+        variables: {
+          "INVOICEID": INVOICEID
+        }
+      }).then((result) => {
+          console.log("result",result)
+          this.Save1InvoiceToComfrimBill()
+          if (result.data.insertInvoice.status === true) {
+            alert("บันทึกข้อมูลเรียบร้อย")
+            window.location.reload()
+        } else {
+            alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
+            return false
+        }
+      }).catch((err) => {
+
+      });
+    }
+  }
+
+  Save1InvoiceToComfrimBill=()=>{
+      this.props.client.mutate({
+        mutation:insert1InvoiceToComfrimBill
+      }).then((result) => {
+          console.log("result",result)
+      }).catch((err) => {
+
+      });
+}
 
   componentWillMount(){
     this.selectSale()
@@ -260,7 +298,7 @@ class ConfirmBill extends Component {
         </Row> 
 
           <Modal bsSize="large" isOpen={this.state.modal} toggle={this.toggle}>
-            <ModalHeader>Modal title</ModalHeader>
+            <ModalHeader>รหัส INVOICEID: <strong>{this.state.showINVOICEID}</strong></ModalHeader>
             <ModalBody>
               <Table responsive>
                 <thead>
@@ -277,8 +315,6 @@ class ConfirmBill extends Component {
               </Table>
            </ModalBody>
           </Modal>
-
-
          
       </div>
     );
@@ -334,6 +370,22 @@ query selectDetailBill($INVOICEID:String!){
     QTY
     TotalAmount
   }
+}
+`
+
+const insertInvoice = gql`
+mutation insertInvoice($INVOICEID:String!){
+    insertInvoice(INVOICEID:$INVOICEID){
+        status
+    }
+}
+`
+
+const insert1InvoiceToComfrimBill = gql`
+mutation insert1InvoiceToComfrimBill{
+    insert1InvoiceToComfrimBill{
+        status
+    }
 }
 `
 

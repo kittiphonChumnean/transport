@@ -257,11 +257,102 @@ var fnselectDetailBill = function (INVOICEID,callback) {
     })
 }
 
+//insertInvoice
+var insertInvoiceStatus = new GraphQLObjectType({
+    name: 'insertInvoiceStatus', 
+    fields: () => ({
+        status: {type: GraphQLBoolean}
+    })
+})
+
+var insertInvoice={
+    type:insertInvoiceStatus,
+    args:{
+        INVOICEID: {type: GraphQLString}
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject){
+            console.log("ค่า",args)
+            fninsertINVOICEID(args.INVOICEID, function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fninsertINVOICEID = function (INVOICEID, callback) {
+    sql.close();
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        var request = new sql.Request(pool)
+        request.input('INVOICEID',sql.VarChar,INVOICEID)
+        request.query("insert into [ConfirmBill] ([INVOICEID]) values (@INVOICEID)")
+            .then(res => {
+                sql.close();              
+                    callback({ status: true })              
+            })
+    })
+}
+
+//insert1InvoiceToConfirmBill
+var insertInvoiceStatus2 = new GraphQLObjectType({
+    name: 'insertInvoiceStatus2', 
+    fields: () => ({
+        status: {type: GraphQLBoolean}
+    })
+})
+
+var insert1InvoiceToComfrimBill={
+    type: new GraphQLList(insertInvoiceStatus2),
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject){
+            fninsertINVOICEID2(function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fninsertINVOICEID2 = function (callback) {
+    sql.close();
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        return pool.request()
+            .query(
+                'UPDATE '+
+                    ' ConfirmBill '+
+                ' SET '+
+                    ' DocumentSet= 1111, '+
+                   ' CustomerID= [AX-ToWebTest2].CustomerID, '+
+                    ' CustomerName = [AX-ToWebTest2].CustomerName, '+
+                    ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
+                   ' SaleID= [AX-ToWebTest2].SaleID, '+
+                    ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
+                    ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
+                    ' Status=1 , '+
+                    ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
+                ' FROM '+
+                    ' ConfirmBill '+
+                ' INNER JOIN '+
+                    ' [AX-ToWebTest2] '+
+                ' ON '+
+                    ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
+                ' WHERE '+
+                    ' ConfirmBill.CustomerID IS NULL '
+            )
+    }).then(res => {
+        console.log("555555555555", res);
+        sql.close()
+        callback({ status: true })  
+    })
+}
+
+
 
 module.exports = {
     selectSale: selectSale,
     selectAllBill: selectAllBill,
     insertBill: insertBill,
     updateAX: updateAX,
-    selectDetailBill: selectDetailBill
+    selectDetailBill: selectDetailBill,
+    insertInvoice: insertInvoice,
+    insert1InvoiceToComfrimBill: insert1InvoiceToComfrimBill
 }
