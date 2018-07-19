@@ -2,7 +2,7 @@ var dbConnect = require('../../connectdb/connectdb')
 var sql = require('mssql')
 var Request = require('tedious').Request;
 const graphql = require('graphql')
-const { GraphQLList, GraphQLFloat, GraphQLInt,GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, } = graphql
+const { GraphQLList, GraphQLFloat, GraphQLInt,GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLBoolean} = graphql
 
 
 var allSale = new GraphQLObjectType({
@@ -46,10 +46,11 @@ var allBill = new GraphQLObjectType({
         INVOICEID: { type: GraphQLString },
         DELIVERYNAME: { type: GraphQLString },
         Customer_Address: { type: GraphQLString },
-        Sale_Name: { type: GraphQLString },
         StoreZone: { type: GraphQLString },
         CustomerID: { type: GraphQLString },
         CustomerName: { type: GraphQLString },
+        SaleID: { type: GraphQLString },
+        Sale_Name: { type: GraphQLString },
     })
 })
 
@@ -75,7 +76,7 @@ var fnSelectAllBill = function (SaleID,invoicedate,callback) {
         return pool.request()
         .input('SaleID',sql.VarChar,SaleID)
         .input('invoicedate',sql.VarChar,invoicedate)
-            .query('SELECT DISTINCT INVOICEID,DELIVERYNAME,Customer_Address,Sale_Name,StoreZone,CustomerID,CustomerName FROM [Transfer-AX-ToWebTest] WHERE SaleID=@SaleID AND invoicedate= @invoicedate')
+            .query('SELECT DISTINCT INVOICEID,DELIVERYNAME,Customer_Address,SaleID,Sale_Name,StoreZone,CustomerID,CustomerName FROM [AX-ToWebTest2] WHERE SaleID=@SaleID AND invoicedate= @invoicedate AND Stutas IS NULL')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
@@ -83,87 +84,140 @@ var fnSelectAllBill = function (SaleID,invoicedate,callback) {
     })
 }
 
-//  var inputType = new GraphQLInputObjectType({
-//      name: 'inputType',
-//      fields: () => ({
-//          INVOICEID: { type: GraphQLString },
-//          DELIVERYNAME: { type: GraphQLString },
-//         Customer_Address: { type: GraphQLString },
-//          Sale_Name: { type: GraphQLString },
-//          StoreZone: { type: GraphQLString },
-//          CustomerID: { type: GraphQLString },
-//          CustomerName: { type: GraphQLString },
-//      })
-//  })
+//insert bill
+   var inputBill = new GraphQLInputObjectType({
+       name: 'inputBillData',
+       fields: () => ({
+         INVOICEID: { type: GraphQLString },
+         DELIVERYNAME: { type: GraphQLString },
+         Customer_Address: { type: GraphQLString },
+         StoreZone: { type: GraphQLString },
+         CustomerID: { type: GraphQLString },
+         CustomerName: { type: GraphQLString },
+         SaleID: { type: GraphQLString },
+         Sale_Name: { type: GraphQLString },
+       })
+   })
 
-//  var inputStatusType = new GraphQLObjectType({
-//      name: 'inputStatusType',
-//      fields: () => ({
-//          status: { type: GraphQLString }
-//      })
-//  })
+  var inputStatusType = new GraphQLObjectType({
+      name: 'inputStatusType2',
+      fields: () => ({
+          status: { type: GraphQLBoolean }
+      })
+  })
 
-//  var insertBill = {
-//      type: inputStatusType,//new GraphQLList(inputStatusType),
-//      args: {
-//          inData: {
-//              type: new GraphQLList(inputType),
-//              args: {
-//                  INVOICEID: { type: GraphQLString },
-//                  DELIVERYNAME: { type: GraphQLString },
-//                  Customer_Address: { type: GraphQLString },
-//                  Sale_Name: { type: GraphQLString },
-//                  StoreZone: { type: GraphQLString },
-//                  CustomerID: { type: GraphQLString },
-//                  CustomerName: { type: GraphQLString },
-//              }
-//          }
-//      },
-//      resolve: function (_, args) {
-//          return new Promise(function (resolve, reject) {
-//              // resolve({ status: "1" })
-//              fnInsertData(args.inData, function (data) {
-//                  resolve(data)
-//              })
-//          })
-//      }
-//  }
-//  var fnInsertData = function (inData, callback) {
-//      sql.close();
-//      sql.connect(dbConnect.dbConnect).then(pool => {
-//          // console.log("DB Connected",inData, inData.item)
-//          var request = new sql.Request(pool)
-//          var strVal=""
-//          inData.forEach(function (val, i) {
-//              // console.log("val", val);
-//              request.input('inINVOICEID'+i, sql.VarChar, val.INVOICEID)
-//              request.input('inDELIVERYNAME'+i, sql.VarChar, val.DELIVERYNAME)
-//              request.input('inCustomer_Address'+i, sql.VarChar, val.Customer_Address)
-//              request.input('inSale_Name'+i, sql.VarChar, val.Sale_Name)
-//              request.input('inStoreZone'+i, sql.VarChar, val.StoreZone)
-//              request.input('inCustomerID'+i, sql.VarChar, val.CustomerID)
-//              request.input('inCustomerName'+i, sql.VarChar, val.CustomerName)
-//              if(i+1==inData.length){
-//                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inSale_Name"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+")"
-//              }else{
-//                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inSale_Name"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+"),"
-//              }
-//          });
-//          request.query("INSERT INTO [dbo].[AX-ToWebTest2]" +
-//              "([INVOICEID],[DELIVERYNAME],[Customer_Address],[Sale_Name],[StoreZone],[CustomerID],[CustomerName])" +
-//              "VALUES" +
-//              strVal).then(res => {
-//                  // console.log("test", res);
-//                  sql.close();
-//                  if(res.rowsAffected>0){
-//                      callback({status:"2"})
-//                  }
-//              })
-//      })
-//  }
+  var insertBill = {
+      type: inputStatusType,//new GraphQLList(inputStatusType),
+      args: {
+          inData: {
+              type: new GraphQLList(inputBill),
+              args: {
+                    INVOICEID: { type: GraphQLString },
+                    DELIVERYNAME: { type: GraphQLString },
+                    Customer_Address: { type: GraphQLString },
+                    StoreZone: { type: GraphQLString },
+                    CustomerID: { type: GraphQLString },
+                    CustomerName: { type: GraphQLString },
+                    SaleID: { type: GraphQLString },
+                    Sale_Name: { type: GraphQLString },
+              }
+          }
+      },
+      resolve: function (_, args) {
+          return new Promise(function (resolve, reject) {
+              // resolve({ status: "1" })
+              console.log("ค่า", args)
+              fnInsertData(args.inData, function (data) {
+                  resolve(data)
+              })
+          })
+      }
+  }
+  var fnInsertData = function (inData, callback) {
+      sql.close();
+      sql.connect(dbConnect.dbConnect).then(pool => {
+           console.log("DB Connected",inData, inData.item)
+          var request = new sql.Request(pool)
+          var strVal=""
+          inData.forEach(function (val, i) {
+              // console.log("val", val);
+              request.input('inINVOICEID'+i, sql.VarChar, val.INVOICEID)
+              request.input('inDELIVERYNAME'+i, sql.VarChar, val.DELIVERYNAME)
+              request.input('inCustomer_Address'+i, sql.VarChar, val.Customer_Address)
+              request.input('inStoreZone'+i, sql.VarChar, val.StoreZone)
+              request.input('inCustomerID'+i, sql.VarChar, val.CustomerID)
+              request.input('inCustomerName'+i, sql.VarChar, val.CustomerName)
+              request.input('inSaleID'+i, sql.VarChar, val.SaleID)
+              request.input('inSale_Name'+i, sql.VarChar, val.Sale_Name)
+              request.input('inStatus'+i, sql.Int, 1)
+              if(i+1==inData.length){
+                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+",@inSaleID"+i+",@inSale_Name"+i+",@inStatus"+i+")"
+              }else{
+                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+",@inSaleID"+i+",@inSale_Name"+i+",@inStatus"+i+"),"
+              }
+          });
+          request.query("INSERT INTO [dbo].[ConfirmBill]" +
+              "([INVOICEID],[DELIVERYNAME],[AddressShipment],[StoreZone],[CustomerID],[CustomerName],[SaleID],[Sale_Name],[Status])" +
+              "VALUES" +
+              strVal).then(res => {
+                  //console.log("test", res);
+                  sql.close();
+                  
+                      callback({status:true})
+                  
+              })
+      })
+  }
+
+  var updateAX = {
+    type: inputStatusType,//new GraphQLList(inputStatusType),
+    args: {
+        inData: {
+            type: new GraphQLList(inputBill),
+            args: {
+                  INVOICEID: { type: GraphQLString }
+            }
+        }
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject) {
+            // resolve({ status: "1" })
+            console.log("ค่า", args)
+            fnInsertData2(args.inData, function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+var fnInsertData2 = function (inData, callback) {
+    sql.close();
+    sql.connect(dbConnect.dbConnect).then(pool => {
+         console.log("DB Connected",inData, inData.item)
+        var request = new sql.Request(pool)
+        var strVal=""
+        inData.forEach(function (val, i) {
+            // console.log("val", val);
+            request.input('inINVOICEID'+i, sql.VarChar, val.INVOICEID)
+            if(i+1==inData.length){
+                strVal+="(@inINVOICEID"+i+")"
+            }else{
+                strVal+="(@inINVOICEID"+i+"),"
+            }
+        });
+        request.query("UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = " 
+            + strVal).then(res => {
+                //console.log("test", res);
+                sql.close();
+                
+                    callback({status:true})
+                
+            })
+    })
+}
 
 module.exports = {
     selectSale: selectSale,
     selectAllBill: selectAllBill,
-    //insertBill: insertBill
+    insertBill: insertBill,
+    updateAX: updateAX
 }

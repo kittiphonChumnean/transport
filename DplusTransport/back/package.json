@@ -23,6 +23,7 @@
     "node-fetch": "^2.1.2",
     "nodemon": "^1.17.5",
     "react-apollo": "^1.4.16",
-    "tedious-connection-pool": "^1.0.5"
+    "tedious-connection-pool": "^1.0.5",
+    "utf8": "^3.0.0"
   }
 }

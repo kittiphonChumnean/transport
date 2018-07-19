@@ -16,6 +16,7 @@ import {
 import { withApollo, gql, compose } from 'react-apollo';
 import ConfirmDetail from './ConfirmDetail';
 
+
 class ConfirmBill extends Component {
   constructor(props) {
     super(props);
@@ -25,17 +26,11 @@ class ConfirmBill extends Component {
       showSale:'',
       showDate:'',
       showTable:'',
-      INVOICEID:false
+      INVOICEID:false,
+      dataTable:''
     };
-    this.toggle = this.toggle.bind(this);
+    this.ConfrimBill = this.ConfrimBill.bind(this)
   }
-
-  toggle() {
-    this.setState({
-      modal: !this.state.modal
-    });
-  }
-
 
   selectSale=(e)=>{
     this.props.client.query({
@@ -77,7 +72,7 @@ class ConfirmBill extends Component {
           "invoicedate":this.state.showDate
         }
       }).then((result) => {
-        //console.log("3333",result)
+        //onsole.log("3333",result)
         var arrData = []
         var tblData
         result.data.selectAllBill.forEach(function (val,i) {
@@ -95,7 +90,8 @@ class ConfirmBill extends Component {
         arrData.push(tblData)
         });
         this.setState({
-          showTable:arrData
+          showTable:arrData,
+          dataTable:result
         })
     }).catch((err) => {
 
@@ -103,42 +99,61 @@ class ConfirmBill extends Component {
 }
 
   ConfrimBill(e){
-    this.SaveBill(this.state, this.props)
+    //console.log("555555")
+    if (window.confirm("กรุณายืนยันการทำรายการ")) {
+      this.SaveBill(this.state, this.props)
+    }
   }
 
   SaveBill(self, props) {
-    console.log("กดคอนเฟริม")
+    console.log("กดคอนเฟริม",self.dataTable)
     var arrData = []
-    this.state.showTable.forEach(function (val,i) {
-      arrData.push({
-        INVOICEID: val.INVOICEID,
-        DELIVERYNAME: val.DELIVERYNAME,
-        Customer_Address: val.Customer_Address,
-        Sale_Name: val.Sale_Name,
-        StoreZone: val.StoreZone,
-        CustomerID: val.CustomerID,
-        CustomerName: val.CustomerName
-      })
-    });
-    this.state.saveData(self, props, arrData)
+    //self.dataTable.data.forEach(function (val,i) {
+      arrData.push(self.dataTable)
+    //});
+    console.log("ค่า",arrData)
+    this.saveData(self, props, arrData)
   }
 
-  saveData(data) {
+  saveData(self, props,data) {
     console.log("save bill",data)
     this.props.client.mutate({
         mutation: insertBill,
         variables: {
-            "insertData": data
+            "inData": data
         }
     }).then(res => {
         console.log("Client Res", res)
-        if (res.data.insertBill.status === "2") {
+        this.updateAX(this.state, this.props)
+        if (res.data.insertBill.status === true) {
             alert("บันทึกข้อมูลเรียบร้อย")
             window.location.reload()
         } else {
             alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
             return false
         }
+    })
+}
+
+  updateAX(self, props) {
+    console.log("อัพเดต",self.dataTable)
+    var arrData = []
+    //self.dataTable.data.forEach(function (val,i) {
+      arrData.push(self.dataTable)
+    //});
+    console.log("ค่า",arrData)
+    this.updateData(self, props, arrData)
+  }
+
+  updateData(self, props,data) {
+    console.log("updateData",data)
+    this.props.client.mutate({
+        mutation: updateAX,
+        variables: {
+            "inData": data
+        }
+    }).then(res => {
+        console.log("อัพเดตแล้ว",res)
     })
 }
 
@@ -150,7 +165,6 @@ class ConfirmBill extends Component {
     return (
       <div className="animated fadeIn">
         <Row>
-
           <Col xs="12" sm="12">
             <Card>
               <CardHeader>
@@ -201,7 +215,7 @@ class ConfirmBill extends Component {
                     </thead>
                     {this.state.showTable}
                   </Table>
-                  <Button color="success" onclick={this.ConfrimBill}>คอนเฟริมทั้งหมด</Button>
+                  <Button color="success" onClick={this.ConfrimBill}>คอนเฟริม</Button>
                 </center>
               </CardBody>
             </Card>
@@ -214,8 +228,16 @@ class ConfirmBill extends Component {
 
 
 const insertBill = gql`
-mutation insertBill($insertData:[inDataTypeAddQuota]){
-    insertBill(inData:$insertData){
+mutation insertBill($inData:[inputBill]){
+    insertBill(inData:$inData){
+        status
+    }
+}
+`
+
+const updateAX = gql`
+mutation updateAX($inData:[inputBillData]){
+    updateAX(inData:$inData){
         status
     }
 }
@@ -235,10 +257,11 @@ query selectAllBill($SaleID:String!,$invoicedate:String!){
     INVOICEID
     DELIVERYNAME
     Customer_Address
-    Sale_Name
     StoreZone
     CustomerID
     CustomerName
+    SaleID
+    Sale_Name
   }
 }
 `

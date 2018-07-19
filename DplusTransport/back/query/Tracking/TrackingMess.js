@@ -37,12 +37,11 @@ var fnSelectAllData = function (callback) {
         callback(err)
     })
 }
-
+//trackingMess
 var tackMess = new GraphQLObjectType({
     name: 'tackMess',
     fields: () => ({
         MessengerID: { type: GraphQLString },
-        StoreZone: { type: GraphQLString },
         Trip: { type: GraphQLInt },
         invoice: { type: GraphQLString },
         DateTime: { type: GraphQLString },
@@ -75,7 +74,50 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
         .input('MessengerID',sql.VarChar,MessengerID)
         .input('DateTime',sql.VarChar,DateTime)
         .input('Trip',sql.Int,Trip)
-            .query('SELECT DISTINCT Tracking.invoice, BillToApp.MessengerID,BillToApp.StoreZone,BillToApp.Trip,DateTime = CONVERT(varchar,Tracking.DateTime),Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.messengerID = Tracking.messengerID AND Tracking.messengerID=@MessengerID AND datediff(day, Tracking.DateTime, @DateTime) = 0 AND Tracking.Trip=@Trip ORDER BY DateTime')
+            .query('SELECT DISTINCT Tracking.invoice, BillToApp.MessengerID,BillToApp.Trip,DateTime = CONVERT(varchar,Tracking.DateTime),Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.messengerID = Tracking.messengerID AND Tracking.messengerID=@MessengerID AND datediff(day, Tracking.DateTime, @DateTime) = 0 AND Tracking.Trip=@Trip ORDER BY DateTime')
+    }).then(res => {
+        console.log("555555555555", res);
+        sql.close()
+        callback(res)
+    })
+}
+
+//statusMess
+var statusMess = new GraphQLObjectType({
+    name: 'statusMess',
+    fields: () => ({
+        statusA: { type: GraphQLString },
+        allinvoice: { type: GraphQLString },
+    })
+})
+
+var trackingStatusMess = {
+    type: new GraphQLList(statusMess),
+    args:{
+        MessengerID:{type:GraphQLString},
+        DateTime:{type:GraphQLString},
+        Trip:{type:GraphQLInt},
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject) {
+            console.log("ค่า",args)
+            fnSelectStatus(args.MessengerID,args.DateTime,args.Trip,function(data){
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fnSelectStatus = function (MessengerID,DateTime,Trip,callback) {
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        // console.log("DB Connected")
+        return pool.request()
+        .input('MessengerID',sql.VarChar,MessengerID)
+        .input('DateTime',sql.VarChar,DateTime)
+        .input('Trip',sql.Int,Trip)
+        .input('A',sql.VarChar,"A%")
+        .input('B',sql.VarChar,"B%")
+            .query('select count(status) as statusA ,(select count(distinct invoice) from Tracking where messengerID=@MessengerID AND datediff(day, DateTime, @DateTime) = 0 AND Trip=@Trip)as  allinvoice FROM [Tracking] where messengerID=@MessengerID AND datediff(day, DateTime, @DateTime) = 0 AND Trip=@Trip and status like @A or status like @B')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
@@ -85,5 +127,6 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
 
 module.exports = {
     //selectMess: selectMess,
-    trackingMess: trackingMess
+    trackingMess: trackingMess,
+    trackingStatusMess: trackingStatusMess
 }

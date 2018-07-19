@@ -50,6 +50,7 @@
     "react-test-renderer": "^16.4.0",
     "reactstrap": "^6.1.0",
     "simple-line-icons": "^2.4.1",
+    "utf8": "^3.0.0",
     "yarn": "^1.7.0"
   },
   "devDependencies": {

@@ -49,9 +49,12 @@ class TrackingOrder extends Component {
         "INVOICEID":this.state.showInvoice,
       }
     }).then((result) => {
+      
         var arrData = []
         var tblData
         var Laststatus
+        var lengthStatus = 0
+        var Laststatus_text
         var invoice
         var Mess
         var CusName
@@ -87,15 +90,18 @@ class TrackingOrder extends Component {
           Mess = val.MessengerID
           CusName = val.CustomerName
           CusAddess =val.AddressShipment
+          lengthStatus = lengthStatus+1
         arrData.push(tblData)
         });
+        Laststatus = result.data.selectOrder[lengthStatus-1].status
+        Laststatus_text = status_list[Laststatus]
         this.setState({
           showTable:arrData,
           showINVOICEID:invoice,
           showMessengerID:Mess,
           showCustomerName:CusName,
           showAddressShipment:CusAddess,
-          showLastStatus: Laststatus
+          showLastStatus: Laststatus_text
         })
   }).catch((err) => {
 
@@ -146,7 +152,7 @@ class TrackingOrder extends Component {
                     </div>
                   </div>
                   <br/>
-                  <h3><strong>สถานะปัจจุบัน : {this.state.LastStatus}</strong></h3>
+                  <h3><strong>สถานะปัจจุบัน : {this.state.showLastStatus}</strong></h3>
                   <Table striped>
                     <tr>
                       <th><center>ลำดับ</center></th>
