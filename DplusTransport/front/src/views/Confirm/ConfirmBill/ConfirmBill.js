@@ -16,7 +16,7 @@ import {
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
 import ConfirmDetail from './ConfirmDetail';
-
+var arrCheck=[]
 
 class ConfirmBill extends Component {
   constructor(props) {
@@ -30,11 +30,30 @@ class ConfirmBill extends Component {
       INVOICEID:false,
       dataTable:'',
       showTableModal:'',
-      showINVOICEID:''
+      showINVOICEID:'',
+      TableDetail:'',
+      isGoing: true,
     };
     this.ConfrimBill = this.ConfrimBill.bind(this)
     this.toggle = this.toggle.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleInputChange= invoice => event => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    if (target.checked==true){
+      arrCheck.push(invoice)    
+    }else{
+      arrCheck.splice(arrCheck.findIndex(k => k==invoice),1)
+    }
     
+    this.setState({
+      [name]: value
+    });
+    console.log(target.checked+'==>'+invoice)
+    console.log(arrCheck)
   }
 
   selectSale=(e)=>{
@@ -83,13 +102,16 @@ class ConfirmBill extends Component {
         result.data.selectAllBill.forEach(function (val,i) {
           tblData = <tbody>
             <tr>
-              <td><center><Input type="checkbox" value=""></Input></center></td>
+            <td><center> <input
+            name="isGoing"
+            type="checkbox"
+            onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
               <td><center>{i+1}</center></td>
               <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
               <td> </td>
               <td><center>{val.DELIVERYNAME}</center></td>
               <td><center>{val.Customer_Address}</center></td>
-              <td><center><Button color="success" onClick={()=>this.SaveInvoice(val.INVOICEID)}>คอนเฟริม</Button></center></td>
+              <td><center><Button color="success" onClick={()=>this.DocumentSet(val.INVOICEID)}>คอนเฟริม</Button></center></td>
             </tr>
           </tbody>
         arrData.push(tblData)
@@ -103,33 +125,92 @@ class ConfirmBill extends Component {
     });
 }
 
-  ConfrimBill(e){
-    //console.log("555555")
-    if (window.confirm("กรุณายืนยันการทำรายการ")) {
-      this.SaveBill(this.state, this.props)
+
+toggle(INVOICEID) {
+  this.props.client.query({
+    query:selectDetailBill,
+    variables: {
+      "INVOICEID":INVOICEID
     }
-  }
-
-  SaveBill(self, props) {
-    console.log("กดคอนเฟริม",self.dataTable)
+  }).then((result) => {
+    //onsole.log("3333",result)
     var arrData = []
-    //self.dataTable.data.forEach(function (val,i) {
-      arrData.push(self.dataTable)
-    //});
-    console.log("ค่า",arrData)
-    this.saveData(self, props, arrData)
-  }
+    var tblData
+    var invoice
+    var QTY
+    var TotalAmount
+    result.data.selectDetailBill.forEach(function (val,i) {
+      var PriceOfUnit = val.TotalAmount / val.QTY
+      tblData =<tbody>
+        <tr>
+          <td><center>{i+1}</center></td>
+          <td><center>{val.ITEMID}</center></td>
+          <td><center>{val.ItemName}</center></td>
+          <td><center>{val.QTY}</center></td>
+          <td><center>{val.TotalAmount}</center></td>
+          <td><center>{PriceOfUnit}</center></td>
+        </tr>
+    </tbody>
+    arrData.push(tblData)
+    invoice = val.INVOICEID
+    },this);
+    this.setState({
+      showTableModal:arrData,
+      showINVOICEID:invoice,
+    })
+}).catch((err) => {
 
-  saveData(self, props,data) {
-    console.log("save bill",data)
-    this.props.client.mutate({
+});
+  this.setState({
+    modal: !this.state.modal
+  });
+}
+
+DocumentSet2=()=>{
+  var Document_Set
+    if(window.confirm("กรุณายืนยันการคอนเฟริม")){
+    this.props.client.query({
+        query:DocumentSet
+    }).then((result) => {
+        console.log("result",result.data.DocumentSet[0].last)
+        var _result = result.data.DocumentSet[0].last
+        if(_result < 10){
+          Document_Set = 'D0000'+_result
+        }else if(_result < 100){
+          Document_Set = 'D000'+_result
+        }else if(_result < 1000){
+          Document_Set = 'D00'+_result
+        }else if(_result < 10000){
+          Document_Set = 'D0'+_result
+        }else if(_result >= 10000){
+          Document_Set = 'D'+_result
+        }
+        console.log('DocumentSet',Document_Set)
+        this.ConfrimBill(Document_Set)
+    }).catch((err) => {
+
+    });
+  }
+}
+
+  ConfrimBill(DocumentSet){
+    var arrData = []
+      arrCheck.forEach(function (val,i) {
+        arrData.push({
+          INVOICEID:arrCheck[i]
+        })
+      });
+      console.log('arrCheck[i]',arrCheck[0])
+      console.log('arr',arrData)
+       this.props.client.mutate({
         mutation: insertBill,
         variables: {
-            "inData": data
+            "inData": arrData,
+            "DocumentSet": DocumentSet
         }
     }).then(res => {
         console.log("Client Res", res)
-        this.updateAX(this.state, this.props)
+        this.updateAX()
         if (res.data.insertBill.status === true) {
             alert("บันทึกข้อมูลเรียบร้อย")
             window.location.reload()
@@ -138,80 +219,68 @@ class ConfirmBill extends Component {
             return false
         }
     })
-}
-
-  updateAX(self, props) {
-    console.log("อัพเดต",self.dataTable)
-    var arrData = []
-    //self.dataTable.data.forEach(function (val,i) {
-      arrData.push(self.dataTable)
-    //});
-    console.log("ค่า",arrData)
-    this.updateData(self, props, arrData)
   }
 
-  updateData(self, props,data) {
-    console.log("updateData",data)
-    this.props.client.mutate({
+  updateAX(){
+    console.log('เข้า')
+    var arrData = []
+      this.state.dataTable.data.selectAllBill.forEach(function (val,i) {
+        arrData.push({
+          INVOICEID:val.INVOICEID
+        })
+      });
+
+       this.props.client.mutate({
         mutation: updateAX,
         variables: {
-            "inData": data
+            "inData": arrData
         }
     }).then(res => {
-        console.log("อัพเดตแล้ว",res)
+      
     })
-}
-
-  toggle(INVOICEID) {
-    this.props.client.query({
-      query:selectDetailBill,
-      variables: {
-        "INVOICEID":INVOICEID
-      }
-    }).then((result) => {
-      //onsole.log("3333",result)
-      var arrData = []
-      var tblData
-      var invoice
-      result.data.selectDetailBill.forEach(function (val,i) {
-        tblData =<tbody>
-          <tr>
-            <td><center>{i+1}</center></td>
-            <td><center>{val.ITEMID}</center></td>
-            <td><center>{val.ItemName}</center></td>
-            <td><center>{val.QTY}</center></td>
-            <td><center>{val.TotalAmount}</center></td>
-          </tr>
-      </tbody>
-      arrData.push(tblData)
-      invoice = val.INVOICEID
-      },this);
-      this.setState({
-        showTableModal:arrData,
-        showINVOICEID:invoice
-      })
-  }).catch((err) => {
-
-  });
-    this.setState({
-      modal: !this.state.modal
-    });
+    
   }
 
-  SaveInvoice=(INVOICEID)=>{
-    console.log("save",INVOICEID)
-    if(window.confirm("กรุณายืนยันการคอนเฟริม INVOICEID: "+INVOICEID)){
+  DocumentSet=(INVOICEID)=>{
+    var Document_Set
+      if(window.confirm("กรุณายืนยันการคอนเฟริม INVOICEID: "+INVOICEID)){
+      this.props.client.query({
+          query:DocumentSet
+      }).then((result) => {
+          console.log("result",result.data.DocumentSet[0].last)
+          var _result = result.data.DocumentSet[0].last
+          if(_result < 10){
+            Document_Set = 'D0000'+_result
+          }else if(_result < 100){
+            Document_Set = 'D000'+_result
+          }else if(_result < 1000){
+            Document_Set = 'D00'+_result
+          }else if(_result < 10000){
+            Document_Set = 'D0'+_result
+          }else if(_result >= 10000){
+            Document_Set = 'D'+_result
+          }
+          console.log('DocumentSet',Document_Set)
+          this.SaveInvoice(INVOICEID,Document_Set)
+      }).catch((err) => {
+
+      });
+    }
+  }
+
+  SaveInvoice=(INVOICEID,DocumentSet)=>{
       this.props.client.mutate({
         mutation:insertInvoice,
         variables: {
-          "INVOICEID": INVOICEID
+          "INVOICEID": INVOICEID,
+          "DocumentSet": DocumentSet
         }
       }).then((result) => {
           console.log("result",result)
-          this.Save1InvoiceToComfrimBill()
           if (result.data.insertInvoice.status === true) {
             alert("บันทึกข้อมูลเรียบร้อย")
             window.location.reload()
+            
         } else {
             alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
             return false
@@ -219,18 +288,7 @@ class ConfirmBill extends Component {
       }).catch((err) => {
 
       });
-    }
   }
-
-  Save1InvoiceToComfrimBill=()=>{
-      this.props.client.mutate({
-        mutation:insert1InvoiceToComfrimBill
-      }).then((result) => {
-          console.log("result",result)
-      }).catch((err) => {
-
-      });
-}
 
   componentWillMount(){
     this.selectSale()
@@ -279,7 +337,7 @@ class ConfirmBill extends Component {
                   <Table responsive>
                     <thead>
                       <tr>
-                        <th width="5%"><center><Button color="primary">all</Button></center></th>
+                        <th width="5%"><center> </center></th>
                         <th width="5%"><center>ลำดับ </center></th>
                         <th width="15%"><center>รหัส invoice</center></th>
                         <th width="10%"><center>จำนวนกล่อง</center></th>
@@ -290,7 +348,7 @@ class ConfirmBill extends Component {
                     </thead>
                     {this.state.showTable}
                   </Table>
-                  <Button color="success" onClick={this.ConfrimBill}>คอนเฟริม</Button>
+                  <Button color="primary" onClick={this.DocumentSet2}>คอนเฟริมบิล</Button>
                 </center>
               </CardBody>
             </Card>
@@ -308,7 +366,7 @@ class ConfirmBill extends Component {
                     <th><center>ชื่อสินค้า</center></th>
                     <th><center>จำนวน</center></th>
                     <th><center>ยอดเงินรวม</center></th>
-                    <th></th>
+                    <th><center>ราคาต่อหน่วย</center></th>
                   </tr>
                 </thead>
                 {this.state.showTableModal}
@@ -323,15 +381,15 @@ class ConfirmBill extends Component {
 
 
 const insertBill = gql`
-mutation insertBill($inData:[inputBill]){
-    insertBill(inData:$inData){
+mutation insertBill($inData:[ConfrimModel],$DocumentSet:String!){
+    insertBill(inData:$inData,DocumentSet:$DocumentSet){
         status
     }
 }
 `
 
 const updateAX = gql`
-mutation updateAX($inData:[inputBillData]){
+mutation updateAX($inData:[ConfrimModel]){
     updateAX(inData:$inData){
         status
     }
@@ -342,6 +400,14 @@ const selectSale = gql`
   query selectSale{
     selectSale{
       SaleID
+    }
+  }
+`
+
+const DocumentSet = gql`
+  query DocumentSet{
+    DocumentSet{
+      last
     }
   }
 `
@@ -374,16 +440,8 @@ query selectDetailBill($INVOICEID:String!){
 `
 
 const insertInvoice = gql`
-mutation insertInvoice($INVOICEID:String!){
-    insertInvoice(INVOICEID:$INVOICEID){
-        status
-    }
-}
-`
-
-const insert1InvoiceToComfrimBill = gql`
-mutation insert1InvoiceToComfrimBill{
-    insert1InvoiceToComfrimBill{
+mutation insertInvoice($INVOICEID:String!,$DocumentSet:String!){
+    insertInvoice(INVOICEID:$INVOICEID,DocumentSet:$DocumentSet){
         status
     }
 }
