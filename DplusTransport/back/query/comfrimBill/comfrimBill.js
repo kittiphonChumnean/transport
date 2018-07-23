@@ -86,133 +86,126 @@ var fnSelectAllBill = function (SaleID,invoicedate,callback) {
 }
 
 //insert Allbill
-   var inputBill = new GraphQLInputObjectType({
-       name: 'inputBillData',
-       fields: () => ({
-         INVOICEID: { type: GraphQLString },
-         DELIVERYNAME: { type: GraphQLString },
-         Customer_Address: { type: GraphQLString },
-         StoreZone: { type: GraphQLString },
-         CustomerID: { type: GraphQLString },
-         CustomerName: { type: GraphQLString },
-         SaleID: { type: GraphQLString },
-         Sale_Name: { type: GraphQLString },
-       })
-   })
+var ConfrimModel = new GraphQLInputObjectType({
+    name: 'ConfrimModel',
+    fields: () => ({
+        INVOICEID: { type: GraphQLString }
+    })
+})
 
-  var inputStatusType = new GraphQLObjectType({
-      name: 'inputStatusType2',
-      fields: () => ({
-          status: { type: GraphQLBoolean }
-      })
-  })
+var inputStatusAllbill = new GraphQLObjectType({
+    name: 'inputStatusAllbill', 
+    fields: () => ({
+        status: {type: GraphQLBoolean}
+    })
+})
 
-  var insertBill = {
-      type: inputStatusType,//new GraphQLList(inputStatusType),
-      args: {
-          inData: {
-              type: new GraphQLList(inputBill),
-              args: {
-                    INVOICEID: { type: GraphQLString },
-                    DELIVERYNAME: { type: GraphQLString },
-                    Customer_Address: { type: GraphQLString },
-                    StoreZone: { type: GraphQLString },
-                    CustomerID: { type: GraphQLString },
-                    CustomerName: { type: GraphQLString },
-                    SaleID: { type: GraphQLString },
-                    Sale_Name: { type: GraphQLString },
-              }
-          }
-      },
-      resolve: function (_, args) {
-          return new Promise(function (resolve, reject) {
-              // resolve({ status: "1" })
-              console.log("ค่า", args)
-              fnInsertData(args.inData, function (data) {
-                  resolve(data)
-              })
-          })
-      }
-  }
-  var fnInsertData = function (inData, callback) {
-      sql.close();
-      sql.connect(dbConnect.dbConnect).then(pool => {
-           console.log("DB Connected",inData, inData.item)
-          var request = new sql.Request(pool)
-          var strVal=""
-          inData.forEach(function (val, i) {
-              // console.log("val", val);
-              request.input('inINVOICEID'+i, sql.VarChar, val.INVOICEID)
-              request.input('inDELIVERYNAME'+i, sql.VarChar, val.DELIVERYNAME)
-              request.input('inCustomer_Address'+i, sql.VarChar, val.Customer_Address)
-              request.input('inStoreZone'+i, sql.VarChar, val.StoreZone)
-              request.input('inCustomerID'+i, sql.VarChar, val.CustomerID)
-              request.input('inCustomerName'+i, sql.VarChar, val.CustomerName)
-              request.input('inSaleID'+i, sql.VarChar, val.SaleID)
-              request.input('inSale_Name'+i, sql.VarChar, val.Sale_Name)
-              request.input('inStatus'+i, sql.Int, 1)
-              if(i+1==inData.length){
-                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+",@inSaleID"+i+",@inSale_Name"+i+",@inStatus"+i+")"
-              }else{
-                  strVal+="(@inINVOICEID"+i+",@inDELIVERYNAME"+i+",@inCustomer_Address"+i+",@inStoreZone"+i+",@inCustomerID"+i+",@inCustomerName"+i+",@inSaleID"+i+",@inSale_Name"+i+",@inStatus"+i+"),"
-              }
-          });
-          request.query("INSERT INTO [dbo].[ConfirmBill]" +
-              "([INVOICEID],[DELIVERYNAME],[AddressShipment],[StoreZone],[CustomerID],[CustomerName],[SaleID],[Sale_Name],[Status])" +
-              "VALUES" +
-              strVal).then(res => {
-                  //console.log("test", res);
-                  sql.close();
-                  
-                      callback({status:true})
-                  
-              })
-      })
-  }
-
-  //updateAX
-  var updateAX = {
-    type: inputStatusType,//new GraphQLList(inputStatusType),
+var insertBill={
+    type:inputStatusAllbill,
     args: {
         inData: {
-            type: new GraphQLList(inputBill),
+            type: new GraphQLList(ConfrimModel),
             args: {
-                  INVOICEID: { type: GraphQLString }
+                INVOICEID: { type: GraphQLString }
             }
-        }
+        },
+        DocumentSet: { type: GraphQLString }
     },
     resolve: function (_, args) {
-        return new Promise(function (resolve, reject) {
-            // resolve({ status: "1" })
-            console.log("ค่า", args)
-            fnInsertData2(args.inData, function (data) {
+        return new Promise(function (resolve, reject){
+            console.log("ค่า",args)
+            fninsertBill(args.inData,args.DocumentSet, function (data) {
                 resolve(data)
             })
         })
     }
 }
-var fnInsertData2 = function (inData, callback) {
+
+var fninsertBill = function (inData,DocumentSet, callback) {
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
-         console.log("DB Connected",inData, inData.item)
         var request = new sql.Request(pool)
-        var strVal=""
+        var strVal = ""
         inData.forEach(function (val, i) {
-            // console.log("val", val);
-            request.input('inINVOICEID'+i, sql.VarChar, val.INVOICEID)
-            if(i+1==inData.length){
-                strVal+="(@inINVOICEID"+i+")"
-            }else{
-                strVal+="(@inINVOICEID"+i+"),"
+            request.input('INVOICEID' + i, sql.VarChar, val.INVOICEID)
+            if (i + 1 == inData.length) {
+                strVal += "(@INVOICEID" + i +")"
+            } else {
+                strVal += "(@INVOICEID" + i +"),"
             }
         });
-        request.query("UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = " 
-            + strVal).then(res => {
-                //console.log("test", res);
-                sql.close();
-                
-                    callback({status:true})
-                
+        request.input('DocumentSet' ,sql.VarChar, DocumentSet)
+        //console.log('str',strVal)
+        request.query('insert into [ConfirmBill] ([INVOICEID]) values '+ strVal  + 
+                        
+                            ' UPDATE '+
+                            ' ConfirmBill '+
+                        ' SET '+
+                            ' DocumentSet= @DocumentSet, '+
+                        ' CustomerID= [AX-ToWebTest2].CustomerID, '+
+                            ' CustomerName = [AX-ToWebTest2].CustomerName, '+
+                            ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
+                        ' SaleID= [AX-ToWebTest2].SaleID, '+
+                            ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
+                            ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
+                            ' Status=1 , '+
+                            ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
+                        ' FROM '+
+                            ' ConfirmBill '+
+                        ' INNER JOIN '+
+                            ' [AX-ToWebTest2] '+
+                        ' ON '+
+                            ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
+                        ' WHERE '+
+                            ' ConfirmBill.CustomerID IS NULL '+
+
+                        ' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = '+ strVal)
+            .then(res => {
+                sql.close();              
+                    callback({ status: true })              
+            })
+    })
+}
+
+//updateAX
+var updateAX={
+    type:inputStatusAllbill,
+    args: {
+        inData: {
+            type: new GraphQLList(ConfrimModel),
+            args: {
+                INVOICEID: { type: GraphQLString }
+            }
+        }
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject){
+            console.log("ค่า",args)
+            fnupdateAX(args.inData, function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fnupdateAX = function (inData, callback) {
+    sql.close();
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        var request = new sql.Request(pool)
+        var strVal = ""
+        inData.forEach(function (val, i) {
+            request.input('INVOICEID' + i, sql.VarChar, val.INVOICEID)
+            if (i + 1 == inData.length) {
+                strVal += "(@INVOICEID" + i +")"
+            } else {
+                strVal += "(@INVOICEID" + i +"),"
+            }
+        });
+        //console.log('str',strVal)
+        request.query(' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = '+ strVal)
+            .then(res => {
+                sql.close();              
+                    callback({ status: true })              
             })
     })
 }
@@ -268,24 +261,53 @@ var insertInvoiceStatus = new GraphQLObjectType({
 var insertInvoice={
     type:insertInvoiceStatus,
     args:{
-        INVOICEID: {type: GraphQLString}
+        INVOICEID: {type: GraphQLString},
+        DocumentSet: {type: GraphQLString}
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject){
             console.log("ค่า",args)
-            fninsertINVOICEID(args.INVOICEID, function (data) {
+            fninsertINVOICEID(args.INVOICEID,args.DocumentSet, function (data) {
                 resolve(data)
             })
         })
     }
 }
 
-var fninsertINVOICEID = function (INVOICEID, callback) {
+var fninsertINVOICEID = function (INVOICEID,DocumentSet, callback) {
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
         var request = new sql.Request(pool)
         request.input('INVOICEID',sql.VarChar,INVOICEID)
-        request.query("insert into [ConfirmBill] ([INVOICEID]) values (@INVOICEID)")
+        request.input('DocumentSet',sql.VarChar,DocumentSet)
+        request.query('insert into [ConfirmBill] ([INVOICEID]) values (@INVOICEID) '+
+
+                            'UPDATE '+
+                            ' ConfirmBill '+
+                        ' SET '+
+                            ' DocumentSet= @DocumentSet, '+
+                        ' CustomerID= [AX-ToWebTest2].CustomerID, '+
+                            ' CustomerName = [AX-ToWebTest2].CustomerName, '+
+                            ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
+                        ' SaleID= [AX-ToWebTest2].SaleID, '+
+                            ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
+                            ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
+                            ' Status=1 , '+
+                            ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
+                        ' FROM '+
+                            ' ConfirmBill '+
+                        ' INNER JOIN '+
+                            ' [AX-ToWebTest2] '+
+                        ' ON '+
+                            ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
+                        ' WHERE '+
+                            ' ConfirmBill.CustomerID IS NULL ' +  
+                        
+                        ' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = @INVOICEID ' +
+
+                        ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] ,[Amount],[PriceOfUnit]) '+
+                        ' SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) '+            
+                        ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] = @INVOICEID')
             .then(res => {
                 sql.close();              
                     callback({ status: true })              
@@ -293,55 +315,41 @@ var fninsertINVOICEID = function (INVOICEID, callback) {
     })
 }
 
-//insert1InvoiceToConfirmBill
-var insertInvoiceStatus2 = new GraphQLObjectType({
-    name: 'insertInvoiceStatus2', 
+//creatDocumentSet
+var model = new GraphQLObjectType({
+    name: 'model',
     fields: () => ({
-        status: {type: GraphQLBoolean}
+        last: { type: GraphQLInt }
     })
 })
 
-var insert1InvoiceToComfrimBill={
-    type: new GraphQLList(insertInvoiceStatus2),
+var DocumentSet = {
+    type: new GraphQLList(model),
     resolve: function (_, args) {
-        return new Promise(function (resolve, reject){
-            fninsertINVOICEID2(function (data) {
+        return new Promise(function (resolve, reject) {
+            fnData(function (data) {
                 resolve(data)
             })
         })
     }
 }
 
-var fninsertINVOICEID2 = function (callback) {
-    sql.close();
+var fnData = function (callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
+        // console.log("DB Connected")
         return pool.request()
-            .query(
-                'UPDATE '+
-                    ' ConfirmBill '+
-                ' SET '+
-                    ' DocumentSet= 1111, '+
-                   ' CustomerID= [AX-ToWebTest2].CustomerID, '+
-                    ' CustomerName = [AX-ToWebTest2].CustomerName, '+
-                    ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
-                   ' SaleID= [AX-ToWebTest2].SaleID, '+
-                    ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
-                    ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
-                    ' Status=1 , '+
-                    ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
-                ' FROM '+
-                    ' ConfirmBill '+
-                ' INNER JOIN '+
-                    ' [AX-ToWebTest2] '+
-                ' ON '+
-                    ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
-                ' WHERE '+
-                    ' ConfirmBill.CustomerID IS NULL '
-            )
+            .query('SELECT last FROM LastDocomentSet '+
+                   ' UPDATE LastDocomentSet SET last = last+1 ')
     }).then(res => {
-        console.log("555555555555", res);
         sql.close()
-        callback({ status: true })  
+        console.log('res',res)
+        callback(res)
+
+    })
+
+    sql.on('error', err => {
+        // ... error handler
+        callback(err)
     })
 }
 
@@ -351,8 +359,8 @@ module.exports = {
     selectSale: selectSale,
     selectAllBill: selectAllBill,
     insertBill: insertBill,
-    updateAX: updateAX,
     selectDetailBill: selectDetailBill,
     insertInvoice: insertInvoice,
-    insert1InvoiceToComfrimBill: insert1InvoiceToComfrimBill
+    updateAX: updateAX,
+    DocumentSet: DocumentSet
 }
