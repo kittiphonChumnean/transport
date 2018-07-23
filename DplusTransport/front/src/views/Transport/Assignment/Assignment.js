@@ -361,7 +361,7 @@ queryAssingment2=()=>{
                     <th width="10%" className="text-center"> ลำดับ </th>
                     <th width="15%" className="text-center"> รหัส invoice </th>
                     <th className="text-center"> ผู้รับ </th>
-                    <th className="text-center"> ห้าง </th>
+                    <th className="text-center"> ที่อยู่จัดส่ง </th>
                     <th width="5%" ></th>
                   </tr>
                 </thead>
