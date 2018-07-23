@@ -106,7 +106,9 @@ if (this.state.showinvoice >= this.state.num){
 ChangeInvoice = (e) => {
   this.setState({
       showinvoice: this.state.showinvoice+1
+     
   })
+  console.log("showinvoice=="+this.state.showinvoice)
 }
 
   toggle(i) {
