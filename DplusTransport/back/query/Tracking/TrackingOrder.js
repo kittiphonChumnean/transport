@@ -38,7 +38,13 @@ var fnSelectOrder = function (INVOICEID,callback) {
         // console.log("DB Connected")
         return pool.request()
         .input('INVOICEID',sql.VarChar,INVOICEID)
-            .query('SELECT BillToApp.MessengerID,BillToApp.CustomerName,BillToApp.AddressShipment,Tracking.invoice, CONVERT(VARCHAR(10), CONVERT(DATETIME,Tracking.DateTime, 0), 101) as Date,CONVERT(VARCHAR(5),CONVERT(DATETIME,Tracking.DateTime, 0), 108) as Time,Tracking.status,Tracking.location FROM BillToApp,Tracking WHERE BillToApp.INVOICEID = Tracking.invoice AND Tracking.invoice=@INVOICEID ORDER BY Date,Time')
+            .query('SELECT BillToApp.MessengerID,BillToApp.CustomerName, '+
+                   ' BillToApp.AddressShipment,Tracking.invoice, CONVERT(VARCHAR(10), '+
+                   ' CONVERT(DATETIME,Tracking.DateTime, 0), 101) as Date, '+
+                   ' CONVERT(VARCHAR(5),CONVERT(DATETIME,Tracking.DateTime, 0), 108) as Time, '+
+                   ' Tracking.status,Tracking.location FROM BillToApp,Tracking '+
+                   ' WHERE BillToApp.INVOICEID = Tracking.invoice AND '+
+                   ' Tracking.invoice=@INVOICEID ORDER BY Date,Time ')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()

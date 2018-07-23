@@ -137,7 +137,7 @@ class TrackingMess extends Component {
           });
           this.setState({
             showTable:arrData,
-            showMessID:Mess,
+            showMessID:this.state.showMess,
             showMessTrip:Trip,
             showDateTime:DateTime,
           })
@@ -163,7 +163,7 @@ class TrackingMess extends Component {
       var finish = result.data.trackingStatusMess[0].statusA
       var allTrack = result.data.trackingStatusMess[0].allinvoice
       var notFinish =  allTrack - finish
-      console.log("status",finish)
+      console.log("status",allTrack)
       this.setState({
         showfinish: finish,
         shownotFinish: notFinish

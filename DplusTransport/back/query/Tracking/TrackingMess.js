@@ -75,7 +75,13 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
         .input('MessengerID',sql.VarChar,MessengerID)
         .input('DateTime',sql.VarChar,DateTime)
         .input('Trip',sql.Int,Trip)
-            .query('SELECT DISTINCT Tracking.invoice, BillToApp.MessengerID,BillToApp.Trip,CONVERT(VARCHAR(10), CONVERT(DATETIME,Tracking.DateTime, 0), 101) as Date,CONVERT(VARCHAR(5),CONVERT(DATETIME,Tracking.DateTime, 0), 108) as Time,Tracking.status,Tracking.location FROM BillToApp,Tracking  WHERE BillToApp.messengerID = Tracking.messengerID AND Tracking.messengerID=@MessengerID AND datediff(day, Tracking.DateTime, @DateTime) = 0 AND Tracking.Trip=@Trip ORDER BY Date,Time')
+            .query('SELECT invoice '+
+                ' ,CONVERT(VARCHAR(10), CONVERT(DATETIME,DateTime, 0), 101) as Date '+
+                ' ,CONVERT(VARCHAR(5),CONVERT(DATETIME,DateTime, 0), 108) as Time '+
+                ' ,status,location,messengerID,Trip '+
+                ' FROM Tracking WHERE  Tracking.messengerID=@MessengerID '+ 
+                ' AND datediff(day, Tracking.DateTime, @DateTime) = 0 '+
+                ' AND Tracking.Trip=@Trip ORDER BY DateTime ')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
@@ -118,7 +124,11 @@ var fnSelectStatus = function (MessengerID,DateTime,Trip,callback) {
         .input('Trip',sql.Int,Trip)
         .input('A',sql.VarChar,"A%")
         .input('B',sql.VarChar,"B%")
-            .query('select count(status) as statusA ,(select count(distinct invoice) from Tracking where messengerID=@MessengerID AND datediff(day, DateTime, @DateTime) = 0 AND Trip=@Trip)as  allinvoice FROM [Tracking] where messengerID=@MessengerID AND datediff(day, DateTime, @DateTime) = 0 AND Trip=@Trip and status like @A or status like @B')
+            .query(' select count(distinct invoice) as statusA ,(select  count(distinct invoice) '+
+                   ' from tracking where messengerID= @MessengerID) as allinvoice '+
+                   ' FROM [Tracking] where messengerID= @MessengerID and '+
+                   ' status like @A or status like @B'+
+                   ' and datediff(day, DateTime, @DateTime) = 0 and Trip = @Trip')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
