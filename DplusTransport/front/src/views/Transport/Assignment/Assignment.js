@@ -20,9 +20,14 @@ import {
   import { gql, withApollo, compose } from 'react-apollo'
   var IDMess_
   var Trip_
+  var num = 0;
+
+  
+  
 class Assignment extends React.Component {
   constructor(props) {
     super(props);
+ 
     this.toggle = this.toggle.bind(this);
     this.state = {
       showMess:'',
@@ -38,6 +43,9 @@ class Assignment extends React.Component {
       itemInvoice:'',
       itemtrip:'',
       rows: [],
+      Datastorezone:'',
+      DataSaleID:'',
+    
       dropdownOpen: new Array(6).fill(false),
     };
     this.ClickSave = this.ClickSave.bind(this)
@@ -60,7 +68,9 @@ handleAddRow = () => {
   const item = {
     name: "",
     customer: "",
-    dalivery:""
+    storezone:"",
+    saleID:"",
+    invoicetem:"",
   };
  
   this.setState({
@@ -69,11 +79,21 @@ handleAddRow = () => {
 };
 
 
-handleRemoveRow = () => {
+handleRemoveRow= idx => e => { 
+  console.log("delete"+idx)
+  console.log("=====>"+this.state.rows[0])
+  console.log("=====>"+this.state.rows[1])
+
+  //console.log("=====>"+this.state.rows.findIndex(k => k==idx))
+
+   
   this.setState({
-    rows: this.state.rows.slice(0, -1)
+    rows: this.state.rows.slice(0,-1)
+    //rows: this.state.rows.splice(this.state.rows.findIndex(k => k==idx),1)
+
+   
   });
-  console.log(this.state.rows)
+ 
 };
 
 //-----------------------test------------------------------//
@@ -88,7 +108,30 @@ handleChange = idx => e => {
   });
 };
 
-queryAssingmentInvoice2= idx => e => {
+Enterfn= idx => e => {
+
+  if (e.key === 'Enter') {
+    this.handleAddRow()
+    this.queryAssingmentInvoice2(idx,e)
+    num =num+1
+
+    this.inputTitle.value = "";
+   
+   
+ 
+
+    //this.setState({
+     // teminvoice:''
+    //})
+    
+    
+    console.log("num"+num)
+    console.log("idx"+idx)
+  }
+}
+
+
+queryAssingmentInvoice2(idx,e) {
   const { test1,test2  } = e.target;
   const rows = [...this.state.rows];
   //console.log("1234567890")
@@ -96,18 +139,21 @@ queryAssingmentInvoice2= idx => e => {
       query:queryAssingmentInvoice,
       variables: {
         "INVOICEID":rows[idx].name
-       
+     
       }
     }).then((result) => {
+   
       console.log("22222",result,result.data)
    
      // rows[idx].mobile = result.data.queryAssingmentInvoice.CustomerName
       
       result.data.queryAssingmentInvoice.forEach(function (val,i) {
         rows[idx].customer = val.CustomerName
-        rows[idx].dalivery = val.DELIVERYNAME
+        rows[idx].storezone = val.StoreZone
+        rows[idx].saleID = val.SaleID
+        console.log("test++>"+ val.StoreZone)
       });
-     console.log("test"+ rows[idx].customer)
+     
 
         
       this.setState({
@@ -151,15 +197,20 @@ queryAssingmentInvoice2= idx => e => {
       }).then((result) => {
         console.log("3333",result)
         var DataCustomer
-        var DataDELIVERYNAME
+        var Datastorezone
+        var DataSaleID
         result.data.queryAssingmentInvoice.forEach(function (val,i) {
           DataCustomer = val.CustomerName,
-          DataDELIVERYNAME = val.DELIVERYNAME
+          Datastorezone = val.StoreZone,
+          DataSaleID =  val.SaleID
+         
 
         });     
+        console.log("Datastorezone"+Datastorezone)
         this.setState({
           DataCustomer:DataCustomer,
-          DataDELIVERYNAME,DataDELIVERYNAME
+          Datastorezone:Datastorezone,
+          DataSaleID:DataSaleID
         })
     }).catch((err) => {
 
@@ -246,6 +297,7 @@ setDataSave( self, props) {
       Trip: self.itemtrip
     })
   });   
+  arrData.pop()
 
   console.log("arrData")
   console.log(arrData)
@@ -343,6 +395,18 @@ queryAssingment2=()=>{
                           <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showzone} disabled>
                           </input>
                         </div>
+                        &nbsp;<div class="pr-1 form-group">
+                        &nbsp;&nbsp;<label for="exampleInputName2" id="invoice_" class="pr-1"><strong>INVOICEID</strong></label>
+ <input
+                         value={this.state.invoicetem}
+                          type="text"
+                          name="name"
+                          onChange={this.handleChange(num)}
+                          className="form-control"
+                          onKeyPress={this.Enterfn(num)}
+                          ref={el => this.inputTitle = el}
+                        />
+ </div>
                       </form>
                     </div>
                   </div>
@@ -360,8 +424,10 @@ queryAssingment2=()=>{
                   <tr>
                     <th width="10%" className="text-center"> ลำดับ </th>
                     <th width="15%" className="text-center"> รหัส invoice </th>
+                    <th width="15%" className="text-center"> SaleID </th>
                     <th className="text-center"> ผู้รับ </th>
                     <th className="text-center"> ห้าง </th>
+                 
                     <th width="5%" ></th>
                   </tr>
                 </thead>
@@ -370,40 +436,30 @@ queryAssingment2=()=>{
                     <tr id="addr0" key={idx}>
                       <td>{idx+1}</td>
                       <td>
-                        <input
-                          type="text"
-                          name="name"
-                          value={this.state.rows[idx].name}
-                          onChange={this.handleChange(idx)}
-                          className="form-control"
-                        />
+                        
+                          {this.state.rows[idx].name }
+                        
+                      </td>
+                      <td>
+                    <center>{this.state.rows[idx].saleID } </center>
                       </td>
                       <td>
                     <center>{this.state.rows[idx].customer } </center>
                       </td>
                       <td>
-                    <center>{this.state.rows[idx].dalivery } </center>
+                    <center>{this.state.rows[idx].storezone } </center>
                       </td>
+                      
                       <td>
-                      <button class="btn btn-outline-warning btn-block"  onClick={this.queryAssingmentInvoice2(idx)} >ยิง</button>
+                      <button class="btn btn-outline-warning btn-block"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
                         </td>
                     </tr>
-                  ))}
+                  ),this)}
                 </tbody>
               </table>
-              <button
-                onClick={this.handleAddRow}
-                className="btn btn-default pull-left btn-warning"
-              >
-                Add Row
-              </button>
              
-              <button
-                onClick={this.handleRemoveRow}
-                className="pull-right btn btn-default btn-danger"
-              >
-                Delete Row
-              </button>
+             
+              
 
 <br/><br/>
  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg" onClick={this.ClickSave}>บันทึก</button></div>
@@ -445,7 +501,8 @@ const queryAssingmentInvoice = gql`
 query queryAssingmentInvoice($INVOICEID:String!){
   queryAssingmentInvoice(INVOICEID:$INVOICEID){
     CustomerName,
-    DELIVERYNAME
+    StoreZone,
+    SaleID
   }
 }
 `

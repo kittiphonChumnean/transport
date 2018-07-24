@@ -256,7 +256,11 @@ var fninsertInvoice = function (callback) {
                 ' ON '+
                     ' BillToApp.INVOICEID = ConfirmBill.INVOICEID '+
                 ' where'+
-                ' BillToApp.CustomerID is null '   
+                ' BillToApp.CustomerID is null '   +
+
+              '  UPDATE ConfirmBill SET Status=3 '+
+              '  FROM ConfirmBill,BillToApp '+
+               ' where BillToApp.Status=3 and ConfirmBill.INVOICEID= BillToApp.INVOICEID '
             )
     }).then(res => {
         console.log("555555555555", res);
