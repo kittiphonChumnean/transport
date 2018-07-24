@@ -102,6 +102,7 @@ class TrackingMess extends Component {
           var Zone
           var Trip
           var status_list = {
+            '4':'Messenger รับงานเข้า Application',
             '5':'Messenger ตรวจของเรียบร้อย',
             '6':'Messenger คอนเฟริมออกรอบ',
             '7':'Messenger กดโทรหาลูกค้า',
@@ -124,7 +125,7 @@ class TrackingMess extends Component {
                 <th><center>{i+1}</center></th>
                 <th width="15%"><center>{val.Date}</center></th> 
                 <th width="15%"><center>{val.Time}</center></th>
-                <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
+                <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
                 <th><center>{val.invoice}</center></th>
                 <th width="20%"><center>{status_list[val.status]}</center></th>
                 <th><center>{val.location}</center></th>
@@ -132,7 +133,7 @@ class TrackingMess extends Component {
             </tbody>
             Mess = val.MessengerID
             Trip = val.Trip
-            DateTime = moment(val.DateTime).format("DD-MM-YYYY")
+            DateTime = moment(val.Date).format("DD-MM-YYYY")
           arrData.push(tblData)
           });
           this.setState({

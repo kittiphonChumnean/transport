@@ -27,7 +27,7 @@ var fnSelectAllData = function (callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
         // console.log("DB Connected")
         return pool.request()
-            .query('SELECT DISTINCT  SaleID FROM [AX-ToWebTest2]')
+            .query('SELECT DISTINCT  SaleID FROM [AX-ToWebTest2] Order by SaleID ASC')
     }).then(res => {
         sql.close()
         callback(res)
@@ -113,7 +113,7 @@ var insertBill={
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject){
-            console.log("ค่า",args)
+            console.log("ค่า",args.inData)
             fninsertBill(args.inData,args.DocumentSet, function (data) {
                 resolve(data)
             })
@@ -157,53 +157,15 @@ var fninsertBill = function (inData,DocumentSet, callback) {
                         ' ON '+
                             ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
                         ' WHERE '+
-                            ' ConfirmBill.CustomerID IS NULL '+
-
-                        ' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = '+ strVal)
+                            ' ConfirmBill.CustomerID IS NULL '+  
+                        
+                        ' UPDATE [AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] IN ('+ strVal+') '+
+                        
+                        ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] , '+
+                        ' [Amount],[PriceOfUnit]) SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) '+         
+                        ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] IN ('+ strVal+') ')
             .then(res => {
-                sql.close();              
-                    callback({ status: true })              
-            })
-    })
-}
-
-//updateAX
-var updateAX={
-    type:inputStatusAllbill,
-    args: {
-        inData: {
-            type: new GraphQLList(ConfrimModel),
-            args: {
-                INVOICEID: { type: GraphQLString }
-            }
-        }
-    },
-    resolve: function (_, args) {
-        return new Promise(function (resolve, reject){
-            console.log("ค่า",args)
-            fnupdateAX(args.inData, function (data) {
-                resolve(data)
-            })
-        })
-    }
-}
-
-var fnupdateAX = function (inData, callback) {
-    sql.close();
-    sql.connect(dbConnect.dbConnect).then(pool => {
-        var request = new sql.Request(pool)
-        var strVal = ""
-        inData.forEach(function (val, i) {
-            request.input('INVOICEID' + i, sql.VarChar, val.INVOICEID)
-            if (i + 1 == inData.length) {
-                strVal += "(@INVOICEID" + i +")"
-            } else {
-                strVal += "(@INVOICEID" + i +"),"
-            }
-        });
-        //console.log('str',strVal)
-        request.query(' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = '+ strVal)
-            .then(res => {
+                // console.log(q.sql)
                 sql.close();              
                     callback({ status: true })              
             })
@@ -247,71 +209,6 @@ var fnselectDetailBill = function (INVOICEID,callback) {
         console.log("Detail", res);
         sql.close()
         callback(res)
-    })
-}
-
-//insertInvoice
-var insertInvoiceStatus = new GraphQLObjectType({
-    name: 'insertInvoiceStatus', 
-    fields: () => ({
-        status: {type: GraphQLBoolean}
-    })
-})
-
-var insertInvoice={
-    type:insertInvoiceStatus,
-    args:{
-        INVOICEID: {type: GraphQLString},
-        DocumentSet: {type: GraphQLString}
-    },
-    resolve: function (_, args) {
-        return new Promise(function (resolve, reject){
-            console.log("ค่า",args)
-            fninsertINVOICEID(args.INVOICEID,args.DocumentSet, function (data) {
-                resolve(data)
-            })
-        })
-    }
-}
-
-var fninsertINVOICEID = function (INVOICEID,DocumentSet, callback) {
-    sql.close();
-    sql.connect(dbConnect.dbConnect).then(pool => {
-        var request = new sql.Request(pool)
-        request.input('INVOICEID',sql.VarChar,INVOICEID)
-        request.input('DocumentSet',sql.VarChar,DocumentSet)
-        request.query('insert into [ConfirmBill] ([INVOICEID]) values (@INVOICEID) '+
-
-                            'UPDATE '+
-                            ' ConfirmBill '+
-                        ' SET '+
-                            ' DocumentSet= @DocumentSet, '+
-                        ' CustomerID= [AX-ToWebTest2].CustomerID, '+
-                            ' CustomerName = [AX-ToWebTest2].CustomerName, '+
-                            ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
-                        ' SaleID= [AX-ToWebTest2].SaleID, '+
-                            ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
-                            ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
-                            ' Status=1 , '+
-                            ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
-                        ' FROM '+
-                            ' ConfirmBill '+
-                        ' INNER JOIN '+
-                            ' [AX-ToWebTest2] '+
-                        ' ON '+
-                            ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
-                        ' WHERE '+
-                            ' ConfirmBill.CustomerID IS NULL ' +  
-                        
-                        ' UPDATE [dbo].[AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] = @INVOICEID ' +
-
-                        ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] ,[Amount],[PriceOfUnit]) '+
-                        ' SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) '+            
-                        ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] = @INVOICEID')
-            .then(res => {
-                sql.close();              
-                    callback({ status: true })              
-            })
     })
 }
 
@@ -360,7 +257,5 @@ module.exports = {
     selectAllBill: selectAllBill,
     insertBill: insertBill,
     selectDetailBill: selectDetailBill,
-    insertInvoice: insertInvoice,
-    updateAX: updateAX,
     DocumentSet: DocumentSet
 }

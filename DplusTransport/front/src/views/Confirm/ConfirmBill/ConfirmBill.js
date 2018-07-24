@@ -14,6 +14,9 @@ import {
   ModalHeader,
   ModalFooter
 } from 'reactstrap';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { withApollo, gql, compose } from 'react-apollo';
 import ConfirmDetail from './ConfirmDetail';
 var arrCheck=[]
@@ -33,10 +36,30 @@ class ConfirmBill extends Component {
       showINVOICEID:'',
       TableDetail:'',
       isGoing: true,
+      startDate: moment(),
+      show_date: '',
+      show_sale:'',
+      allChecked: false
     };
     this.ConfrimBill = this.ConfrimBill.bind(this)
     this.toggle = this.toggle.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.AllChecked = this.AllChecked.bind(this);
+  }
+
+  handleChange(date) {
+    var dateTime = moment(date).format("YYYY-MM-DD")
+    this.setState({
+      startDate: date
+    });
+  }
+
+  AllChecked(e) {
+    const target = e.target
+    this.setState({
+      allChecked: target.checked
+    })
   }
 
   handleInputChange= invoice => event => {
@@ -81,19 +104,14 @@ class ConfirmBill extends Component {
     })
  }
 
-  chooseDate=(e)=>{
-    this.setState({
-      showDate:e.target.value
-    })
-  }
-
   seachBill=()=>{
     //console.log("1234567890")
+    var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
       this.props.client.query({
         query:selectAllBill,
         variables: {
           "SaleID":this.state.showSale,
-          "invoicedate":this.state.showDate
+          "invoicedate":formatDate
         }
       }).then((result) => {
         //onsole.log("3333",result)
@@ -105,20 +123,26 @@ class ConfirmBill extends Component {
             <td><center> <input
             name="isGoing"
             type="checkbox"
+            bsSize="large"
+            allChecked={this.state.allChecked}
             onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
               <td><center>{i+1}</center></td>
+              <td><center>{val.SaleID}</center></td>
               <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
-              <td> </td>
-              <td><center>{val.DELIVERYNAME}</center></td>
-              <td><center>{val.Customer_Address}</center></td>
-              <td><center><Button color="success" onClick={()=>this.DocumentSet(val.INVOICEID)}>คอนเฟริม</Button></center></td>
+              <td><center></center></td>
+              <td><center></center></td>
+              <td>{val.DELIVERYNAME}</td>
+              <td>{val.Customer_Address}</td>
             </tr>
           </tbody>
         arrData.push(tblData)
         },this);
+        var date = moment(formatDate).format("DD-MM-YYYY")
         this.setState({
           showTable:arrData,
-          dataTable:result
+          dataTable:result,
+          show_date: date,
+          show_sale: this.state.showSale
         })
     }).catch((err) => {
 
@@ -166,24 +190,25 @@ toggle(INVOICEID) {
   });
 }
 
-DocumentSet2=()=>{
+DocumentSet=()=>{
   var Document_Set
+  var tempDate = moment();
+  var _Date = moment(tempDate).format("YYMM")
+  //console.log("Date",_Date)
     if(window.confirm("กรุณายืนยันการคอนเฟริม")){
     this.props.client.query({
         query:DocumentSet
     }).then((result) => {
-        console.log("result",result.data.DocumentSet[0].last)
+        //console.log("result",result.data.DocumentSet[0].last)
         var _result = result.data.DocumentSet[0].last
         if(_result < 10){
-          Document_Set = 'D0000'+_result
+          Document_Set = 'D'+_Date+'-000'+_result
         }else if(_result < 100){
-          Document_Set = 'D000'+_result
+          Document_Set = 'D'+_Date+'-00'+_result
         }else if(_result < 1000){
-          Document_Set = 'D00'+_result
-        }else if(_result < 10000){
-          Document_Set = 'D0'+_result
-        }else if(_result >= 10000){
-          Document_Set = 'D'+_result
+          Document_Set = 'D'+_Date+'-0'+_result
+        }else if(_result >= 1000){
+          Document_Set = 'D'+_Date+'-'+_result
         }
         console.log('DocumentSet',Document_Set)
         this.ConfrimBill(Document_Set)
@@ -209,8 +234,7 @@ DocumentSet2=()=>{
             "DocumentSet": DocumentSet
         }
     }).then(res => {
-        console.log("Client Res", res)
-        this.updateAX()
+        //console.log("Client Res", res)
         if (res.data.insertBill.status === true) {
             alert("บันทึกข้อมูลเรียบร้อย")
             window.location.reload()
@@ -219,75 +243,6 @@ DocumentSet2=()=>{
             return false
         }
     })
-  }
-
-  updateAX(){
-    console.log('เข้า')
-    var arrData = []
-      this.state.dataTable.data.selectAllBill.forEach(function (val,i) {
-        arrData.push({
-          INVOICEID:val.INVOICEID
-        })
-      });
-
-       this.props.client.mutate({
-        mutation: updateAX,
-        variables: {
-            "inData": arrData
-        }
-    }).then(res => {
-      
-    })
-    
-  }
-
-  DocumentSet=(INVOICEID)=>{
-    var Document_Set
-      if(window.confirm("กรุณายืนยันการคอนเฟริม INVOICEID: "+INVOICEID)){
-      this.props.client.query({
-          query:DocumentSet
-      }).then((result) => {
-          console.log("result",result.data.DocumentSet[0].last)
-          var _result = result.data.DocumentSet[0].last
-          if(_result < 10){
-            Document_Set = 'D0000'+_result
-          }else if(_result < 100){
-            Document_Set = 'D000'+_result
-          }else if(_result < 1000){
-            Document_Set = 'D00'+_result
-          }else if(_result < 10000){
-            Document_Set = 'D0'+_result
-          }else if(_result >= 10000){
-            Document_Set = 'D'+_result
-          }
-          console.log('DocumentSet',Document_Set)
-          this.SaveInvoice(INVOICEID,Document_Set)
-      }).catch((err) => {
-
-      });
-    }
-  }
-
-  SaveInvoice=(INVOICEID,DocumentSet)=>{
-      this.props.client.mutate({
-        mutation:insertInvoice,
-        variables: {
-          "INVOICEID": INVOICEID,
-          "DocumentSet": DocumentSet
-        }
-      }).then((result) => {
-          console.log("result",result)
-          if (result.data.insertInvoice.status === true) {
-            alert("บันทึกข้อมูลเรียบร้อย")
-            window.location.reload()
-            
-        } else {
-            alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
-            return false
-        }
-      }).catch((err) => {
-
-      });
   }
 
   componentWillMount(){
@@ -310,45 +265,48 @@ DocumentSet2=()=>{
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" required={true/false} requiredRule="isFalse" onChange={this.chooseSale}>
                           <option>---</option>
                           {this.state.showDropdown}
                         </Input>
                         </div>
                         <div class="pr-1 form-group">
                           &nbsp;<Label for="date" class="pr-1"><strong>วันที่</strong></Label>
-                          &nbsp;&nbsp;<Input id="date" name="date" type="date" onChange={this.chooseDate} ></Input>
+                          &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
                         <Button color="success" onClick={this.seachBill}>ค้นหา</Button>
                         </div>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                           &nbsp;&nbsp;<Label for="exampleInputName2" class="pr-1"><strong>Sale</strong></Label>&nbsp;&nbsp;
-                          <Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showSale} disabled>
+                          <Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.show_sale} disabled>
                           </Input>
                           &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>วันที่</strong></label>&nbsp;&nbsp;
-                          <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.showDate} disabled>
+                          <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.show_date} disabled>
                           </Input>
                         </div>
                       </form>
                     </div>
                   </div>
                   <br />
+                  <Button color="primary" onClick={this.DocumentSet}>คอนเฟริมบิล</Button>
+                  <br />
+                  <br />
                   <Table responsive>
                     <thead>
                       <tr>
-                        <th width="5%"><center> </center></th>
-                        <th width="5%"><center>ลำดับ </center></th>
-                        <th width="15%"><center>รหัส invoice</center></th>
-                        <th width="10%"><center>จำนวนกล่อง</center></th>
-                        <th width="20%"><center>ผู้รับ</center></th>
-                        <th><center>ที่อยู่</center></th>
-                        <th width="10%"></th>
+                        <th width="5%"><center><Button color="primary" AllChecked={this.AllChecked}>All</Button></center></th>
+                        <th width="3%"><center>ลำดับ</center></th>
+                        <th width="4%"><center>Sale ID</center></th>
+                        <th width="5%"><center>รหัส invoice</center></th>
+                        <th width="5%"><center>เลข SO</center></th>
+                        <th width="5%"><center>จำนวนกล่อง</center></th>
+                        <th width="10%">ผู้รับ</th>
+                        <th width="15%">ที่อยู่</th>
                       </tr>
                     </thead>
                     {this.state.showTable}
                   </Table>
-                  <Button color="primary" onClick={this.DocumentSet2}>คอนเฟริมบิล</Button>
                 </center>
               </CardBody>
             </Card>
