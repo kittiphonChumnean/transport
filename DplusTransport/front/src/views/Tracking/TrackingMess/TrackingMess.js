@@ -132,9 +132,10 @@ class TrackingMess extends Component {
             </tbody>
             Mess = val.MessengerID
             Trip = val.Trip
-            DateTime = moment(val.DateTime).format("DD-MM-YYYY")
+            DateTime = moment(val.Date).format("DD-MM-YYYY")
           arrData.push(tblData)
           });
+          //console.log("วันที่",DateTime)
           this.setState({
             showTable:arrData,
             showMessID:this.state.showMess,
