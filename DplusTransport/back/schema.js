@@ -116,8 +116,6 @@ const mutationtype = new GraphQLObjectType({
 
         //jar muta
         insertDoc: AssignmentDoc.insertDoc,
-        insertInvoice: queryComfrimBill.insertInvoice,
-        updateAX: queryComfrimBill.updateAX
 
 
     }

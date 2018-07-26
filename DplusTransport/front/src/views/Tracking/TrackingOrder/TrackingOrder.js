@@ -60,6 +60,7 @@ class TrackingOrder extends Component {
         var CusName
         var CusAddess
         var status_list = {
+          '4':'Messenger รับงานเข้า Application',
           '5':'Messenger ตรวจของเรียบร้อย',
           '6':'Messenger คอนเฟริมออกรอบ',
           '7':'Messenger กดโทรหาลูกค้า',
@@ -79,9 +80,10 @@ class TrackingOrder extends Component {
           tblData = <tbody>
             <tr>
               <th><center>{i+1}</center></th>
+              <th width="10%"><center> </center></th>
               <th width="15%"><center>{val.Date}</center></th> 
               <th width="15%"><center>{val.Time}</center></th>
-              <th><center><img src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
+              <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
               <th width="20%"><center>{status_list[val.status]}</center></th>
               <th><center>{val.location}</center></th>
             </tr>
@@ -156,6 +158,7 @@ class TrackingOrder extends Component {
                   <Table striped>
                     <tr>
                       <th><center>ลำดับ</center></th>
+                      <th><center>เลข SO</center></th>
                       <th><center>วันที่ </center></th>
                       <th><center>เวลา</center></th>
                       <th><center> </center></th>
