@@ -261,7 +261,7 @@ arr.push(e.target.value)
         INVOICEID:e.target.value
         
       })
-       
+      this.inputTitle.value = "";
       this.queryGettesk()
     
     }
@@ -297,7 +297,7 @@ arr.push(e.target.value)
 
                           </input>
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลข INVOICE</strong></label>&nbsp;&nbsp;
-                          <input  id="invoice" required="required" onKeyPress={this.Enterfn}   type="text" class="form-control"  ></input>
+                          <input  id="invoice"  ref={el => this.inputTitle = el} required="required" onKeyPress={this.Enterfn}   type="text" class="form-control"  ></input>
                         </div>
                         <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
                       </form>
