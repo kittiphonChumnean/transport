@@ -21,6 +21,7 @@ import {
   var IDMess_
   var Trip_
   var num = 0;
+  var arr=[]
 
   
   
@@ -135,6 +136,9 @@ handleChange = idx => e => {
 Enterfn= idx => e => {
 
   if (e.key === 'Enter') {
+    if (arr.findIndex(k => k==e.target.value)<0||arr.length==0){
+      arr.push(e.target.value)
+
     this.handleAddRow()
     this.queryAssingmentInvoice2(idx,e)
     num =num+1
@@ -152,7 +156,11 @@ Enterfn= idx => e => {
     
     console.log("row"+this.state.rows)
     console.log("idx"+idx)
+  }else{
+    window.alert("invoice ซ้ำ")
+    this.inputTitle.value = "";
   }
+}
 }
 
 
@@ -181,10 +189,14 @@ console.log("Status==>"+val.Status)
         rows[idx].saleID = val.SaleID}
 
         else if (val.Status==3){
+          window.alert("invoice นี้ได้จ่ายงานไปแล้ว")
           msg_="invoice นี้ได้จ่ายงานไปแล้ว"
+          
         }
         else if (val.Status==1){
+          window.alert("invoice นี้ยังไม่ได้รับงาน")
           msg_="invoice นี้ยังไม่ได้รับงาน"
+          
         }
         console.log("test++>"+ val.Status)
       });
@@ -198,11 +210,12 @@ console.log("Status==>"+val.Status)
       console.log("ไปลบ",idx)}
     
     }else{
-      this.setState({
-        msg:'ไม่มี invoice นี้'
-      })
+      window.alert("ไม่มี invoice นี้")
+      //this.setState({
+        //msg:'ไม่มี invoice นี้'
+      //})
       this.handleRemoveRowOato(idx)
-      console.log("ไปลบ",idx)
+      //console.log("ไปลบ",idx)
     }
      
 
@@ -460,7 +473,7 @@ queryAssingment2=()=>{
                         />
                         </div>
                         
-                        &nbsp; &nbsp;<font color="red"><label  class="pr-1"   ><strong>{this.state.msg} </strong></label></font>&nbsp;&nbsp;
+                        &nbsp; &nbsp;<font color="red"><label  class="pr-1"   ><strong> </strong></label></font>&nbsp;&nbsp;
                       </form>
                     </div>
                   </div>
@@ -506,7 +519,7 @@ queryAssingment2=()=>{
                       </td>
                       
                       <td>
-                      <button class="btn btn-outline-danger btn-block"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
+                      <button class="btn btn-sm btn-pill btn-danger"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
                         </td>
                     </tr>
                   ))}
