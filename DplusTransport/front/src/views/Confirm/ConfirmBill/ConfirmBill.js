@@ -14,12 +14,33 @@ import {
   ModalHeader,
   ModalFooter
 } from 'reactstrap';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { withApollo, gql, compose } from 'react-apollo';
 import ConfirmDetail from './ConfirmDetail';
 var arrCheck=[]
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+var arrDataPDF = []
+var datePDF
+pdfMake.fonts = {
+  THSarabun: {
+    normal: 'THSarabun.ttf',
+    bold: 'THSarabun Bold',
+    italics: 'THSarabun Italic',
+    bolditalics: 'THSarabun Bold Italic.ttf'
+  },
+  Roboto: {
+    normal: 'Roboto-Regular.ttf',
+    bold: 'Roboto-Medium.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-MediumItalic.ttf'
+  }
+}
+
+
 
 class ConfirmBill extends Component {
   constructor(props) {
@@ -47,6 +68,32 @@ class ConfirmBill extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.AllChecked = this.AllChecked.bind(this);
   }
+
+  printPDF() {
+    var docDefinition = {
+      pageSize: 'A5',
+      pageOrientation: 'landscape',
+
+
+      content: [
+        { text: 'ทดสอบ print' ,fontSize: 20 },
+        { text:'ทดสอบ print  ' ,fontSize:18 },
+       
+      ],
+      defaultStyle: {
+        font: 'THSarabun',
+        fontSize: 14
+      }
+
+    };
+
+
+
+    pdfMake.createPdf(docDefinition).print()
+
+  }
+
+
 
   handleChange(date) {
     var dateTime = moment(date).format("YYYY-MM-DD")
@@ -285,6 +332,10 @@ DocumentSet=()=>{
                           <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.show_date} disabled>
                           </Input>
                         </div>
+
+                         &nbsp;&nbsp;<div class="pr-1 form-group">
+                        <Button color="info" onClick={this.printPDF}>printPDF</Button>
+                      </div>
                       </form>
                     </div>
                   </div>

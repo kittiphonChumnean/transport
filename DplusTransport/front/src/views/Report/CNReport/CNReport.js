@@ -26,6 +26,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 var arrDataPDF = []
 var datePDF
 var datePDFend
+var sale
 
 
 function buildTableBody(data, columns) {
@@ -49,11 +50,19 @@ function buildTableBody(data, columns) {
 function table(data, columns) {
   return {
       table: {
-          headerRows: 1,
-          body: buildTableBody(data, columns)
-      }
-  };
-}
+        headerRows: 1,
+        body: buildTableBody(data, columns),
+  
+      },
+      layout: {
+        hLineWidth: function(i, node) {
+          return 1;
+          
+        }
+      },
+      margin: [8, 15, 0, 0]
+    };
+  }
 
 
 pdfMake.fonts = {
@@ -93,8 +102,9 @@ printPDF(){
   var docDefinition = {
       
     content: [
-      { text: 'รายงานคืนสินค้า', style: 'header' ,fontSize:20},
-      { text:'วันที่  '+datePDF+' ถึง '+datePDFend, style: 'header' ,fontSize:18},
+      { text: 'รายงานคืนสินค้า', style: 'header' ,fontSize:20,margin:[ 220, 2, 5, 5 ]},
+      { text:'วันที่  '+datePDF+' ถึง '+datePDFend, style: 'header' ,fontSize:18,margin:[ 180, 2, 5, 5 ]},
+      { text:'Sale : '+sale+'  ผู้ส่งเอกสาร............................' ,fontSize:18,margin:[ 165, 2, 5, 5 ]},
         table(arrDataPDF, ['ลำดับ','Sale','invoice','ลูกค้า','Qtyยอดจริง','ยอดเงินจริง','วันที่เคลียร์บิล','ยอดเงินที่เก็บได้','จำนวนCN','ยอดCN','จำนวนคงเหลือ','เหตุผล'])
        
        // table(externalDataRetrievedFromServer, ['ลำดับ', 'เลขที่ invoice', 'รหัสลูกค้า', 'จำนวนเงิน (invoice)','เงินสดที่เก็บได้','ค้างจ่าย'])
@@ -224,6 +234,7 @@ printPDF(){
     this.setState({
       showSale:e.target.value
     })
+    sale=e.target.value
  }
 
 

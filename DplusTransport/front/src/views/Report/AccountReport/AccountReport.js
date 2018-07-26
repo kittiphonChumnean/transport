@@ -48,9 +48,19 @@ function buildTableBody(data, columns) {
 function table(data, columns) {
   return {
     table: {
+      //widths: [0, 0, 0, 0],
+     
       headerRows: 1,
-      body: buildTableBody(data, columns)
-    }
+      body: buildTableBody(data, columns),
+
+    },
+    layout: {
+      hLineWidth: function(i, node) {
+        return 1;
+        
+      }
+    },
+    margin: [55, 15, 0, 0]
   };
 }
 
@@ -95,15 +105,21 @@ class AccountReport extends Component {
     var docDefinition = {
 
       content: [
-        { text: 'รายงานบัญชี', style: 'header', fontSize: 20 },
-        { text: 'วันที่  ' + datePDF, style: 'header', fontSize: 18 },
-        table(arrDataPDF, ['ลำดับ', 'Invoice', 'รหัสลูกค้า', 'จำนวนเงินตามInvoice', 'เงินสดที่เก็บได้', 'ค้างจ่าย'])
+        
+
+        { text: 'รายงานส่งบัญชี', style: 'header', fontSize: 20 ,margin:[ 220, 2, 5, 5 ]},
+        { text: 'วันที่  ' + datePDF, style: 'header', fontSize: 18 ,margin:[ 218, 2, 5, 5 ]},
+        
+        table(arrDataPDF, ['ลำดับ', 'Invoice', 'รหัสลูกค้า', 'จำนวนเงินตามInvoice', 'เงินสดที่เก็บได้', 'ค้างจ่าย'] )
 
         // table(externalDataRetrievedFromServer, ['ลำดับ', 'เลขที่ invoice', 'รหัสลูกค้า', 'จำนวนเงิน (invoice)','เงินสดที่เก็บได้','ค้างจ่าย'])
       ],
       defaultStyle: {
         font: 'THSarabun',
         fontSize: 16,
+        
+        
+        
       }
     };
     pdfMake.createPdf(docDefinition).open()
