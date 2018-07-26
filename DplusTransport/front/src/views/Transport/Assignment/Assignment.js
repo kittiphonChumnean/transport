@@ -45,6 +45,7 @@ class Assignment extends React.Component {
       rows: [],
       Datastorezone:'',
       DataSaleID:'',
+      msg:'',
     
       dropdownOpen: new Array(6).fill(false),
     };
@@ -81,19 +82,42 @@ handleAddRow = () => {
 
 handleRemoveRow= idx => e => { 
   console.log("delete"+idx)
-  console.log("=====>"+this.state.rows[0])
-  console.log("=====>"+this.state.rows[1])
+  console.log("rows1")
+  console.log(this.state.rows)
+
 
   //console.log("=====>"+this.state.rows.findIndex(k => k==idx))
 
-   
+  this.state.rows.splice(idx,1)
   this.setState({
-    rows: this.state.rows.slice(0,-1)
+    rows: this.state.rows
     //rows: this.state.rows.splice(this.state.rows.findIndex(k => k==idx),1)
 
    
   });
- 
+ num=num-1
+ console.log("rows2")
+  console.log(this.state.rows)
+};
+
+handleRemoveRowOato(idx) { 
+  console.log("delete"+idx)
+  console.log("rows1")
+  console.log(this.state.rows)
+
+
+  //console.log("=====>"+this.state.rows.findIndex(k => k==idx))
+
+  this.state.rows.splice(idx,1)
+  this.setState({
+    rows: this.state.rows
+    //rows: this.state.rows.splice(this.state.rows.findIndex(k => k==idx),1)
+
+   
+  });
+ num=num-1
+ console.log("rows2")
+  console.log(this.state.rows)
 };
 
 //-----------------------test------------------------------//
@@ -116,6 +140,7 @@ Enterfn= idx => e => {
     num =num+1
 
     this.inputTitle.value = "";
+    this.state.msg = "";
    
    
  
@@ -125,7 +150,7 @@ Enterfn= idx => e => {
     //})
     
     
-    console.log("num"+num)
+    console.log("row"+this.state.rows)
     console.log("idx"+idx)
   }
 }
@@ -142,20 +167,46 @@ queryAssingmentInvoice2(idx,e) {
      
       }
     }).then((result) => {
-   
+   var msg_
       console.log("22222",result,result.data)
    
      // rows[idx].mobile = result.data.queryAssingmentInvoice.CustomerName
-      
+      if (result.data.queryAssingmentInvoice.length>=1){
+
       result.data.queryAssingmentInvoice.forEach(function (val,i) {
+console.log("Status==>"+val.Status)
+        if (val.Status==2){
         rows[idx].customer = val.CustomerName
         rows[idx].storezone = val.StoreZone
-        rows[idx].saleID = val.SaleID
-        console.log("test++>"+ val.StoreZone)
+        rows[idx].saleID = val.SaleID}
+
+        else if (val.Status==3){
+          msg_="invoice นี้ได้จ่ายงานไปแล้ว"
+        }
+        else if (val.Status==1){
+          msg_="invoice นี้ยังไม่ได้รับงาน"
+        }
+        console.log("test++>"+ val.Status)
       });
+    
+
+      if (msg_!=null){
+      this.setState({
+        msg:msg_
+      })
+      this.handleRemoveRowOato(idx)
+      console.log("ไปลบ",idx)}
+    
+    }else{
+      this.setState({
+        msg:'ไม่มี invoice นี้'
+      })
+      this.handleRemoveRowOato(idx)
+      console.log("ไปลบ",idx)
+    }
      
 
-        
+    console.log("msg",msg_)
       this.setState({
      
         
@@ -395,9 +446,10 @@ queryAssingment2=()=>{
                           <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showzone} disabled>
                           </input>
                         </div>
-                        &nbsp;<div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" id="invoice_" class="pr-1"><strong>INVOICEID</strong></label>
- <input
+
+                          &nbsp;<div class="pr-1 form-group">
+                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>INVOICEID</strong></label>&nbsp;&nbsp;
+                        <input
                          value={this.state.invoicetem}
                           type="text"
                           name="name"
@@ -406,10 +458,13 @@ queryAssingment2=()=>{
                           onKeyPress={this.Enterfn(num)}
                           ref={el => this.inputTitle = el}
                         />
- </div>
+                        </div>
+                        
+                        &nbsp; &nbsp;<font color="red"><label  class="pr-1"   ><strong>{this.state.msg} </strong></label></font>&nbsp;&nbsp;
                       </form>
                     </div>
                   </div>
+                 
                   <h5><strong>จำนวนรวม {this.state.rows.length} บิล</strong></h5>
                  
                  
@@ -422,11 +477,11 @@ queryAssingment2=()=>{
               >
                 <thead>
                   <tr>
-                    <th width="10%" className="text-center"> ลำดับ </th>
-                    <th width="15%" className="text-center"> รหัส invoice </th>
-                    <th width="15%" className="text-center"> SaleID </th>
-                    <th className="text-center"> ผู้รับ </th>
-                    <th className="text-center"> ห้าง </th>
+                    <th width="2%" className="text-center"> ลำดับ </th>
+                    <th width="10%" className="text-center"> รหัส invoice </th>
+                    <th width="10%" className="text-center"> SaleID </th>
+                    <th width="40%" className="text-center"> ผู้รับ </th>
+                    <th width="40%" className="text-center"> ห้าง </th>
                  
                     <th width="5%" ></th>
                   </tr>
@@ -451,10 +506,10 @@ queryAssingment2=()=>{
                       </td>
                       
                       <td>
-                      <button class="btn btn-outline-warning btn-block"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
+                      <button class="btn btn-outline-danger btn-block"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
                         </td>
                     </tr>
-                  ),this)}
+                  ))}
                 </tbody>
               </table>
              
@@ -502,7 +557,8 @@ query queryAssingmentInvoice($INVOICEID:String!){
   queryAssingmentInvoice(INVOICEID:$INVOICEID){
     CustomerName,
     StoreZone,
-    SaleID
+    SaleID,
+    Status
   }
 }
 `

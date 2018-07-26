@@ -18,7 +18,8 @@ import {
 
 } from 'reactstrap';
 import { gql, withApollo, compose } from 'react-apollo'
-
+var arr =[]
+var num=0
 
 class GetTask extends Component {
   constructor(props) {
@@ -28,14 +29,17 @@ class GetTask extends Component {
       dropdownOpen: new Array(6).fill(false),
       showText: "",
       showTable: '',
-      num:'',
+    
+      msg:'',
       showinvoice:0,
-      
+      invoiceData:[],
+      color:'',
     };
   }
 
 
   queryGettesk = () => {
+    console.log("queryGettesk")
     this.props.client.query({
       query: queryGettesk,
       variables: {
@@ -45,57 +49,193 @@ class GetTask extends Component {
       console.log("result", result)
       var arrData = []
       var tblData
-     
-     
+      
+    var msg_
+    
+
+      if (result.data.queryGettesk.length>=1){
+
+  
+        
+       
       result.data.queryGettesk.forEach(function (val, i) {
+       
+       
+          console.log(val.Status)
+          if(val.Status==2||val.Status==3){
+            this.setState({
+              color:"palegreen"
+            
+            })
+            
+////
+           
+         
+          
+          }else{
+            console.log("elseeeeeeeee")
+            console.log(arr[0])
+if (arr.length>=1){
+console.log("lengtharr>>>>>1")
+var m=0
+console.log("m"+m)
+
+console.log("INVOICEID"+val.INVOICEID+"arr"+arr[0])
+            for (var j=0;j<arr.length;j++){
+              console.log("test"+val.INVOICEID+arr[j])
+            
+          
+                if (val.INVOICEID==arr[j]) {
+                  console.log("INVOICEID=arr")
+                 m++
+                
+                }
+                
+                console.log("m"+m)
+            }
+            console.log("m3"+m)
+            if (m>=1){
+              this.setState({
+                color:"#ffffb3"
+              
+              })
+              
+            }else{
+              this.setState({
+                color:""
+              
+              })
+            
+            }
+        
+
+          }else{
+            this.setState({
+              color:""
+            
+            })
+            num=num+1
+            console.log("num++")
+          }
+          }
+        
+
+
         tblData = <tbody>
           <tr>
-            <td> <center>{i+1}</center></td>
-            <td><center><input  id="invoice" placeholder={val.INVOICEID} required="required" onChange={this.ChangeInvoice}   type="text" class="form-control"  ></input>
+            <td bgcolor={this.state.color}> <center>{i+1}</center></td>
+            <td bgcolor={this.state.color}><center>{val.INVOICEID}
             </center></td>
-            <td><center>{val.QTYbox}</center></td>
-            <td><center>{val.CustomerName}</center></td>
+            <td bgcolor={this.state.color}><center>{val.QTYbox}</center></td>
+            <td bgcolor={this.state.color}><center>{val.CustomerName}</center></td>
           </tr>
         </tbody>
         arrData.push(tblData)
-      
-      }, this);
+        
+        
+      }, this); 
     
-      this.setState({
-        showTable: arrData,
-        num:arrData.length,
-       
-      })
-      console.log("num == "+this.state.num)
-      console.log("invoice == "+this.state.showinvoice)
-    }).catch((err) => {
-
-    });
-  }
+    
+    
+    }
+    
+    
+    else{
+      msg_='ไม่มีเลขชุดเอกสารนี้'
+    }
 
 
   
-  queryGetteskUpdate = () => {
+  
 
-if (this.state.showinvoice >= this.state.num){
 
+      this.setState({
+        showTable: arrData,
+       
+        msg:msg_
+       
+      })
+     
+      console.log("invoice == "+this.state.showinvoice)
+      } 
+  
+  ).catch((err) => {
+
+    });
+  }
+
+ 
+
+  
+  queryGetteskUpdate= () => {
+if (num>arr.length){
+if (window.confirm("INVOICE ไม่ครบจะไปต่อหรือไม่")){
     if(window.confirm("กรุณายืนยัน")){
-    this.props.client.mutate({
-      mutation: queryGetteskUpdate,
-      variables: {
-        "DocumentSet":this.state.showText,
-      }
-    }).then((result) => {
-      console.log("result", result)
-      window.alert("รับงานสำเร็จ")
       window.location.reload()
+      console.log(this.state.invoiceData)
+     
+    this.props.client.mutate({
       
+      mutation: queryGetteskUpdate,
+      
+      variables: {
+        "inData":this.state.invoiceData
+      
+      }
+      
+    }).then(res => {
+      
+      this.queryGettesk()
+
+      if (res.data.queryGetteskUpdate.status == "2") {
+      console.log("result", res)
+      window.alert("รับงานสำเร็จ")
+     
+      window.location.reload()
+      }else {
+        console.log(this.state.invoiceData)
+          alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
+          return false
+      }
     }).catch((err) => {
       
     });
   }
-}else
-{ alert('Invoice ไม่ครบ' )}
+}
+}else{
+  if(window.confirm("กรุณายืนยัน")){
+    window.location.reload()
+    console.log(this.state.invoiceData)
+   
+  this.props.client.mutate({
+    
+    mutation: queryGetteskUpdate,
+    
+    variables: {
+      "inData":this.state.invoiceData
+    
+    }
+    
+  }).then(res => {
+    
+    this.queryGettesk()
+
+    if (res.data.queryGetteskUpdate.status == "2") {
+    console.log("result", res)
+    window.alert("รับงานสำเร็จ")
+   
+    window.location.reload()
+    }else {
+      console.log(this.state.invoiceData)
+        alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
+        return false
+    }
+  }).catch((err) => {
+    
+  });
+}
+}
+
 }
 
   ChangeText = (e) => {
@@ -103,13 +243,7 @@ if (this.state.showinvoice >= this.state.num){
         showText: e.target.value
     })
 }
-ChangeInvoice = (e) => {
-  this.setState({
-      showinvoice: this.state.showinvoice+1
-     
-  })
-  console.log("showinvoice=="+this.state.showinvoice)
-}
+
 
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => {
@@ -118,6 +252,22 @@ ChangeInvoice = (e) => {
     this.setState({
       dropdownOpen: newArray,
     });
+  }
+  Enterfn=  e => {
+
+    if (e.key === 'Enter') {
+arr.push(e.target.value)
+      this.state.invoiceData.push({
+        INVOICEID:e.target.value
+        
+      })
+       
+      this.queryGettesk()
+    
+    }
+    console.log(this.state.invoiceData)
+    console.log("showNum"+num)
+    console.log("Enter")
   }
 
   render() {
@@ -144,12 +294,19 @@ ChangeInvoice = (e) => {
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                         &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>&nbsp;&nbsp;
                           <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value= {this.state.showText} disabled>
+
                           </input>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลข INVOICE</strong></label>&nbsp;&nbsp;
+                          <input  id="invoice" required="required" onKeyPress={this.Enterfn}   type="text" class="form-control"  ></input>
                         </div>
+                        <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
                       </form>
                     </div>
                   </div>
-                  <h5><strong>จำนวนรวม {this.state.num} บิล</strong></h5>
+                  
+
+                  
+                  <h5><strong>จำนวนรวม {this.state.showTable.length} บิล</strong></h5>
                   <Table responsive>
                     <thead>
                       <tr>
@@ -161,7 +318,7 @@ ChangeInvoice = (e) => {
                     </thead>
                     {this.state.showTable}
                   </Table>
-                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg"onClick={this.queryGetteskUpdate} >เทียบ</button></div>
+                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button onClick={this.queryGetteskUpdate} class="btn-pill btn btn-success btn-lg" >เทียบ</button></div>
                 </center>
               </CardBody>
             </Card>
@@ -178,17 +335,21 @@ query queryGettesk($DocumentSet:String!){
     INVOICEID
     QTYbox
     CustomerName
-  }
-}
-`
-
-const queryGetteskUpdate = gql`
-mutation queryGettesk($DocumentSet:String!){
-  queryGettesk(DocumentSet:$DocumentSet){
     Status
   }
 }
 `
+const queryGetteskUpdate = gql`
+mutation queryGettesk($inData:[upDateStateGetTeskModel]){
+  queryGettesk(inData:$inData){
+        status
+    }
+}
+`
+
+
+
+
 
 
 const GraphQL = compose(

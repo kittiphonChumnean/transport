@@ -90,6 +90,7 @@ var invoiceModel = new GraphQLObjectType({
         Sale_Name: { type: GraphQLString },
         StoreZone: { type: GraphQLString },
         DELIVERYNAME :{ type: GraphQLString },
+        Status:{type:GraphQLInt}
 
     })
 })
@@ -114,7 +115,7 @@ var fnSelectinvoice = function (INVOICEID, callback) {
         // console.log("DB Connected")
         return pool.request()
             .input('INVOICEID', sql.VarChar, INVOICEID)
-            .query('SELECT [INVOICEID],[DocumentSet],[CustomerID],[CustomerName],[AddressShipment],[SaleID],[Sale_Name],[StoreZone],[DELIVERYNAME]FROM [ConfirmBill] WHERE Status=2 AND INVOICEID = @INVOICEID')
+            .query('SELECT [INVOICEID],[DocumentSet],[CustomerID],[CustomerName],[AddressShipment],[SaleID],[Sale_Name],[StoreZone],[DELIVERYNAME],[Status]FROM [ConfirmBill] WHERE  INVOICEID = @INVOICEID')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
