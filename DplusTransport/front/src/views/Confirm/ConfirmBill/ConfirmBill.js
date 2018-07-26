@@ -168,9 +168,12 @@ class ConfirmBill extends Component {
           tblData = <tbody>
             <tr>
             <td><center> <input
+           
             name="isGoing"
             type="checkbox"
+            
             bsSize="large"
+           
             allChecked={this.state.allChecked}
             onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
               <td><center>{i+1}</center></td>
