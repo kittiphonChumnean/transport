@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI - Open Source Dashboard UI Kit
- * @version v2.0.2
+ * @version v2.0.3
  * @link https://coreui.io
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
@@ -253,9 +253,7 @@ button::-moz-focus-inner,
 input[type="radio"],
 input[type="checkbox"] {
   box-sizing: border-box;
-  padding: 0; 
-  width: 25px;
-  height: 25px;}
+  padding: 0; }
 
 input[type="date"],
 input[type="time"],
@@ -1056,8 +1054,7 @@ pre {
   width: 100%;
   max-width: 100%;
   margin-bottom: 1rem;
-  background-color: transparent;
-  line-height: 12pt; }
+  background-color: transparent; }
   .table th,
   .table td {
     padding: 0.75rem;

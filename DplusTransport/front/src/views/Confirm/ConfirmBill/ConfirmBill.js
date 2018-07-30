@@ -12,7 +12,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  ModalFooter
 } from 'reactstrap';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -20,7 +19,9 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { withApollo, gql, compose } from 'react-apollo';
-import ConfirmDetail from './ConfirmDetail';
+import EllipsisText  from 'react-ellipsis-text';
+
+
 var arrCheck=[]
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 var arrDataPDF = []
@@ -60,16 +61,17 @@ class ConfirmBill extends Component {
       startDate: moment(),
       show_date: '',
       show_sale:'',
-      allChecked: false
+      showButtonConfrim: '',
+      checked: false,
     };
     this.ConfrimBill = this.ConfrimBill.bind(this)
     this.toggle = this.toggle.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.AllChecked = this.AllChecked.bind(this);
   }
 
   printPDF() {
+    console.log("printt")
     var docDefinition = {
       pageSize: 'A5',
       pageOrientation: 'landscape',
@@ -96,17 +98,9 @@ class ConfirmBill extends Component {
 
 
   handleChange(date) {
-    var dateTime = moment(date).format("YYYY-MM-DD")
     this.setState({
       startDate: date
     });
-  }
-
-  AllChecked(e) {
-    const target = e.target
-    this.setState({
-      allChecked: target.checked
-    })
   }
 
   handleInputChange= invoice => event => {
@@ -151,9 +145,18 @@ class ConfirmBill extends Component {
     })
  }
 
+ onCheckAll=(e)=>{
+   //console.log("...")
+    this.setState({
+      checked: !this.state.checked
+    },()=>console.log(this.state.checked))
+    
+ }
+
   seachBill=()=>{
-    //console.log("1234567890")
-    var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
+    //console.log("1234567890",this.state.showSale)
+    if(this.state.showSale != ''){
+      var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
       this.props.client.query({
         query:selectAllBill,
         variables: {
@@ -162,41 +165,47 @@ class ConfirmBill extends Component {
         }
       }).then((result) => {
         //onsole.log("3333",result)
-        var arrData = []
-        var tblData
-        result.data.selectAllBill.forEach(function (val,i) {
-          tblData = <tbody>
-            <tr>
-            <td><center> <input
-           
-            name="isGoing"
-            type="checkbox"
-            
-            bsSize="large"
-           
-            allChecked={this.state.allChecked}
-            onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
-              <td><center>{i+1}</center></td>
-              <td><center>{val.SaleID}</center></td>
-              <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
-              <td><center></center></td>
-              <td><center></center></td>
-              <td>{val.DELIVERYNAME}</td>
-              <td>{val.Customer_Address}</td>
-            </tr>
-          </tbody>
-        arrData.push(tblData)
-        },this);
-        var date = moment(formatDate).format("DD-MM-YYYY")
-        this.setState({
-          showTable:arrData,
-          dataTable:result,
-          show_date: date,
-          show_sale: this.state.showSale
-        })
-    }).catch((err) => {
+        if(result.data.selectAllBill.length != 0){
+          var arrData = []
+          var tblData
+          result.data.selectAllBill.forEach(function (val,i) {
+            tblData = <tbody>
+              <tr>
+              <td><center> <input
+              name="isGoing"
+              type="checkbox"      
+              bsSize="large"
+              allChecked={this.state.allChecked}
+              onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
+                <td><center>{i+1}</center></td>
+                <td><center>{val.SaleID}</center></td>
+                <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
+                <td><center></center></td>
+                <td><center></center></td>
+                <td>{val.DELIVERYNAME}</td>
+                <td><p data-tip={val.Customer_Address}><EllipsisText text={val.Customer_Address} length={'40'} /></p></td>
+              </tr>
+            </tbody>
+          arrData.push(tblData)
+          },this);
+          var ButtonConfrim = <Button color="primary" onClick={this.DocumentSet}>คอนเฟริมบิล</Button>
+          var date = moment(formatDate).format("DD-MM-YYYY")
+          this.setState({
+            showTable:arrData,
+            dataTable:result,
+            show_date: date,
+            show_sale: this.state.showSale,
+            showButtonConfrim: ButtonConfrim
+          })
+        }else{
+          alert("ไม่พบข้อมูล")
+      }
+      }).catch((err) => {
 
     });
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
+    }
 }
 
 
@@ -286,8 +295,10 @@ DocumentSet=()=>{
     }).then(res => {
         //console.log("Client Res", res)
         if (res.data.insertBill.status === true) {
-            alert("บันทึกข้อมูลเรียบร้อย")
+          if(window.confirm("บันทึกข้อมูลเรียบร้อย กรุณายืนยันการปริ้น")){
+            this.printPDF
             window.location.reload()
+          }
         } else {
             alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
             return false
@@ -315,7 +326,7 @@ DocumentSet=()=>{
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" required={true/false} requiredRule="isFalse" onChange={this.chooseSale}>
+                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
                           <option>---</option>
                           {this.state.showDropdown}
                         </Input>
@@ -334,29 +345,22 @@ DocumentSet=()=>{
                           &nbsp;&nbsp;<label for="exampleInputName3" class="pr-1"><strong>วันที่</strong></label>&nbsp;&nbsp;
                           <Input id="exampleInputName3" placeholder="" required="" type="text" class="form-control" value={this.state.show_date} disabled>
                           </Input>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{this.state.showButtonConfrim}
                         </div>
-
-                         &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Button color="info" onClick={this.printPDF}>printPDF</Button>
-                      </div>
                       </form>
                     </div>
                   </div>
-                  <br />
-                  <Button color="primary" onClick={this.DocumentSet}>คอนเฟริมบิล</Button>
-                  <br />
-                  <br />
-                  <Table responsive>
+                  <Table>
                     <thead>
                       <tr>
-                        <th width="5%"><center><Button color="primary" AllChecked={this.AllChecked}>All</Button></center></th>
-                        <th width="3%"><center>ลำดับ</center></th>
-                        <th width="4%"><center>Sale ID</center></th>
-                        <th width="5%"><center>รหัส invoice</center></th>
-                        <th width="5%"><center>เลข SO</center></th>
-                        <th width="5%"><center>จำนวนกล่อง</center></th>
-                        <th width="10%">ผู้รับ</th>
-                        <th width="15%">ที่อยู่</th>
+                        <th width="5%"><center><Button color="primary" onClick={this.onCheckAll}>All</Button></center></th>
+                        <th width="5%"><center>ลำดับ</center></th>
+                        <th width="5%"><center>Sale ID</center></th>
+                        <th width="10%"><center>รหัส invoice</center></th>
+                        <th width="10%"><center>เลข SO</center></th>
+                        <th width="10%"><center>จำนวนกล่อง</center></th>
+                        <th width="15%">ผู้รับ</th>
+                        <th width="20%">ที่อยู่</th>
                       </tr>
                     </thead>
                     {this.state.showTable}
@@ -392,17 +396,11 @@ DocumentSet=()=>{
 }
 
 
+
+
 const insertBill = gql`
 mutation insertBill($inData:[ConfrimModel],$DocumentSet:String!){
     insertBill(inData:$inData,DocumentSet:$DocumentSet){
-        status
-    }
-}
-`
-
-const updateAX = gql`
-mutation updateAX($inData:[ConfrimModel]){
-    updateAX(inData:$inData){
         status
     }
 }
@@ -448,14 +446,6 @@ query selectDetailBill($INVOICEID:String!){
     QTY
     TotalAmount
   }
-}
-`
-
-const insertInvoice = gql`
-mutation insertInvoice($INVOICEID:String!,$DocumentSet:String!){
-    insertInvoice(INVOICEID:$INVOICEID,DocumentSet:$DocumentSet){
-        status
-    }
 }
 `
 
