@@ -13,6 +13,8 @@ import {
   ModalBody,
   ModalHeader,
 } from 'reactstrap';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -21,6 +23,25 @@ import EllipsisText  from 'react-ellipsis-text';
 
 
 var arrCheck=[]
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+var arrDataPDF = []
+var datePDF
+pdfMake.fonts = {
+  THSarabun: {
+    normal: 'THSarabun.ttf',
+    bold: 'THSarabun Bold',
+    italics: 'THSarabun Italic',
+    bolditalics: 'THSarabun Bold Italic.ttf'
+  },
+  Roboto: {
+    normal: 'Roboto-Regular.ttf',
+    bold: 'Roboto-Medium.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-MediumItalic.ttf'
+  }
+}
+
+
 
 class ConfirmBill extends Component {
   constructor(props) {
@@ -48,6 +69,32 @@ class ConfirmBill extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
+
+  printPDF() {
+    var docDefinition = {
+      pageSize: 'A5',
+      pageOrientation: 'landscape',
+
+
+      content: [
+        { text: 'ทดสอบ print' ,fontSize: 20 },
+        { text:'ทดสอบ print  ' ,fontSize:18 },
+       
+      ],
+      defaultStyle: {
+        font: 'THSarabun',
+        fontSize: 14
+      }
+
+    };
+
+
+
+    pdfMake.createPdf(docDefinition).print()
+
+  }
+
+
 
   handleChange(date) {
     this.setState({
@@ -116,43 +163,39 @@ class ConfirmBill extends Component {
           "invoicedate":formatDate
         }
       }).then((result) => {
-        //console.log("result",result.data.selectAllBill.length)
-        if(result.data.selectAllBill.length != 0){
-          var arrData = []
-          var tblData
-          result.data.selectAllBill.forEach(function (val,i) {
-            tblData = <tbody>
-              <tr>
-              <td><center><input
-              name="isGoing"
-              id={val.INVOICEID}
-              type="checkbox"
-              font-size= "110%"
-              value = {this.state.checked}
-              onChange={this.handleInputChange(val.INVOICEID)}/></center></td>
-                <td><center>{i+1}</center></td>
-                <td><center>{val.SaleID}</center></td>
-                <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
-                <td><center></center></td>
-                <td><center></center></td>
-                <td>{val.DELIVERYNAME}</td>
-                <td><p data-tip={val.Customer_Address}><EllipsisText text={val.Customer_Address} length={'40'} /></p></td>
-              </tr>
-            </tbody>
-          arrData.push(tblData)
-          },this);
-          var ButtonConfrim = <Button color="primary" onClick={this.DocumentSet}>คอนเฟริมบิล</Button>
-          var date = moment(formatDate).format("DD-MM-YYYY")
-          this.setState({
-            showTable:arrData,
-            dataTable:result,
-            show_date: date,
-            show_sale: this.state.showSale,
-            showButtonConfrim: ButtonConfrim
-          })
-        }else{
-          alert("ไม่พบข้อมูล")
-      }
+        //onsole.log("3333",result)
+        var arrData = []
+        var tblData
+        result.data.selectAllBill.forEach(function (val,i) {
+          tblData = <tbody>
+            <tr>
+            <td><center> <input
+           
+            name="isGoing"
+            type="checkbox"
+            
+            bsSize="large"
+           
+            allChecked={this.state.allChecked}
+            onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
+              <td><center>{i+1}</center></td>
+              <td><center>{val.SaleID}</center></td>
+              <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
+              <td><center></center></td>
+              <td><center></center></td>
+              <td>{val.DELIVERYNAME}</td>
+              <td>{val.Customer_Address}</td>
+            </tr>
+          </tbody>
+        arrData.push(tblData)
+        },this);
+        var date = moment(formatDate).format("DD-MM-YYYY")
+        this.setState({
+          showTable:arrData,
+          dataTable:result,
+          show_date: date,
+          show_sale: this.state.showSale
+        })
     }).catch((err) => {
 
     });
@@ -298,6 +341,10 @@ DocumentSet=()=>{
                           </Input>
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{this.state.showButtonConfrim}
                         </div>
+
+                         &nbsp;&nbsp;<div class="pr-1 form-group">
+                        <Button color="info" onClick={this.printPDF}>printPDF</Button>
+                      </div>
                       </form>
                     </div>
                   </div>
