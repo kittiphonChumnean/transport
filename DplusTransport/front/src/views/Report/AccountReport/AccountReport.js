@@ -17,6 +17,9 @@ import {
   Input,
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import Workbook from 'react-excel-workbook'//excel
 
 //------------------//pdf------------------//
@@ -74,18 +77,21 @@ class AccountReport extends Component {
 
   constructor(props) {
     super(props);
-
-    this.toggle = this.toggle.bind(this);
     this.state = {
       showSale: '',
-      showDate: '',
+      _showSale: '',
       showTable: '',
-
-      dropdownOpen: new Array(6).fill(false),
+      showDate:'',
+      startDate: moment(),
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
-
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
+  }
 
 
 
@@ -110,77 +116,78 @@ class AccountReport extends Component {
   }
 
 
-  toggle(i) {
-    const newArray = this.state.dropdownOpen.map((element, index) => {
-      return (index === i ? !element : false);
-    });
-    this.setState({
-      dropdownOpen: newArray,
-    });
-  }
-
-
 
   QueryAccountReport = () => {
-    this.props.client.query({
-      query: QueryAccountReport,
-      variables: {
-        "SaleID": this.state.showSale,
-        "Date": this.state.showDate,
+    if(this.state.showSale != ''){
+      var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
+      this.props.client.query({
+        query: QueryAccountReport,
+        variables: {
+          "SaleID": this.state.showSale,
+          "Date": formatDate,
 
-      }
-    }).then((result) => {
-      console.log("result", result)
-      var arrData = []
-      var tblData
-      var arrDataPDF_
-      //arrDataPDF=result.data.QueryAccountReport;
-
-
-
-      result.data.QueryAccountReport.forEach(function (val, i) {
-        tblData =
-          <tr>
-            <td><center>{i + 1}</center></td>
-            <td><center>{val.INVOICEID}</center></td>
-            <td><center>{val.CustomerID}</center></td>
-            <td><center>{val.AmountBill}</center></td>
-            <td><center>{val.AmountActual}</center></td>
-            <td><center>{(val.AmountBill) - (val.AmountActual)}</center></td>
-
-          </tr>
+        }
+      }).then((result) => {
+        if(result.data.QueryAccountReport.length != 0){
+          console.log("result", result)
+          var arrData = []
+          var tblData
+          var arrDataPDF_
+          //arrDataPDF=result.data.QueryAccountReport;
 
 
-        arrData.push(tblData)
+
+          result.data.QueryAccountReport.forEach(function (val, i) {
+            tblData =
+              <tr>
+                <td><center>{i + 1}</center></td>
+                <td><center>{val.INVOICEID}</center></td>
+                <td><center>{val.CustomerID}</center></td>
+                <td><center>{val.AmountBill}</center></td>
+                <td><center>{val.AmountActual}</center></td>
+                <td><center>{(val.AmountBill) - (val.AmountActual)}</center></td>
+
+              </tr>
 
 
-      },
-        result.data.QueryAccountReport.forEach(function (val2, i) {
-          arrDataPDF_ = {
+            arrData.push(tblData)
 
-            ลำดับ: i + 1,
-            Invoice: val2.INVOICEID,
-            รหัสลูกค้า: val2.CustomerID,
-            จำนวนเงินตามInvoice: val2.AmountBill,
-            เงินสดที่เก็บได้: val2.AmountActual,
-            ค้างจ่าย: (val2.AmountBill) - (val2.AmountActual),
+
           },
+            result.data.QueryAccountReport.forEach(function (val2, i) {
+              arrDataPDF_ = {
 
-            arrDataPDF.push(arrDataPDF_)
+                ลำดับ: i + 1,
+                Invoice: val2.INVOICEID,
+                รหัสลูกค้า: val2.CustomerID,
+                จำนวนเงินตามInvoice: val2.AmountBill,
+                เงินสดที่เก็บได้: val2.AmountActual,
+                ค้างจ่าย: (val2.AmountBill) - (val2.AmountActual),
+              },
+
+                arrDataPDF.push(arrDataPDF_)
 
 
-        },
-          datePDF = this.state.showDate
+            },
+              datePDF = this.state.showDate
 
-        ));
+            ));
 
+            var date = moment(formatDate).format("DD-MM-YYYY")
+          this.setState({
+            showTable: arrData,
+            showDate: date,
+            _showSale: this.state.showSale
+          })
+        }else{
+          alert("ไม่พบข้อมูล")
+        }
+      }).catch((err) => {
 
-      this.setState({
-        showTable: arrData
-      })
-    }).catch((err) => {
-
-    });
+      });
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
+    }
   }
 
   selectSale = () => {
@@ -207,13 +214,6 @@ class AccountReport extends Component {
       showSale: e.target.value
     })
   }
-
-  chooseDate = (e) => {
-    this.setState({
-      showDate: e.target.value,
-    })
-  }
-
 
   componentWillMount() {
     this.selectSale()
@@ -254,21 +254,21 @@ class AccountReport extends Component {
 
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
                         &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
-                          <option value="">---</option>
+                          <option value=''>---</option>
                           {this.state.showDropdown}
                         </Input>
 
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                         <Label for="date" class="pr-1"><strong>วันที่</strong></Label>
-                        &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.chooseDate} ></Input>
+                        &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                         <button type="button" class="btn btn-success" onClick={this.QueryAccountReport}>ค้นหา</button>
                       </div>
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
                         <Label for="exampleInputName2" class="pr-1"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showSale} disabled>
+                        &nbsp;&nbsp;<Input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state._showSale} disabled>
                         </Input>
 
                       </div>

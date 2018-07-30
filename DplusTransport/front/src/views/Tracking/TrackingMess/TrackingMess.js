@@ -19,6 +19,8 @@ import {
 } from 'reactstrap';
 import moment from 'moment';
 import { withApollo, gql, compose } from 'react-apollo';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 var dateTime
 var trip
@@ -35,8 +37,16 @@ class TrackingMess extends Component {
       showMessTrip:'',
       test:'',
       shownotFinish:'',
-      showfinish:''
+      showfinish:'',
+      startDate: moment(),
     };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
   }
 
   queryAssingmentIDmess=()=>{
@@ -65,12 +75,6 @@ class TrackingMess extends Component {
     //console.log("Mess",this.state.showMess)
  }
 
-  ChooseDate=(e)=>{
-    this.setState({
-      showDate:e.target.value     
-    })
-  }
-
   ChooseTrip=(e)=>{
     this.setState({
       showTrip:e.target.value
@@ -79,74 +83,79 @@ class TrackingMess extends Component {
   }
 
   trackingMess=()=>{
-    console.log("1234567890")
-    dateTime = moment(this.state.showDate).format("YYYY-MM-DD")
-    trip = parseInt(this.state.showTrip)
-    //console.log("ค่า",this.state.showTrip)
-    //console.log("ค่า2",this.state.showDate)
-    //console.log("ค่า3",this.state.showMess)
-      this.props.client.query({
-        query:trackingMess,
-        variables: {
-          "MessengerID":this.state.showMess,
-          "DateTime":dateTime,
-          "Trip": trip,
-        }
-      }).then((result) => {
-        console.log("result",result)
-        var arrData = []
-          var tblData
-          var status =[]
-          var Mess
-          var DateTime
-          var Zone
-          var Trip
-          var status_list = {
-            '4':'Messenger รับงานเข้า Application',
-            '5':'Messenger ตรวจของเรียบร้อย',
-            '6':'Messenger คอนเฟริมออกรอบ',
-            '7':'Messenger กดโทรหาลูกค้า',
-            '8':'Messenger กดนำทาง',
-            '9':'Messenger แก้ไขการส่งของ',
-            'A1':'ส่งสินค้าเรียบร้อย',
-            'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
-            'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
-            'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
-            'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
-            'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
-            'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
-            'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
-            'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+    //console.log("1234567890")
+    if(this.state.showMess != '' && this.state.showTrip != ''){
+      dateTime = moment(this.state.startDate).format("YYYY-MM-DD")
+      trip = parseInt(this.state.showTrip)
+        this.props.client.query({
+          query:trackingMess,
+          variables: {
+            "MessengerID":this.state.showMess,
+            "DateTime":dateTime,
+            "Trip": trip,
           }
-          
-          result.data.trackingMess.forEach(function (val,i) {
-            tblData = <tbody>
-              <tr>
-                <th><center>{i+1}</center></th>
-                <th width="15%"><center>{val.Date}</center></th> 
-                <th width="15%"><center>{val.Time}</center></th>
-                <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-                <th><center>{val.invoice}</center></th>
-                <th width="20%"><center>{status_list[val.status]}</center></th>
-                <th><center>{val.location}</center></th>
-              </tr>
-            </tbody>
-            Mess = val.MessengerID
-            Trip = val.Trip
-            DateTime = moment(val.Date).format("DD-MM-YYYY")
-          arrData.push(tblData)
-          });
-          //console.log("วันที่",DateTime)
-          this.setState({
-            showTable:arrData,
-            showMessID:this.state.showMess,
-            showMessTrip:Trip,
-            showDateTime:DateTime,
-          })
-    }).catch((err) => {
-  
-    });
-    this.trackingStatusMess()
+        }).then((result) => {
+          console.log("result",result)
+          if(result.data.trackingMess.length != 0){
+            var arrData = []
+              var tblData
+              var status =[]
+              var Mess
+              var DateTime
+              var Zone
+              var Trip
+              var status_list = {
+                '4':'Messenger รับงานเข้า Application',
+                '5':'Messenger ตรวจของเรียบร้อย',
+                '6':'Messenger คอนเฟริมออกรอบ',
+                '7':'Messenger กดโทรหาลูกค้า',
+                '8':'Messenger กดนำทาง',
+                '9':'Messenger แก้ไขการส่งของ',
+                'A1':'ส่งสินค้าเรียบร้อย',
+                'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+                'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+                'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+                'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+                'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+                'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+                'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+                'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+              }
+              
+              result.data.trackingMess.forEach(function (val,i) {
+                tblData = <tbody>
+                  <tr>
+                    <th><center>{i+1}</center></th>
+                    <th width="15%"><center>{val.Date}</center></th> 
+                    <th width="15%"><center>{val.Time}</center></th>
+                    <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
+                    <th><center>{val.invoice}</center></th>
+                    <th width="20%"><center>{status_list[val.status]}</center></th>
+                    <th><center>{val.location}</center></th>
+                  </tr>
+                </tbody>
+                Mess = val.MessengerID
+                Trip = val.Trip
+                DateTime = moment(val.Date).format("DD-MM-YYYY")
+              arrData.push(tblData)
+              });
+              //console.log("วันที่",DateTime)
+              this.setState({
+                showTable:arrData,
+                showMessID:this.state.showMess,
+                showMessTrip:Trip,
+                showDateTime:DateTime,
+              })
+            } else{
+                alert("ไม่พบข้อมูล")
+            }
+        }).catch((err) => {
+      
+        });
+        this.trackingStatusMess()
+    }else{
+      alert("กรุณากรอกข้อมูลให้ครบ")
+    }
   }
 
   trackingStatusMess(){
@@ -203,12 +212,12 @@ class TrackingMess extends Component {
                         </div>
                         <div class="pr-1 form-group">
                         &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" type="date" onChange={this.ChooseDate}></Input>
+                        &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                         </div>
                         <div class="pr-1 form-group">
                         &nbsp;&nbsp;<Label for="exampleSelect"><strong>Trip</strong></Label>&nbsp;&nbsp;
                         <Input type="select" name="select2" id="exampleSelect2" onChange={this.ChooseTrip}>
-                          <option>---</option>
+                          <option value=''>---</option>
                           <option value="1">1</option>
                           <option value="2">2</option>
                           <option value="3">3</option>

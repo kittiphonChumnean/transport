@@ -1,22 +1,18 @@
 import React, { Component } from 'react';
 import {
   Button,
-  ButtonDropdown,
   Card,
   CardBody,
   CardHeader,
   Col,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Row,
-  Table,
-  Badge,
-  Dropdown,
   Label,
   Input,
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 class AssignmentDoc extends Component {
 
@@ -28,8 +24,16 @@ class AssignmentDoc extends Component {
       showDate:'',
       showType:'',
       showLocation:'',
-      showDetail:''
+      showDetail:'',
+      startDate: moment(),
     };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
   }
 
   ChooseMess=(e)=>{
@@ -82,28 +86,32 @@ ChooseDetail=(e)=>{
   }
 
   ClickSave=()=>{
-    if(window.confirm("กรุณายืนยันการส่งข้อมูล")){
-      this.props.client.mutate({
-        mutation:insertDoc,
-        variables: {
-          "MessengerID": this.state.showMess,
-          "Date": this.state.showDate,
-          "Type": this.state.showType,
-          "Location": this.state.showLocation,
-          "Detail": this.state.showDetail,
-        }
-      }).then((result) => {
-          console.log("result",result)
-          if (result.data.insertDoc.status === true) {
-            alert("บันทึกข้อมูลเรียบร้อย")
-            window.location.reload()
-        } else {
-            alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
-            return false
-        }
-      }).catch((err) => {
+    if(this.state.showMess != '' && this.state.showDate != '' && this.state.showType != ''&& this.state.showLocation != ''&& this.state.showDetail != ''){
+      if(window.confirm("กรุณายืนยันการส่งข้อมูล")){
+        this.props.client.mutate({
+          mutation:insertDoc,
+          variables: {
+            "MessengerID": this.state.showMess,
+            "Date": this.state.showDate,
+            "Type": this.state.showType,
+            "Location": this.state.showLocation,
+            "Detail": this.state.showDetail,
+          }
+        }).then((result) => {
+            console.log("result",result)
+            if (result.data.insertDoc.status === true) {
+              alert("บันทึกข้อมูลเรียบร้อย")
+              window.location.reload()
+          } else {
+              alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
+              return false
+          }
+        }).catch((err) => {
 
-      });
+        });
+      }
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
     }
   }
 
@@ -134,7 +142,7 @@ ChooseDetail=(e)=>{
                     </div>
                     <div class="pr-1 form-group">
                       &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
-                      &nbsp;&nbsp;<Input id="exampleInputName2" type="date" onChange={this.ChooseDate}></Input>
+                      &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                     </div>
                   </form>
                 </div>

@@ -18,6 +18,8 @@ import {
 } from 'reactstrap';
 import { withApollo, gql, compose } from 'react-apollo';
 import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import Workbook from 'react-excel-workbook'//excel
 
 //------------------//pdf------------------//
@@ -72,9 +74,6 @@ pdfMake.fonts = {
   }
 }
 
-
-
-var dateTime
 class TransportReport extends Component {
 
   constructor(props) {
@@ -84,9 +83,16 @@ class TransportReport extends Component {
       showDateTime: '',
       selectSale: '',
       selectDate: '',
+      startDate: moment(),
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
+  }
 
   //-----pdf-----//
   printPDF() {
@@ -141,84 +147,87 @@ class TransportReport extends Component {
     })
   }
 
-  chooseDate = (e) => {
-    this.setState({
-      selectDate: e.target.value
-    })
-  }
-
   transportReport = () => {
-    console.log("1234567890")
-    dateTime = moment(this.state.selectDate).format("YYYY-MM-DD")
-    this.props.client.query({
-      query: transportReport,
-      variables: {
-        "SaleID": this.state.selectSale,
-        "DateTime": dateTime,
-      }
-    }).then((result) => {
-      console.log("result", result)
-      var arrData = []
-      var tblData
-      var Sale
-      var DateTime
-      var LastStatus
-      var arrDataPDF_
-      var status_list = {
-        'A1': 'ส่งสินค้าเรียบร้อย',
-        'A2': 'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
-        'B1': 'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
-        'B2': 'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
-        'B3': 'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
-        'B4': 'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
-        'B5': 'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
-        'B6': 'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
-        'B7': 'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
-      }
-      result.data.transportReport.forEach(function (val, i) {
-        tblData = <tbody>
-          <tr>
-            <td><center>{i + 1}</center></td>
-            <td><center>{val.INVOICEID}</center></td>
-            <td><center>{val.CustomerID}</center></td>
-            <td><center>{val.SaleID}</center></td>
-            <td><center>{val.MessengerID}</center></td>
-            <td><center>{status_list[val.Status]}</center></td>
-          </tr>
-        </tbody>
-        Sale = val.SaleID
-        DateTime = moment(val.DateTime).format("DD-MM-YYYY")
-        arrData.push(tblData)
-      },
-        result.data.transportReport.forEach(function (val2, i) {
-          arrDataPDF_ = {
-
-            ลำดับ:i + 1,
-            invoice: val2.INVOICEID,
-            ลูกค้า: val2.CustomerID,
-            Sale: val2.SaleID,
-            Messenger: val2.MessengerID,
-            สถานะ: status_list[val2.Status]
-            
+    //console.log("1234567890")
+    if(this.state.selectSale != ''){
+      var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
+      this.props.client.query({
+        query: transportReport,
+        variables: {
+          "SaleID": this.state.selectSale,
+          "DateTime": formatDate,
+        }
+      }).then((result) => {
+        //console.log("result", result)
+        if(result.data.transportReport.length != 0){
+          var arrData = []
+          var tblData
+          var LastStatus
+          var Sale
+          var DateTime
+          var arrDataPDF_
+          var status_list = {
+            'A1': 'ส่งสินค้าเรียบร้อย',
+            'A2': 'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+            'B1': 'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+            'B2': 'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+            'B3': 'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+            'B4': 'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+            'B5': 'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+            'B6': 'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+            'B7': 'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+          }
+          result.data.transportReport.forEach(function (val, i) {
+            tblData = <tbody>
+              <tr>
+                <td><center>{i + 1}</center></td>
+                <td><center>{val.INVOICEID}</center></td>
+                <td><center>{val.CustomerID}</center></td>
+                <td><center>{val.SaleID}</center></td>
+                <td><center>{val.MessengerID}</center></td>
+                <td><center>{status_list[val.Status]}</center></td>
+              </tr>
+            </tbody>
+          Sale = val.SaleID
+          DateTime = moment(formatDate).format("DD-MM-YYYY")
+            arrData.push(tblData)
           },
+            result.data.transportReport.forEach(function (val2, i) {
+              arrDataPDF_ = {
+
+                ลำดับ:i + 1,
+                invoice: val2.INVOICEID,
+                ลูกค้า: val2.CustomerID,
+                Sale: val2.SaleID,
+                Messenger: val2.MessengerID,
+                สถานะ: status_list[val2.Status]
+                
+              },
 
 
 
 
-            arrDataPDF.push(arrDataPDF_)
+                arrDataPDF.push(arrDataPDF_)
 
-       },
-        datePDF = dateTime
-          
-        ));
-      this.setState({
-        showTable: arrData,
-        showSale: Sale,
-        showDateTime: DateTime
-      })
-    }).catch((err) => {
+          },
+            datePDF = DateTime
+              
+            ));
 
-    });
+          this.setState({
+            showTable: arrData,
+            showSale: Sale,
+            showDateTime: DateTime
+          })
+        }else{
+          alert("ไม่พบข้อมูล")
+      }
+      }).catch((err) => {
+
+      });
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
+    }
   }
 
 
@@ -256,13 +265,13 @@ class TransportReport extends Component {
                       <div class="pr-1 form-group ">
                         <Label for="exampleSelect"><strong>Sale</strong></Label>
                         &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
-                          <option>---</option>
+                          <option value=''>---</option>
                           {this.state.showDropdown}
                         </Input>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                         <Label for="exampleInputName2" ><strong>วันที่</strong></Label>&nbsp;&nbsp;
-                          <Input id="exampleInputName2" type="date" onChange={this.chooseDate}></Input>
+                        <DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                         <Button color="success" onClick={this.transportReport}>ค้นหา</Button>
