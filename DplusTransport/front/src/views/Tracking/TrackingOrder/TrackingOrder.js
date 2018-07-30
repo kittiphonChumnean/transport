@@ -42,72 +42,79 @@ class TrackingOrder extends Component {
  }
 
  selectOrder=()=>{
-  console.log("1234567890")
-    this.props.client.query({
-      query:selectOrder,
-      variables: {
-        "INVOICEID":this.state.showInvoice,
-      }
-    }).then((result) => {
-      
-        var arrData = []
-        var tblData
-        var Laststatus
-        var lengthStatus = 0
-        var Laststatus_text
-        var invoice
-        var Mess
-        var CusName
-        var CusAddess
-        var status_list = {
-          '4':'Messenger รับงานเข้า Application',
-          '5':'Messenger ตรวจของเรียบร้อย',
-          '6':'Messenger คอนเฟริมออกรอบ',
-          '7':'Messenger กดโทรหาลูกค้า',
-          '8':'Messenger กดนำทาง',
-          '9':'Messenger แก้ไขการส่งของ',
-          'A1':'ส่งสินค้าเรียบร้อย',
-          'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
-          'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
-          'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
-          'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
-          'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
-          'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
-          'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
-          'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+  //console.log("1234567890")
+  if(this.state.showInvoice != ''){
+      this.props.client.query({
+        query:selectOrder,
+        variables: {
+          "INVOICEID":this.state.showInvoice,
         }
-        result.data.selectOrder.forEach(function (val,i) {          
-          tblData = <tbody>
-            <tr>
-              <th><center>{i+1}</center></th>
-              <th width="10%"><center> </center></th>
-              <th width="15%"><center>{val.Date}</center></th> 
-              <th width="15%"><center>{val.Time}</center></th>
-              <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
-              <th width="20%"><center>{status_list[val.status]}</center></th>
-              <th><center>{val.location}</center></th>
-            </tr>
-          </tbody>
-          invoice = val.invoice
-          Mess = val.MessengerID
-          CusName = val.CustomerName
-          CusAddess =val.AddressShipment
-          lengthStatus = lengthStatus+1
-        arrData.push(tblData)
-        });
-        Laststatus = result.data.selectOrder[lengthStatus-1].status
-        Laststatus_text = status_list[Laststatus]
-        this.setState({
-          showTable:arrData,
-          showINVOICEID:invoice,
-          showMessengerID:Mess,
-          showCustomerName:CusName,
-          showAddressShipment:CusAddess,
-          showLastStatus: Laststatus_text
-        })
-  }).catch((err) => {
+      }).then((result) => {
+        if (result.data.selectOrder.length != 0){
+          var arrData = []
+          var tblData
+          var Laststatus
+          var lengthStatus = 0
+          var Laststatus_text
+          var invoice
+          var Mess
+          var CusName
+          var CusAddess
+          var status_list = {
+            '4':'Messenger รับงานเข้า Application',
+            '5':'Messenger ตรวจของเรียบร้อย',
+            '6':'Messenger คอนเฟริมออกรอบ',
+            '7':'Messenger กดโทรหาลูกค้า',
+            '8':'Messenger กดนำทาง',
+            '9':'Messenger แก้ไขการส่งของ',
+            'A1':'ส่งสินค้าเรียบร้อย',
+            'A2':'ส่งสินค้าเรียบร้อย แต่มีการแก้ไข',
+            'B1':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้ากดผิด',
+            'B2':'ไม่สามารถส่งสินค้าได้ เนื่องจากร้านปิด',
+            'B3':'ไม่สามารถส่งสินค้าได้ เนื่องจากOrderซ้ำ',
+            'B4':'ไม่สามารถส่งสินค้าได้ เนื่องจากสินค้าผิด',
+            'B5':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleคีย์ผิด',
+            'B6':'ไม่สามารถส่งสินค้าได้ เนื่องจากลูกค้าสั่งร้านอื่นแล้ว',
+            'B7':'ไม่สามารถส่งสินค้าได้ เนื่องจากSaleแจ้งราคาผิด'
+          }
+          result.data.selectOrder.forEach(function (val,i) {          
+            tblData = <tbody>
+              <tr>
+                <th><center>{i+1}</center></th>
+                <th width="10%"><center> </center></th>
+                <th width="15%"><center>{val.Date}</center></th> 
+                <th width="15%"><center>{val.Time}</center></th>
+                <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
+                <th width="20%"><center>{status_list[val.status]}</center></th>
+                <th><center>{val.location}</center></th>
+              </tr>
+            </tbody>
+            invoice = val.invoice
+            Mess = val.MessengerID
+            CusName = val.CustomerName
+            CusAddess =val.AddressShipment
+            lengthStatus = lengthStatus+1
+            arrData.push(tblData)
+            });
+            Laststatus = result.data.selectOrder[lengthStatus-1].status
+            Laststatus_text = status_list[Laststatus]
+            this.setState({
+              showTable:arrData,
+              showINVOICEID:invoice,
+              showMessengerID:Mess,
+              showCustomerName:CusName,
+              showAddressShipment:CusAddess,
+              showLastStatus: Laststatus_text
+            })
+          }else{
+            alert("ไม่พบข้อมูล")
+        }
+        }).catch((err) => {
 
-  });
+        });
+  } else {
+    alert("กรุณากรอกข้อมูลให้ครบ")
+  }
 }
 
   render() {
