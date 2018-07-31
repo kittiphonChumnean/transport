@@ -103,68 +103,70 @@ class EditStatus extends Component {
 
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-              <h4><strong>แก้ไขสถานะ</strong></h4>
-              </CardHeader>
-              <CardBody>
-                <center>
-                  <div class="col-12">
-                    <div class="card-body">
-                      <form action="" method="post" class="form-inline" margin="auto auto">
+      <html lang="en">
+      <title>แก้ไขสถานะ</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                <h4><strong>แก้ไขสถานะ</strong></h4>
+                </CardHeader>
+                <CardBody>
+                  <center>
+                    <div class="col-12">
+                      <div class="card-body">
+                        <form action="" method="post" class="form-inline" margin="auto auto">
+                          <div class="pr-1 form-group">
+                            <Label><strong>รหัส invoice</strong></Label>
+                            &nbsp;&nbsp;<Input id="invoice" onChange={this.invoice}></Input>
+                          </div>
+                          &nbsp;&nbsp;<div class="pr-1 form-group">
+                            <Button color="success" onClick={this.selectOrder}>ค้นหา</Button>
+                          </div>
+                        </form>
+                        <br/>
+                        <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group">
                           <Label><strong>รหัส invoice</strong></Label>
-                          &nbsp;&nbsp;<Input id="invoice" onChange={this.invoice}></Input>
+                          &nbsp;&nbsp;<Input id="invoice" value={this.state.showINVOICEID} disabled></Input>
                         </div>
-                        &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <Button color="success" onClick={this.selectOrder}>ค้นหา</Button>
-                        </div>
-                      </form>
-                      <br/>
-                      <form action="" method="post" class="form-inline" margin="auto auto">
-                      <div class="pr-1 form-group">
-                        <Label><strong>รหัส invoice</strong></Label>
-                        &nbsp;&nbsp;<Input id="invoice" value={this.state.showINVOICEID} disabled></Input>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></Label>
+                          &nbsp;&nbsp;<Input id="Mess" value={this.state.showMessengerID} disabled></Input>
+                          </div>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleInputEmail2" class="pr-1"><strong>ชื่อผู้รับ</strong></Label>
+                          &nbsp;&nbsp;<Input id="CusName" value={this.state.showCustomerName} disabled></Input>
+                          </div>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleInputEmail2" class="pr-1"><strong>ที่อยู่ผู้รับ</strong></Label>
+                          &nbsp;&nbsp;<Input id="CusAddess" value={this.state.showAddressShipment}disabled></Input>
+                          </div>
+                        </form>
                       </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></Label>
-                        &nbsp;&nbsp;<Input id="Mess" value={this.state.showMessengerID} disabled></Input>
-                        </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleInputEmail2" class="pr-1"><strong>ชื่อผู้รับ</strong></Label>
-                        &nbsp;&nbsp;<Input id="CusName" value={this.state.showCustomerName} disabled></Input>
-                        </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleInputEmail2" class="pr-1"><strong>ที่อยู่ผู้รับ</strong></Label>
-                        &nbsp;&nbsp;<Input id="CusAddess" value={this.state.showAddressShipment}disabled></Input>
-                        </div>
-                      </form>
                     </div>
-                  </div>
-                  <br/>
-                  <h3><strong>สถานะปัจจุบัน : เสร็จสิ้น </strong></h3>
-                  <Table striped>
-                    <tr>
-                      <th><center>ลำดับ</center></th>
-                      <th><center>วันที่ </center></th>
-                      <th><center>เวลา</center></th>
-                      <th><center> </center></th>
-                      <th><center>สถานะ</center></th>
-                      <th><center>สถานที่</center></th>
-                      <th> </th>
-                    </tr>
-                      {this.state.showTable}
-                  </Table>
-                </center>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-
+                    <br/>
+                    <h3><strong>สถานะปัจจุบัน : เสร็จสิ้น </strong></h3>
+                    <Table striped>
+                      <tr>
+                        <th><center>ลำดับ</center></th>
+                        <th><center>วันที่ </center></th>
+                        <th><center>เวลา</center></th>
+                        <th><center> </center></th>
+                        <th><center>สถานะ</center></th>
+                        <th><center>สถานที่</center></th>
+                        <th> </th>
+                      </tr>
+                        {this.state.showTable}
+                    </Table>
+                  </center>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </html>
     );
   }
 }

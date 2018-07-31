@@ -122,66 +122,69 @@ ChooseDetail=(e)=>{
   
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-              <h4><strong>จ่ายงานเอกสาร</strong></h4>
-              </CardHeader>
-              <CardBody>
-              <div class="col-12">
+      <html lang="en">
+      <title>จ่ายงานเอกสาร</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                <h4><strong>จ่ายงานเอกสาร</strong></h4>
+                </CardHeader>
+                <CardBody>
                 <div class="col-12">
-                  <form action="" method="post" class="form-inline" margin="auto auto">
-                    <div class="pr-1 form-group">
-                      <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
-                      <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
-                        <option>---</option>
-                        {this.state.showDropdown}
-                      </Input>
-                    </div>
-                    <div class="pr-1 form-group">
-                      &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
-                      &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
-                    </div>
-                  </form>
-                </div>
-                <br/>
-                <div class="col-12">
-                  <form action="" method="post" class="form-inline" margin="auto auto">
+                  <div class="col-12">
+                    <form action="" method="post" class="form-inline" margin="auto auto">
                       <div class="pr-1 form-group">
-                        <Label for="exampleSelect"><strong>ประเภท</strong></Label>&nbsp;&nbsp;
-                        <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseType}>
+                        <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
+                        <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
                           <option>---</option>
-                          <option value="รับของเคลม">รับของเคลม</option>
-                          <option value="รับ-ส่งเอกสาร">รับ-ส่งเอกสาร</option>
+                          {this.state.showDropdown}
                         </Input>
                       </div>
                       <div class="pr-1 form-group">
-                      &nbsp;&nbsp;<Label for="name" class=""><strong>สถานที่</strong></Label>&nbsp;&nbsp;
-                        <Input id="name" type="text" onChange={this.ChooseLocation}></Input>
+                        &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
+                        &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
                       </div>
-                  </form>
+                    </form>
+                  </div>
                   <br/>
+                  <div class="col-12">
+                    <form action="" method="post" class="form-inline" margin="auto auto">
+                        <div class="pr-1 form-group">
+                          <Label for="exampleSelect"><strong>ประเภท</strong></Label>&nbsp;&nbsp;
+                          <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseType}>
+                            <option>---</option>
+                            <option value="รับของเคลม">รับของเคลม</option>
+                            <option value="รับ-ส่งเอกสาร">รับ-ส่งเอกสาร</option>
+                          </Input>
+                        </div>
+                        <div class="pr-1 form-group">
+                        &nbsp;&nbsp;<Label for="name" class=""><strong>สถานที่</strong></Label>&nbsp;&nbsp;
+                          <Input id="name" type="text" onChange={this.ChooseLocation}></Input>
+                        </div>
+                    </form>
+                    <br/>
+                  </div>
+                  <div class="col-12">
+                    <form action="" method="post" class="form-inline" margin="auto auto">
+                        <div class="pr-1 form-group">
+                          <label for="name" class=""><strong>รายละเอียด</strong></label>&nbsp;&nbsp;
+                          <textarea rows="10" cols="45" id="name" onChange={this.ChooseDetail}></textarea>
+                        </div>
+                    </form>
+                  </div>
+                  <br/>
+                  <div class="col-8">
+                  <Button color="success" onClick={this.ClickSave}>บันทึก</Button>
+                  </div>
                 </div>
-                <div class="col-12">
-                  <form action="" method="post" class="form-inline" margin="auto auto">
-                      <div class="pr-1 form-group">
-                        <label for="name" class=""><strong>รายละเอียด</strong></label>&nbsp;&nbsp;
-                        <textarea rows="10" cols="45" id="name" onChange={this.ChooseDetail}></textarea>
-                      </div>
-                  </form>
-                </div>
-                <br/>
-                <div class="col-8">
-                <Button color="success" onClick={this.ClickSave}>บันทึก</Button>
-                </div>
-              </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </html>
     );
   }
 }

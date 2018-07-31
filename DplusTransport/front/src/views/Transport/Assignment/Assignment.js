@@ -421,135 +421,137 @@ queryAssingment2=()=>{
 
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-                <h4><strong>จ่ายงาน</strong></h4>
-              </CardHeader>
-              <CardBody>
-                <center>
-                  <div class="col-12">
-                    <div class="card-body">
-                      <form action="" method="post" class="form-inline" margin="auto auto">
-                        <div class="pr-1 form-group ">
-                        <Label for="exampleSelect"><strong>Messenger</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect"  onChange={this.chooseMess}>
-                        <option value="">---</option>
-                          {this.state.showDropdown}
-                        </Input>
-                        </div>
-                        &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Label for="exampleSelect"><strong>Trip</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange= {this.ChangeText} >
-                        <option value="">---</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
+      <html lang="en">
+      <title>จ่ายงาน</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                  <h4><strong>จ่ายงาน</strong></h4>
+                </CardHeader>
+                <CardBody>
+                  <center>
+                    <div class="col-12">
+                      <div class="card-body">
+                        <form action="" method="post" class="form-inline" margin="auto auto">
+                          <div class="pr-1 form-group ">
+                          <Label for="exampleSelect"><strong>Messenger</strong></Label>
+                          &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect"  onChange={this.chooseMess}>
+                          <option value="">---</option>
+                            {this.state.showDropdown}
+                          </Input>
+                          </div>
+                          &nbsp;&nbsp;<div class="pr-1 form-group">
+                          <Label for="exampleSelect"><strong>Trip</strong></Label>
+                          &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange= {this.ChangeText} >
+                          <option value="">---</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
 
-                        </Input>
-                        </div>
-                        &nbsp;&nbsp;<div class="pr-1 form-group">
-                        
-                        <button  type="button" class="btn btn-success" onClick={this.queryAssingmentMess}>ค้นหา</button>
-                        </div>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required=""  type="text" class="form-control" value= {this.state.showText} disabled>
-                          </input>
-                        </div>
-                        &nbsp;<div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Trip</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showtrip} disabled >
-                          </input>
-                        </div>
-                        &nbsp;<div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Route</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showzone} disabled>
-                          </input>
-                        </div>
-
+                          </Input>
+                          </div>
+                          &nbsp;&nbsp;<div class="pr-1 form-group">
+                          
+                          <button  type="button" class="btn btn-success" onClick={this.queryAssingmentMess}>ค้นหา</button>
+                          </div>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
+                          &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Messenger</strong></label>&nbsp;&nbsp;
+                            <input id="exampleInputName2" placeholder="" required=""  type="text" class="form-control" value= {this.state.showText} disabled>
+                            </input>
+                          </div>
                           &nbsp;<div class="pr-1 form-group">
-                        &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>INVOICEID</strong></label>&nbsp;&nbsp;
-                        <input
-                         value={this.state.invoicetem}
-                          type="text"
-                          name="name"
-                          onChange={this.handleChange(num)}
-                          className="form-control"
-                          onKeyPress={this.Enterfn(num)}
-                          ref={el => this.inputTitle = el}
-                        />
-                        </div>
-                        
-                        &nbsp; &nbsp;<font color="red"><label  class="pr-1"   ><strong> </strong></label></font>&nbsp;&nbsp;
-                      </form>
+                          &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Trip</strong></label>&nbsp;&nbsp;
+                            <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showtrip} disabled >
+                            </input>
+                          </div>
+                          &nbsp;<div class="pr-1 form-group">
+                          &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>Route</strong></label>&nbsp;&nbsp;
+                            <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showzone} disabled>
+                            </input>
+                          </div>
+
+                            &nbsp;<div class="pr-1 form-group">
+                          &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>INVOICEID</strong></label>&nbsp;&nbsp;
+                          <input
+                          value={this.state.invoicetem}
+                            type="text"
+                            name="name"
+                            onChange={this.handleChange(num)}
+                            className="form-control"
+                            onKeyPress={this.Enterfn(num)}
+                            ref={el => this.inputTitle = el}
+                          />
+                          </div>
+                          
+                          &nbsp; &nbsp;<font color="red"><label  class="pr-1"   ><strong> </strong></label></font>&nbsp;&nbsp;
+                        </form>
+                      </div>
                     </div>
-                  </div>
-                 
-                  <h5><strong>จำนวนรวม {this.state.rows.length} บิล</strong></h5>
-                 
-                 
+                  
+                    <h5><strong>จำนวนรวม {this.state.rows.length} บิล</strong></h5>
+                  
+                  
+                  
+
+
+  <table
+                  className="table table-bordered table-hover"
+                  id="tab_logic"
+                >
+                  <thead>
+                    <tr>
+                      <th width="2%" className="text-center"> ลำดับ </th>
+                      <th width="10%" className="text-center"> รหัส invoice </th>
+                      <th width="10%" className="text-center"> SaleID </th>
+                      <th width="40%" className="text-center"> ผู้รับ </th>
+                      <th width="40%" className="text-center"> ห้าง </th>
+                  
+                      <th width="5%" ></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.rows.map((item, idx) => (
+                      <tr id="addr0" key={idx}>
+                        <td>{idx+1}</td>
+                        <td>
+                          
+                            {this.state.rows[idx].name }
+                          
+                        </td>
+                        <td>
+                      <center>{this.state.rows[idx].saleID } </center>
+                        </td>
+                        <td>
+                      <center>{this.state.rows[idx].customer } </center>
+                        </td>
+                        <td>
+                      <center>{this.state.rows[idx].storezone } </center>
+                        </td>
+                        
+                        <td>
+                        <button class="btn btn-sm btn-pill btn-danger"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
+                          </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              
+              
                 
 
-
-<table
-                className="table table-bordered table-hover"
-                id="tab_logic"
-              >
-                <thead>
-                  <tr>
-                    <th width="2%" className="text-center"> ลำดับ </th>
-                    <th width="10%" className="text-center"> รหัส invoice </th>
-                    <th width="10%" className="text-center"> SaleID </th>
-                    <th width="40%" className="text-center"> ผู้รับ </th>
-                    <th width="40%" className="text-center"> ห้าง </th>
-                 
-                    <th width="5%" ></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.rows.map((item, idx) => (
-                    <tr id="addr0" key={idx}>
-                      <td>{idx+1}</td>
-                      <td>
-                        
-                          {this.state.rows[idx].name }
-                        
-                      </td>
-                      <td>
-                    <center>{this.state.rows[idx].saleID } </center>
-                      </td>
-                      <td>
-                    <center>{this.state.rows[idx].customer } </center>
-                      </td>
-                      <td>
-                    <center>{this.state.rows[idx].storezone } </center>
-                      </td>
-                      
-                      <td>
-                      <button class="btn btn-sm btn-pill btn-danger"  onClick={this.handleRemoveRow(idx)} >ลบ</button>
-                        </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-             
-             
-              
-
-<br/><br/>
- <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg" onClick={this.ClickSave}>บันทึก</button></div>
+  <br/><br/>
+  <div col="2" class="mb-3 mb-xl-0 text-center col"><button class="btn-pill btn btn-success btn-lg" onClick={this.ClickSave}>บันทึก</button></div>
 
 
-                </center>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-
+                  </center>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+    </html>
 
 
 

@@ -247,59 +247,62 @@ if (invoicetem.findIndex(l => l==e.target.value)>=0){
 
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-                <h4><strong>รับงาน</strong></h4>
-              </CardHeader>
-              <CardBody>
-                <center>
-                  <div class="col-12">
-                    <div class="card-body">
-                      <form action="" method="post" class="form-inline" margin="auto auto">
-                        <div class="pr-1 form-group ">
-                          <label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>
-                          &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" onChange={this.ChangeText}></input>
-                        </div>
-                        &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <button type="button" class="btn btn-success" onClick={this.queryGettesk}>ค้นหา</button>
-                        </div>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
-                          &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>&nbsp;&nbsp;
-                          <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showText} disabled>
+      <html lang="en">
+      <title>รับงาน</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                  <h4><strong>รับงาน</strong></h4>
+                </CardHeader>
+                <CardBody>
+                  <center>
+                    <div class="col-12">
+                      <div class="card-body">
+                        <form action="" method="post" class="form-inline" margin="auto auto">
+                          <div class="pr-1 form-group ">
+                            <label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>
+                            &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" onChange={this.ChangeText}></input>
+                          </div>
+                          &nbsp;&nbsp;<div class="pr-1 form-group">
+                            <button type="button" class="btn btn-success" onClick={this.queryGettesk}>ค้นหา</button>
+                          </div>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
+                            &nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>&nbsp;&nbsp;
+                            <input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" value={this.state.showText} disabled>
 
-                          </input>
-                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลข INVOICE</strong></label>&nbsp;&nbsp;
-                          <input id="invoice" ref={el => this.inputTitle = el} required="required" onKeyPress={this.Enterfn} type="text" class="form-control"  ></input>
-                        </div>
-                        <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
-                      </form>
+                            </input>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลข INVOICE</strong></label>&nbsp;&nbsp;
+                            <input id="invoice" ref={el => this.inputTitle = el} required="required" onKeyPress={this.Enterfn} type="text" class="form-control"  ></input>
+                          </div>
+                          <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
+                        </form>
+                      </div>
                     </div>
-                  </div>
 
 
 
-                  <h5><strong>จำนวนรวม {this.state.showTable.length} บิล</strong></h5>
-                  <Table responsive>
-                    <thead>
-                      <tr>
-                        <th width="15%"><center>ลำดับ</center></th>
-                        <th width="30%"><center>รหัส  invoice</center></th>
-                        <th width="15%"><center>จำนวนกล่อง</center></th>
-                        <th><center>ผู้รับ</center></th>
-                      </tr>
-                    </thead>
-                    {this.state.showTable}
-                  </Table>
-                  <div col="2" class="mb-3 mb-xl-0 text-center col"><button onClick={this.queryGetteskUpdate} class="btn-pill btn btn-success btn-lg" >เทียบ</button></div>
-                </center>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                    <h5><strong>จำนวนรวม {this.state.showTable.length} บิล</strong></h5>
+                    <Table responsive>
+                      <thead>
+                        <tr>
+                          <th width="15%"><center>ลำดับ</center></th>
+                          <th width="30%"><center>รหัส  invoice</center></th>
+                          <th width="15%"><center>จำนวนกล่อง</center></th>
+                          <th><center>ผู้รับ</center></th>
+                        </tr>
+                      </thead>
+                      {this.state.showTable}
+                    </Table>
+                    <div col="2" class="mb-3 mb-xl-0 text-center col"><button onClick={this.queryGetteskUpdate} class="btn-pill btn btn-success btn-lg" >เทียบ</button></div>
+                  </center>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </html>
     );
   }
 }

@@ -3,6 +3,7 @@ var sql = require('mssql')
 var Request = require('tedious').Request;
 const graphql = require('graphql')
 const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLBoolean } = graphql
+const dateformat = require('dateformat');
 
 //select sale
 var allSale = new GraphQLObjectType({
@@ -122,10 +123,15 @@ var insertBill = {
 }
 
 var fninsertBill = function (inData, DocumentSet, callback) {
+    var now = new Date(); 
+    var date_t = dateformat(now, 'yyyy-mm-dd HH:MM:ss');
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
         var request = new sql.Request(pool)
         var strVal = ""
+        var strVal2 = ""
+        
+        console.log("date",date_t)
         inData.forEach(function (val, i) {
             request.input('INVOICEID' + i, sql.VarChar, val.INVOICEID)
             if (i + 1 == inData.length) {
@@ -133,8 +139,17 @@ var fninsertBill = function (inData, DocumentSet, callback) {
             } else {
                 strVal += "(@INVOICEID" + i + "),"
             }
+
+            request.input('DateTime' + i, sql.VarChar, date_t)
+            request.input('Status' + i, sql.VarChar, "1")
+            if (i + 1 == inData.length) {
+                strVal2 += "(@INVOICEID" + i + ",@DateTime" + i + ",@Status" + i + ")"
+            } else {
+                strVal2 += "(@INVOICEID" + i + ",@DateTime" + i + ",@Status" + i + "),"
+            }
         });
         request.input('DocumentSet', sql.VarChar, DocumentSet)
+        
         //console.log('str',strVal)
         request.query('insert into [ConfirmBill] ([INVOICEID]) values ' + strVal +
 
@@ -163,7 +178,9 @@ var fninsertBill = function (inData, DocumentSet, callback) {
 
             ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] , ' +
             ' [Amount],[PriceOfUnit]) SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) ' +
-            ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] IN (' + strVal + ') ')
+            ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] IN (' + strVal + ') '+
+        
+            'INSERT INTO [Tracking] ([invoice] ,[DateTime] ,[status] ) VALUES ' + strVal2 )
             .then(res => {
                 // console.log(q.sql)
                 sql.close();
@@ -250,12 +267,50 @@ var fnData = function (callback) {
     })
 }
 
+//selectPDF
+var modalPDF = new GraphQLObjectType({
+    name: 'modalPDF',
+    fields: () => ({
+        INVOICEID: { type: GraphQLString },
+        CustomerName: { type: GraphQLString },
+        AddressShipment: { type: GraphQLString },
+        SaleID: { type: GraphQLString },
+    })
+})
 
+var selectPDF = {
+    type: new GraphQLList(modalPDF),
+    args: {
+        DocumentSet: { type: GraphQLString }
+    },
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject) {
+            console.log("ค่า", args)
+            fnselectPDF(args.DocumentSet, function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fnselectPDF = function (DocumentSet, callback) {
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        // console.log("DB Connected")
+        return pool.request()
+            .input('DocumentSet', sql.VarChar, DocumentSet)
+            .query('SELECT [INVOICEID],[SaleID], [CustomerName], [AddressShipment] FROM [ConfirmBill] where [DocumentSet] = @DocumentSet')
+    }).then(res => {
+        console.log("PDF", res);
+        sql.close()
+        callback(res)
+    })
+}
 
 module.exports = {
     selectSale: selectSale,
     selectAllBill: selectAllBill,
     insertBill: insertBill,
     selectDetailBill: selectDetailBill,
-    DocumentSet: DocumentSet
+    DocumentSet: DocumentSet,
+    selectPDF: selectPDF
 }

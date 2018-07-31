@@ -246,80 +246,83 @@ class TransportReport extends Component {
 
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-                <h4><strong>รายงานการส่ง</strong>
-                <img src={require('../../../assets/img/brand/pdf.png')} onClick={this.printPDF} align="right" />
-                <Workbook filename="TransportReport.xlsx" element={<img src={require('../../../assets/img/brand/excel.png')} align="right" />}>
-                      <Workbook.Sheet data={arrDataPDF} name="Sheet A">
-                        <Workbook.Column label="ลำดับ" value="ลำดับ" />
-                        <Workbook.Column label="invoice" value="invoice" />
-                        <Workbook.Column label="ลูกค้า" value="ลูกค้า" />
-                        <Workbook.Column label="Sale" value="Sale" />
-                        <Workbook.Column label="Messenger" value="Messenger" />
-                        <Workbook.Column label="สถานะ" value="สถานะ" />
-                       
-                      </Workbook.Sheet>
+      <html lang="en">
+      <title>รายงานการส่ง</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                  <h4><strong>รายงานการส่ง</strong>
+                  <img src={require('../../../assets/img/brand/pdf.png')} onClick={this.printPDF} align="right" />
+                  <Workbook filename="TransportReport.xlsx" element={<img src={require('../../../assets/img/brand/excel.png')} align="right" />}>
+                        <Workbook.Sheet data={arrDataPDF} name="Sheet A">
+                          <Workbook.Column label="ลำดับ" value="ลำดับ" />
+                          <Workbook.Column label="invoice" value="invoice" />
+                          <Workbook.Column label="ลูกค้า" value="ลูกค้า" />
+                          <Workbook.Column label="Sale" value="Sale" />
+                          <Workbook.Column label="Messenger" value="Messenger" />
+                          <Workbook.Column label="สถานะ" value="สถานะ" />
+                        
+                        </Workbook.Sheet>
 
-                    </Workbook>   
-                </h4>
-              </CardHeader>
-              <CardBody>
-                <div class="col-12">
-                  <div class="card-body">
-                    <form action="" method="post" class="form-inline">
-                      <div class="pr-1 form-group ">
-                        <Label for="exampleSelect"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
-                          <option value=''>---</option>
-                          {this.state.showDropdown}
-                        </Input>
-                      </div>
-                      &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Label for="exampleInputName2" ><strong>วันที่</strong></Label>&nbsp;&nbsp;
-                        <DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
-                      </div>
-                      &nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Button color="success" onClick={this.transportReport}>ค้นหา</Button>
-                      </div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
-                        <Label for="exampleInputName2"><strong>Sale</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showSale} disabled>
-                        </Input>
-                      </div>
-                      <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showDateTime} disabled>
-                        </Input>
-                      </div>
+                      </Workbook>   
+                  </h4>
+                </CardHeader>
+                <CardBody>
+                  <div class="col-12">
+                    <div class="card-body">
+                      <form action="" method="post" class="form-inline">
+                        <div class="pr-1 form-group ">
+                          <Label for="exampleSelect"><strong>Sale</strong></Label>
+                          &nbsp;&nbsp;<Input type="select" name="select" id="exampleSelect" onChange={this.chooseSale}>
+                            <option value=''>---</option>
+                            {this.state.showDropdown}
+                          </Input>
+                        </div>
+                        &nbsp;&nbsp;<div class="pr-1 form-group">
+                          <Label for="exampleInputName2" ><strong>วันที่</strong></Label>&nbsp;&nbsp;
+                          <DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
+                        </div>
+                        &nbsp;&nbsp;<div class="pr-1 form-group">
+                          <Button color="success" onClick={this.transportReport}>ค้นหา</Button>
+                        </div>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="pr-1 form-group">
+                          <Label for="exampleInputName2"><strong>Sale</strong></Label>
+                          &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showSale} disabled>
+                          </Input>
+                        </div>
+                        <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
+                          &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showDateTime} disabled>
+                          </Input>
+                        </div>
 
-                      
-                    </form>
+                        
+                      </form>
+                    </div>
                   </div>
-                </div>
-                <br />
+                  <br />
 
-                <Table>
-                  <thead>
-                    <tr>
-                      <th><center>ลำดับ</center></th>
-                      <th><center>เลขที่ invoice</center></th>
-                      <th><center>รหัสลูกค้า</center></th>
-                      <th><center>Sale</center></th>
-                      <th><center>Messenger</center></th>
-                      <th><center>สถานะ</center></th>
-                    </tr>
-                  </thead>
-                  {this.state.showTable}
-                </Table>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th><center>ลำดับ</center></th>
+                        <th><center>เลขที่ invoice</center></th>
+                        <th><center>รหัสลูกค้า</center></th>
+                        <th><center>Sale</center></th>
+                        <th><center>Messenger</center></th>
+                        <th><center>สถานะ</center></th>
+                      </tr>
+                    </thead>
+                    {this.state.showTable}
+                  </Table>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </html>
     );
   }
 }
