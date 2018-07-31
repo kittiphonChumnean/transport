@@ -3,6 +3,7 @@ var sql = require('mssql')
 var Request = require('tedious').Request;
 const graphql = require('graphql')
 const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString,GraphQLInputObjectType } = graphql
+const dateformat = require('dateformat');
 
 var selectDocomentModel = new GraphQLObjectType({
     name: 'DocomentModel',
@@ -112,10 +113,13 @@ var upDateStateGetTesk = {
 
 
 var fnUpDateStateGetTesk = function ( inData,callback) {
+    var now = new Date(); 
+    var date_t = dateformat(now, 'yyyy-mm-dd HH:MM:ss');
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
         var request = new sql.Request(pool)
         var strVal = ""
+        var strVal2 = ""
         inData.forEach(function (val, i) {
             console.log("val", val);
             request.input('inINVOICEID' + i, sql.VarChar, val.INVOICEID)
@@ -124,8 +128,18 @@ var fnUpDateStateGetTesk = function ( inData,callback) {
             } else {
                 strVal += "(@inINVOICEID" + i +  "),"
             }
+
+            request.input('DateTime' + i, sql.VarChar, date_t)
+            request.input('Status' + i, sql.VarChar, "3")
+            if (i + 1 == inData.length) {
+                strVal2 += "(@inINVOICEID" + i + ",@DateTime" + i + ",@Status" + i + ")"
+            } else {
+                strVal2 += "(@inINVOICEID" + i + ",@DateTime" + i + ",@Status" + i + "),"
+            }
         });
-        request.query("UPDATE [dbo].[ConfirmBill] SET  [Status] = 2 WHERE INVOICEID IN ("+strVal+") " )
+        request.query('UPDATE [dbo].[ConfirmBill] SET  [Status] = 2 WHERE INVOICEID IN ('+strVal+') '+
+    
+                'INSERT INTO [Tracking] ([invoice] ,[DateTime] ,[status] ) VALUES ' + strVal2 )
             .then(res => {
                 // console.log("test", res);
                 sql.close();

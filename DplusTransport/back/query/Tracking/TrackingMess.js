@@ -60,7 +60,7 @@ var trackingMess = {
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject) {
-            //console.log("ค่า",args)
+            console.log("ค่า1",args)
             fnSelectData(args.MessengerID,args.DateTime,args.Trip,function(data){
                 resolve(data)
             })
@@ -130,7 +130,7 @@ var fnSelectStatus = function (MessengerID,DateTime,Trip,callback) {
                    ' status like @A or status like @B'+
                    ' and datediff(day, DateTime, @DateTime) = 0 and Trip = @Trip')
     }).then(res => {
-        console.log("555555555555", res);
+        console.log("status", res);
         sql.close()
         callback(res)
     })

@@ -22,7 +22,7 @@ import { withApollo, gql, compose } from 'react-apollo';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-var dateTime
+var _dateTime
 var trip
 class TrackingMess extends Component {
   constructor(props) {
@@ -85,13 +85,13 @@ class TrackingMess extends Component {
   trackingMess=()=>{
     //console.log("1234567890")
     if(this.state.showMess != '' && this.state.showTrip != ''){
-      dateTime = moment(this.state.startDate).format("YYYY-MM-DD")
+      _dateTime = moment(this.state.startDate).format("YYYY-MM-DD")
       trip = parseInt(this.state.showTrip)
         this.props.client.query({
           query:trackingMess,
           variables: {
             "MessengerID":this.state.showMess,
-            "DateTime":dateTime,
+            "DateTime":_dateTime,
             "Trip": trip,
           }
         }).then((result) => {
@@ -99,11 +99,12 @@ class TrackingMess extends Component {
           if(result.data.trackingMess.length != 0){
             var arrData = []
               var tblData
-              var status =[]
               var Mess
               var DateTime
-              var Zone
               var Trip
+              var correct
+              var _false
+              var img
               var status_list = {
                 '4':'Messenger รับงานเข้า Application',
                 '5':'Messenger ตรวจของเรียบร้อย',
@@ -123,17 +124,22 @@ class TrackingMess extends Component {
               }
               
               result.data.trackingMess.forEach(function (val,i) {
-                tblData = <tbody>
-                  <tr>
+                correct = require('../../../assets/img/brand/checked.png')
+                _false = require('../../../assets/img/brand/false.png')
+                if (val.status == 'B1' || val.status == 'B2' ||val.status == 'B3' ||val.status == 'B4' ||val.status == 'B5' ||val.status == 'B6' ||val.status == 'B7'){
+                  img = _false
+                }else {
+                  img = correct
+                }
+                tblData =<tr>
                     <th><center>{i+1}</center></th>
                     <th width="15%"><center>{val.Date}</center></th> 
                     <th width="15%"><center>{val.Time}</center></th>
-                    <th><center><img height="55" width="55" src={require('../../../assets/img/brand/checked.png')} />&nbsp;&nbsp;</center></th>
+                    <th><center><img height="55" width="55" src={img} />&nbsp;&nbsp;</center></th>
                     <th><center>{val.invoice}</center></th>
                     <th width="20%"><center>{status_list[val.status]}</center></th>
                     <th><center>{val.location}</center></th>
                   </tr>
-                </tbody>
                 Mess = val.MessengerID
                 Trip = val.Trip
                 DateTime = moment(val.Date).format("DD-MM-YYYY")
@@ -144,7 +150,7 @@ class TrackingMess extends Component {
                 showTable:arrData,
                 showMessID:this.state.showMess,
                 showMessTrip:Trip,
-                showDateTime:DateTime,
+                showDateTime:DateTime
               })
             } else{
                 alert("ไม่พบข้อมูล")
@@ -152,21 +158,20 @@ class TrackingMess extends Component {
         }).catch((err) => {
       
         });
-        this.trackingStatusMess()
+        this.trackingStatusMess(_dateTime)
     }else{
       alert("กรุณากรอกข้อมูลให้ครบ")
     }
   }
 
-  trackingStatusMess(){
-    console.log("มาแล้ว")
-    dateTime = moment(this.state.showDateTime).format("YYYY-MM-DD")
+  trackingStatusMess(_dateTime){
+    console.log("วัน",_dateTime)
     trip = parseInt(this.state.showTrip)
     this.props.client.query({
       query:trackingStatusMess,
       variables: {
         "MessengerID":this.state.showMess,
-        "DateTime":this.state.showDateTime,
+        "DateTime":_dateTime,
         "Trip": trip,
       }
     }).then((result) => {
@@ -190,84 +195,90 @@ class TrackingMess extends Component {
 
   render() {
     return (
-      <div className="animated fadeIn">
-        <Row>
-          <Col xs="12" sm="12">
-            <Card>
-              <CardHeader>
-              <h4><strong>ติดตามแมสเซนเจอร์</strong></h4>
-              </CardHeader>
-              <CardBody>
-                <center>
-                  <div class="col-12">
-                    <div class="card-body">
-                      <form action="" method="post" class="form-inline" margin="auto auto">
+      <html lang="en">
+      <title>ติดตามแมสเซนเจอร์</title> 
+        <div className="animated fadeIn">
+          <Row>
+            <Col xs="12" sm="12">
+              <Card>
+                <CardHeader>
+                <h4><strong>ติดตามแมสเซนเจอร์</strong></h4>
+                </CardHeader>
+                <CardBody>
+                  <center>
+                    <div class="col-12">
+                      <div class="card-body">
+                        <form action="" method="post" class="form-inline" margin="auto auto">
 
+                          <div class="pr-1 form-group">
+                          <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
+                          <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
+                            <option>---</option>
+                            {this.state.showDropdown}
+                          </Input>
+                          </div>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
+                          &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
+                          </div>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label for="exampleSelect"><strong>Trip</strong></Label>&nbsp;&nbsp;
+                          <Input type="select" name="select2" id="exampleSelect2" onChange={this.ChooseTrip}>
+                            <option value=''>---</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                          </Input>
+                          </div>
+                          &nbsp;&nbsp;<div class="pr-1 form-group">
+                            <Button color="success" onClick={this.trackingMess} >ค้นหา</Button>
+                          </div>
+                        </form>
+                        <br/>
+                        <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group">
-                        <Label for="exampleSelect"><strong>Messenger</strong></Label>&nbsp;&nbsp;
-                        <Input type="select" name="select" id="exampleSelect" onChange={this.ChooseMess}>
-                          <option>---</option>
-                          {this.state.showDropdown}
-                        </Input>
+                          <Label><strong>Messenger</strong></Label>
+                          &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showMessID} disabled>
+                          </Input>
                         </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleInputName2"><strong>วันที่</strong></Label>
-                        &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.handleChange} tabIndex={1}/>
-                        </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label for="exampleSelect"><strong>Trip</strong></Label>&nbsp;&nbsp;
-                        <Input type="select" name="select2" id="exampleSelect2" onChange={this.ChooseTrip}>
-                          <option value=''>---</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                        </Input>
-                        </div>
-                        &nbsp;&nbsp;<div class="pr-1 form-group">
-                          <Button color="success" onClick={this.trackingMess} >ค้นหา</Button>
-                        </div>
-                      </form>
-                      <br/>
-                      <form action="" method="post" class="form-inline" margin="auto auto">
-                      <div class="pr-1 form-group">
-                        <Label><strong>Messenger</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showMessID} disabled>
-                        </Input>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label><strong>วันที่</strong></Label>
+                          &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showDateTime} disabled>
+                          </Input>
+                          </div>
+                          <div class="pr-1 form-group">
+                          &nbsp;&nbsp;<Label><strong>Trip</strong></Label>
+                          &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showMessTrip} disabled>
+                          </Input>
+                          </div>
+                        </form>
                       </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label><strong>วันที่</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showDateTime} disabled>
-                        </Input>
-                        </div>
-                        <div class="pr-1 form-group">
-                        &nbsp;&nbsp;<Label><strong>Trip</strong></Label>
-                        &nbsp;&nbsp;<Input id="exampleInputName2" value={this.state.showMessTrip} disabled>
-                        </Input>
-                        </div>
-                      </form>
                     </div>
-                  </div>
-                  <br/>
-                  <h3><strong>ยังไม่ได้ส่ง : {this.state.shownotFinish} บิล ส่งแล้ว : {this.state.showfinish} บิล </strong></h3>
-                  <Table striped>
-                    <tr>
-                      <th><center>ลำดับ</center></th>
-                      <th><center>วันที่ </center></th>
-                      <th><center>เวลา</center></th>
-                      <th><center> </center></th>
-                      <th><center>เลข Invoice</center></th>
-                      <th><center>สถานะ</center></th>
-                      <th><center>สถานที่</center></th>
-                    </tr>
-                      {this.state.showTable}
-                    
-                  </Table>
-                </center>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                    <br/>
+                    <h3><strong>ยังไม่ได้ส่ง : {this.state.shownotFinish} บิล ส่งแล้ว : {this.state.showfinish} บิล </strong></h3>
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th><center>ลำดับ</center></th>
+                          <th><center>วันที่ </center></th>
+                          <th><center>เวลา</center></th>
+                          <th><center> </center></th>
+                          <th><center>เลข Invoice</center></th>
+                          <th><center>สถานะ</center></th>
+                          <th><center>สถานที่</center></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {this.state.showTable}
+                      </tbody>
+                    </table>
+                  </center>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </html>
     );
   }
 }

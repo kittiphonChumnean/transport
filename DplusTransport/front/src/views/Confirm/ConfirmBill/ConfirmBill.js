@@ -115,14 +115,37 @@ class ConfirmBill extends Component {
 
   printPDF() {
     //window.location.reload()
-    //console.log("printt")
+    console.log("printt")
+      this.props.client.query({
+        query:selectPDF,
+        variables: {
+          "DocumentSet":Document_SetPDF
+        }
+      }).then((result) => {
+          console.log("result",result)
+          var arrDataPDF_ = []
+          result.data.selectPDF.forEach(function (val,i) {
+            arrDataPDF_ = {
+              ลำดับ: i + 1,
+              Invoice: val.INVOICEID,
+              Sale: val.SaleID,
+              ผู้รับ: val.CustomerName,
+              ที่อยู่: val.AddressShipment
+            },
+              arrDataPDF.push(arrDataPDF_)
+          });
+      }).catch((err) => {
+
+      });
+
     var docDefinition = {
-      pageSize: 'A5',
+      pageSize: 'A4',
       pageOrientation: 'landscape',
       content: [
         { text: 'เลขชุดเอกสาร '  + Document_SetPDF, style: 'header', fontSize: 48 ,margin:[ 88, 2, 5, 5 ]},
         { text: 'Sale ' + salePDF + '   วันที่ ' + darePDF, style: 'header', fontSize: 44 ,margin:[ 75, 2, 5, 5 ]},
 
+        table(arrDataPDF, ['ลำดับ', 'Invoice', 'Sale', 'ผู้รับ', 'ที่อยู่'] )
       ],
       defaultStyle: {
         font: 'THSarabun',
@@ -335,7 +358,7 @@ DocumentSet=()=>{
         //console.log("Client Res", res)
         if (res.data.insertBill.status === true) {
           if(window.confirm("บันทึกข้อมูลเรียบร้อย กรุณายืนยันการ Print")){
-            this.printPDF()
+            this.printPDF(DocumentSet)
             //window.location.reload()
           }
         } else {
@@ -351,6 +374,8 @@ DocumentSet=()=>{
 
   render() {
     return (
+      <html lang="en">
+      <title>คอนเฟริมบิล</title>     
       <div className="animated fadeIn">
         <Row>
           <Col xs="12" sm="12">
@@ -430,11 +455,21 @@ DocumentSet=()=>{
           </Modal>
          
       </div>
+      </html>
     );
   }
 }
 
-
+const selectPDF = gql`
+query selectPDF($DocumentSet:String!){
+  selectPDF(DocumentSet:$DocumentSet){
+    INVOICEID
+    SaleID
+    CustomerName
+    AddressShipment
+  }
+}
+`
 
 
 const insertBill = gql`

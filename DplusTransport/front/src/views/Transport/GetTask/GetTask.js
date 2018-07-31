@@ -378,7 +378,6 @@ componentWillMount(){
                         <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
                       </form>
                     </div>
-                  </div>
 
 
 

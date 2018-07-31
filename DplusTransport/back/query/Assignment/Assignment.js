@@ -3,6 +3,7 @@ var sql = require('mssql')
 var Request = require('tedious').Request;
 const graphql = require('graphql')
 var moment = require('moment')
+const dateformat = require('dateformat');
 
 const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLInputObjectType, } = graphql
 
@@ -173,10 +174,13 @@ var insertBilltoApp = {
 }
 
 var fninsertBilltoApp = function (inData, callback) {
+    var now = new Date(); 
+    var date_t = dateformat(now, 'yyyy-mm-dd HH:MM:ss');
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
         var request = new sql.Request(pool)
         var strVal = ""
+        var strVal2 = ""
         inData.forEach(function (val, i) {
             console.log("val", val);
             request.input('inINVOICEID' + i, sql.VarChar, val.INVOICEID)
@@ -188,10 +192,19 @@ var fninsertBilltoApp = function (inData, callback) {
             } else {
                 strVal += "(@inINVOICEID" + i + ",@inMessengerID" + i + ",@inTrip" + i + "),"
             }
+
+            request.input('DateTime' + i, sql.VarChar, date_t)
+            request.input('Status' + i, sql.VarChar, "2")
+            if (i + 1 == inData.length) {
+                strVal2 += "(@inINVOICEID" + i + ",@DateTime" + i + ",@Status" + i + ")"
+            } else {
+                strVal2 += "(@inINVOICEID" + i + ",@DateTime" + i + ",@Status" + i + "),"
+            }
         });
 
-        request.query("INSERT INTO [BillToApp] ([INVOICEID],[MessengerID],[Trip]) VALUES" +
-            strVal)
+        request.query('INSERT INTO [BillToApp] ([INVOICEID],[MessengerID],[Trip]) VALUES' +strVal+
+    
+                    'INSERT INTO [Tracking] ([invoice] ,[DateTime] ,[status] ) VALUES ' + strVal2 )
             .then(res => {
                 // console.log("test", res);
                 sql.close();

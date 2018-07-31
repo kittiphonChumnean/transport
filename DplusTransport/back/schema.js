@@ -82,7 +82,9 @@ const QueryType = new GraphQLObjectType({
         transportReport: TransportReport.transportReport,
         trackingStatusMess: TrackingMess.trackingStatusMess,
         selectDetailBill: queryComfrimBill.selectDetailBill,
-        DocumentSet: queryComfrimBill.DocumentSet
+        DocumentSet: queryComfrimBill.DocumentSet,
+        selectDataMess: TrackingOrder.selectDataMess,
+        selectPDF: queryComfrimBill.selectPDF
     }
 })
 
