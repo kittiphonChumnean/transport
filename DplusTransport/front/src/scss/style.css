@@ -253,7 +253,10 @@ button::-moz-focus-inner,
 input[type="radio"],
 input[type="checkbox"] {
   box-sizing: border-box;
-  padding: 0; }
+  padding: 0; 
+  width: 20px;
+  height: 20px;
+}
 
 input[type="date"],
 input[type="time"],
@@ -3774,11 +3777,18 @@ button.close {
   align-items: center;
   min-height: calc(100% - (0.5rem * 2)); }
 
+div.modal-content{
+  width: 1000px;
+ margin-left: -15rem;
+ margin-right: -15rem;
+
+}
+
+
 .modal-content {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
   pointer-events: auto;
   background-color: #fff;
   background-clip: padding-box;
@@ -3841,7 +3851,9 @@ button.close {
 @media (min-width: 576px) {
   .modal-dialog {
     max-width: 500px;
-    margin: 1.75rem auto; }
+    margin: 1.75rem auto;
+    margin-left: 22rem;
+  }
   .modal-dialog-centered {
     min-height: calc(100% - (1.75rem * 2)); }
   .modal-sm {

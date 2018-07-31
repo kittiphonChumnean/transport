@@ -39,91 +39,129 @@ class GetTask extends Component {
   }
 
   queryGettesk = () => {
-    console.log("queryGettesk")
-    this.props.client.query({
-      query: queryGettesk,
-      variables: {
-        "DocumentSet": this.state.showText,
-      }
-    }).then((result) => {
-      console.log("result", result)
-      var arrData = []
-      var tblData
-      var msg_
+    if(this.state.showText != ''){
+      console.log("queryGettesk")
+      this.props.client.query({
+        query: queryGettesk,
+        variables: {
+          "DocumentSet": this.state.showText,
+        }
+      }).then((result) => {
+        console.log("result", result)
+        var arrData = []
+        var tblData
+        var msg_
 
-      if (result.data.queryGettesk.length >= 1) {
-        result.data.queryGettesk.forEach(function (val, i) {
-          //console.log(val.Status)
-          if (val.Status == 2 || val.Status == 3) {
-            this.setState({
-              color: "#ccffcc"//เขียว
-            })
-          } else {
-            //console.log("elseeeeeeeee")
-            //console.log(arr[0])
-            if (arr.length >= 1) {
-              var m = 0
-              //console.log("INVOICEID"+val.INVOICEID+"arr"+arr[0])
-              for (var j = 0; j < arr.length; j++) {
-                //console.log("test"+val.INVOICEID+arr[j])
-                if (val.INVOICEID == arr[j]) {
-                  m++
+        if (result.data.queryGettesk.length >= 1) {
+          result.data.queryGettesk.forEach(function (val, i) {
+            //console.log(val.Status)
+            if (val.Status == 2 || val.Status == 3) {
+              this.setState({
+                color: "#ccffcc"//เขียว
+              })
+            } else {
+              //console.log("elseeeeeeeee")
+              //console.log(arr[0])
+              if (arr.length >= 1) {
+                var m = 0
+                //console.log("INVOICEID"+val.INVOICEID+"arr"+arr[0])
+                for (var j = 0; j < arr.length; j++) {
+                  //console.log("test"+val.INVOICEID+arr[j])
+                  if (val.INVOICEID == arr[j]) {
+                    m++
+                  }
                 }
-              }
 
-              if (m >= 1) {
-                this.setState({
-                  color: "#ffffb3"//สีแหลือง
-                })
+                if (m >= 1) {
+                  this.setState({
+                    color: "#ffffb3"//สีแหลือง
+                  })
+                } else {
+                  this.setState({
+                    color: "#f5f5ef"//สีเทา
+                  })
+                  invoicetem.push(val.INVOICEID)
+                }
               } else {
                 this.setState({
                   color: "#f5f5ef"//สีเทา
                 })
                 invoicetem.push(val.INVOICEID)
+                num = num + 1
               }
-            } else {
-              this.setState({
-                color: "#f5f5ef"//สีเทา
-              })
-              invoicetem.push(val.INVOICEID)
-              num = num + 1
             }
-          }
 
-          tblData = <tbody>
-            <tr>
-              <td bgcolor={this.state.color}> <center>{i + 1}</center></td>
-              <td bgcolor={this.state.color}><center>{val.INVOICEID}</center></td>
-              <td bgcolor={this.state.color}><center>{val.QTYbox}</center></td>
-              <td bgcolor={this.state.color}><center>{val.CustomerName}</center></td>
-            </tr>
-          </tbody>
-          arrData.push(tblData)
+            tblData = <tbody>
+              <tr>
+                <td bgcolor={this.state.color}> <center>{i + 1}</center></td>
+                <td bgcolor={this.state.color}><center>{val.INVOICEID}</center></td>
+                <td bgcolor={this.state.color}><center>{val.QTYbox}</center></td>
+                <td bgcolor={this.state.color}><center>{val.CustomerName}</center></td>
+              </tr>
+            </tbody>
+            arrData.push(tblData)
 
 
-        }, this);
-      } else {
-        window.alert("ไม่มีเลขชุดเอกสารนี้")
-        //msg_ = 'ไม่มีเลขชุดเอกสารนี้'
+          }, this);
+        } else {
+          window.alert("ไม่มีเลขชุดเอกสารนี้")
+          //msg_ = 'ไม่มีเลขชุดเอกสารนี้'
+        }
+
+        this.setState({
+          showTable: arrData,
+          msg: msg_
+        })
+
+        console.log("invoice == " + this.state.showinvoice)
       }
 
-      this.setState({
-        showTable: arrData,
-        msg: msg_
-      })
-
-      console.log("invoice == " + this.state.showinvoice)
+      ).catch((err) => {
+      });
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
     }
-
-    ).catch((err) => {
-    });
   }
 
 
 
   queryGetteskUpdate = () => {
-    if (num > arr.length) {
-      if (window.confirm("INVOICE ไม่ครบจะไปต่อหรือไม่")) {
+    if(this.state.invoiceData != ''){
+      if (num > arr.length) {
+        if (window.confirm("INVOICE ไม่ครบจะไปต่อหรือไม่")) {
+          if (window.confirm("กรุณายืนยัน")) {
+            window.location.reload()
+            console.log(this.state.invoiceData)
+
+            this.props.client.mutate({
+
+              mutation: queryGetteskUpdate,
+
+              variables: {
+                "inData": this.state.invoiceData
+
+              }
+
+            }).then(res => {
+
+              this.queryGettesk()
+
+              if (res.data.queryGetteskUpdate.status == "2") {
+                console.log("result", res)
+                window.alert("รับงานสำเร็จ")
+
+                window.location.reload()
+              } else {
+                console.log(this.state.invoiceData)
+                alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
+                return false
+              }
+            }).catch((err) => {
+
+            });
+          }
+        }
+      } else {
         if (window.confirm("กรุณายืนยัน")) {
           window.location.reload()
           console.log(this.state.invoiceData)
@@ -156,40 +194,9 @@ class GetTask extends Component {
           });
         }
       }
-    } else {
-      if (window.confirm("กรุณายืนยัน")) {
-        window.location.reload()
-        console.log(this.state.invoiceData)
-
-        this.props.client.mutate({
-
-          mutation: queryGetteskUpdate,
-
-          variables: {
-            "inData": this.state.invoiceData
-
-          }
-
-        }).then(res => {
-
-          this.queryGettesk()
-
-          if (res.data.queryGetteskUpdate.status == "2") {
-            console.log("result", res)
-            window.alert("รับงานสำเร็จ")
-
-            window.location.reload()
-          } else {
-            console.log(this.state.invoiceData)
-            alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
-            return false
-          }
-        }).catch((err) => {
-
-        });
-      }
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
     }
-
   }
 
   ChangeText = (e) => {

@@ -81,6 +81,8 @@ pdfMake.fonts = {
   }
 }
 
+var DateTime
+
 class TransportReport extends Component {
 
   constructor(props) {
@@ -165,13 +167,13 @@ class TransportReport extends Component {
           "DateTime": formatDate,
         }
       }).then((result) => {
+        DateTime = moment(formatDate).format("DD-MM-YYYY")
         //console.log("result", result)
         if(result.data.transportReport.length != 0){
           var arrData = []
           var tblData
           var LastStatus
           var Sale
-          var DateTime
           var arrDataPDF_
           var status_list = {
             'A1': 'ส่งสินค้าเรียบร้อย',
@@ -196,7 +198,7 @@ class TransportReport extends Component {
               </tr>
             </tbody>
           Sale = val.SaleID
-          DateTime = moment(formatDate).format("DD-MM-YYYY")
+          
             arrData.push(tblData)
           },
             result.data.transportReport.forEach(function (val2, i) {

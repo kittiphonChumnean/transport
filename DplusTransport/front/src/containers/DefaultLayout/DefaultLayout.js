@@ -33,7 +33,7 @@ class DefaultLayout extends Component {
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
-            <AppSidebarNav navConfig={navigation} {...this.props} />
+            <AppSidebarNav navConfig={navigation} {...this.props.children} />
             <AppSidebarFooter />
             <AppSidebarMinimizer />
           </AppSidebar>

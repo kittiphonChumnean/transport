@@ -13,19 +13,60 @@ import {
   ModalBody,
   ModalHeader,
 } from 'reactstrap';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { withApollo, gql, compose } from 'react-apollo';
 import EllipsisText  from 'react-ellipsis-text';
-
-
-var arrCheck=[]
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+var style_modal = {
+  color:'red',
+  marginRight:10,
+  marginLeft:10
+}
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 var arrDataPDF = []
-var datePDF
+
+var arrCheck=[]
+function buildTableBody(data, columns) {
+  var body = [];
+
+  body.push(columns);
+
+  data.forEach(function (row) {
+    var dataRow = [];
+
+    columns.forEach(function (column) {
+      dataRow.push(row[column].toString());
+    })
+
+    body.push(dataRow);
+  });
+
+  return body;
+}
+
+function table(data, columns) {
+  return {
+    table: {
+      //widths: [0, 0, 0, 0],
+     
+      headerRows: 1,
+      body: buildTableBody(data, columns),
+
+    },
+    layout: {
+      hLineWidth: function(i, node) {
+        return 1;
+        
+      }
+    },
+    margin: [55, 15, 0, 0]
+  };
+}
+
+
 pdfMake.fonts = {
   THSarabun: {
     normal: 'THSarabun.ttf',
@@ -41,7 +82,9 @@ pdfMake.fonts = {
   }
 }
 
-
+var Document_SetPDF
+var salePDF
+var darePDF
 
 class ConfirmBill extends Component {
   constructor(props) {
@@ -71,31 +114,24 @@ class ConfirmBill extends Component {
   }
 
   printPDF() {
-    console.log("printt")
+    //window.location.reload()
+    //console.log("printt")
     var docDefinition = {
       pageSize: 'A5',
       pageOrientation: 'landscape',
-
-
       content: [
-        { text: 'ทดสอบ print' ,fontSize: 20 },
-        { text:'ทดสอบ print  ' ,fontSize:18 },
-       
+        { text: 'เลขชุดเอกสาร '  + Document_SetPDF, style: 'header', fontSize: 48 ,margin:[ 88, 2, 5, 5 ]},
+        { text: 'Sale ' + salePDF + '   วันที่ ' + darePDF, style: 'header', fontSize: 44 ,margin:[ 75, 2, 5, 5 ]},
+
       ],
       defaultStyle: {
         font: 'THSarabun',
         fontSize: 14
       }
-
     };
-
-
-
+    //window.location.reload()
     pdfMake.createPdf(docDefinition).print()
-
   }
-
-
 
   handleChange(date) {
     this.setState({
@@ -179,10 +215,10 @@ class ConfirmBill extends Component {
               onChange={this.handleInputChange(val.INVOICEID)} /></center></td>
                 <td><center>{i+1}</center></td>
                 <td><center>{val.SaleID}</center></td>
-                <td><center><Button color="link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</Button></center></td> 
+                <td><center><button type="button" class="btn btn-sm btn-link" onClick={()=>this.toggle(val.INVOICEID)}>{val.INVOICEID}</button></center></td> 
                 <td><center></center></td>
                 <td><center></center></td>
-                <td>{val.DELIVERYNAME}</td>
+                <td><p data-tip={val.DELIVERYNAME}><EllipsisText text={val.DELIVERYNAME} length={'30'} /></p></td>
                 <td><p data-tip={val.Customer_Address}><EllipsisText text={val.Customer_Address} length={'40'} /></p></td>
               </tr>
             </tbody>
@@ -190,6 +226,8 @@ class ConfirmBill extends Component {
           },this);
           var ButtonConfrim = <Button color="primary" onClick={this.DocumentSet}>คอนเฟริมบิล</Button>
           var date = moment(formatDate).format("DD-MM-YYYY")
+          salePDF = this.state.showSale
+          darePDF = date
           this.setState({
             showTable:arrData,
             dataTable:result,
@@ -271,6 +309,7 @@ DocumentSet=()=>{
         }
         console.log('DocumentSet',Document_Set)
         this.ConfrimBill(Document_Set)
+        Document_SetPDF = Document_Set
     }).catch((err) => {
 
     });
@@ -295,9 +334,9 @@ DocumentSet=()=>{
     }).then(res => {
         //console.log("Client Res", res)
         if (res.data.insertBill.status === true) {
-          if(window.confirm("บันทึกข้อมูลเรียบร้อย กรุณายืนยันการปริ้น")){
-            this.printPDF
-            window.location.reload()
+          if(window.confirm("บันทึกข้อมูลเรียบร้อย กรุณายืนยันการ Print")){
+            this.printPDF()
+            //window.location.reload()
           }
         } else {
             alert("ผิดพลาด! ไม่สามารถบันทึกข้อมูลได้")
@@ -353,7 +392,7 @@ DocumentSet=()=>{
                   <Table>
                     <thead>
                       <tr>
-                        <th width="5%"><center><Button color="primary" onClick={this.onCheckAll}>All</Button></center></th>
+                        <th width="5%"><center><button class="btn btn-sm btn-pill btn-primary" onClick={this.onCheckAll}>ลบ</button></center></th>
                         <th width="5%"><center>ลำดับ</center></th>
                         <th width="5%"><center>Sale ID</center></th>
                         <th width="10%"><center>รหัส invoice</center></th>
@@ -371,9 +410,9 @@ DocumentSet=()=>{
           </Col>
         </Row> 
 
-          <Modal bsSize="large" isOpen={this.state.modal} toggle={this.toggle}>
-            <ModalHeader>รหัส INVOICEID: <strong>{this.state.showINVOICEID}</strong></ModalHeader>
-            <ModalBody>
+          <Modal  isOpen={this.state.modal} toggle={this.toggle} >
+            <ModalHeader >รหัส INVOICEID: <strong>{this.state.showINVOICEID}</strong></ModalHeader>
+            <ModalBody >
               <Table responsive>
                 <thead>
                   <tr>

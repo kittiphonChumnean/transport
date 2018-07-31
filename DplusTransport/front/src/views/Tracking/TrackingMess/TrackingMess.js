@@ -95,7 +95,7 @@ class TrackingMess extends Component {
             "Trip": trip,
           }
         }).then((result) => {
-          console.log("result",result)
+          //console.log("result",result)
           if(result.data.trackingMess.length != 0){
             var arrData = []
               var tblData
@@ -159,18 +159,18 @@ class TrackingMess extends Component {
   }
 
   trackingStatusMess(){
-    //console.log("มาแล้ว")
-    dateTime = moment(this.state.showDate).format("YYYY-MM-DD")
+    console.log("มาแล้ว")
+    dateTime = moment(this.state.showDateTime).format("YYYY-MM-DD")
     trip = parseInt(this.state.showTrip)
     this.props.client.query({
       query:trackingStatusMess,
       variables: {
         "MessengerID":this.state.showMess,
-        "DateTime":dateTime,
+        "DateTime":this.state.showDateTime,
         "Trip": trip,
       }
     }).then((result) => {
-      //console.log("status",result)
+      console.log("status",result)
       var finish = result.data.trackingStatusMess[0].statusA
       var allTrack = result.data.trackingStatusMess[0].allinvoice
       var notFinish =  allTrack - finish

@@ -2,7 +2,7 @@ var dbConnect = require('../../connectdb/connectdb')
 var sql = require('mssql')
 var Request = require('tedious').Request;
 const graphql = require('graphql')
-const { GraphQLList, GraphQLFloat, GraphQLInt,GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLBoolean} = graphql
+const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLInputObjectType, GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLBoolean } = graphql
 
 //select sale
 var allSale = new GraphQLObjectType({
@@ -57,26 +57,26 @@ var allBill = new GraphQLObjectType({
 
 var selectAllBill = {
     type: new GraphQLList(allBill),
-    args:{
-        SaleID:{type:GraphQLString},
-        invoicedate:{type:GraphQLString},
+    args: {
+        SaleID: { type: GraphQLString },
+        invoicedate: { type: GraphQLString },
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject) {
-            console.log("ค่า",args)
-            fnSelectAllBill(args.SaleID,args.invoicedate,function(data){
+            console.log("ค่า", args)
+            fnSelectAllBill(args.SaleID, args.invoicedate, function (data) {
                 resolve(data)
             })
         })
     }
 }
 
-var fnSelectAllBill = function (SaleID,invoicedate,callback) {
+var fnSelectAllBill = function (SaleID, invoicedate, callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
         // console.log("DB Connected")
         return pool.request()
-        .input('SaleID',sql.VarChar,SaleID)
-        .input('invoicedate',sql.VarChar,invoicedate)
+            .input('SaleID', sql.VarChar, SaleID)
+            .input('invoicedate', sql.VarChar, invoicedate)
             .query('SELECT DISTINCT INVOICEID,DELIVERYNAME,Customer_Address,SaleID,Sale_Name,StoreZone,CustomerID,CustomerName FROM [AX-ToWebTest2] WHERE SaleID=@SaleID AND invoicedate= @invoicedate AND Stutas IS NULL')
     }).then(res => {
         console.log("555555555555", res);
@@ -94,14 +94,14 @@ var ConfrimModel = new GraphQLInputObjectType({
 })
 
 var inputStatusAllbill = new GraphQLObjectType({
-    name: 'inputStatusAllbill', 
+    name: 'inputStatusAllbill',
     fields: () => ({
-        status: {type: GraphQLBoolean}
+        status: { type: GraphQLBoolean }
     })
 })
 
-var insertBill={
-    type:inputStatusAllbill,
+var insertBill = {
+    type: inputStatusAllbill,
     args: {
         inData: {
             type: new GraphQLList(ConfrimModel),
@@ -112,16 +112,16 @@ var insertBill={
         DocumentSet: { type: GraphQLString }
     },
     resolve: function (_, args) {
-        return new Promise(function (resolve, reject){
-            console.log("ค่า",args.inData)
-            fninsertBill(args.inData,args.DocumentSet, function (data) {
+        return new Promise(function (resolve, reject) {
+            console.log("ค่า", args.inData)
+            fninsertBill(args.inData, args.DocumentSet, function (data) {
                 resolve(data)
             })
         })
     }
 }
 
-var fninsertBill = function (inData,DocumentSet, callback) {
+var fninsertBill = function (inData, DocumentSet, callback) {
     sql.close();
     sql.connect(dbConnect.dbConnect).then(pool => {
         var request = new sql.Request(pool)
@@ -129,45 +129,45 @@ var fninsertBill = function (inData,DocumentSet, callback) {
         inData.forEach(function (val, i) {
             request.input('INVOICEID' + i, sql.VarChar, val.INVOICEID)
             if (i + 1 == inData.length) {
-                strVal += "(@INVOICEID" + i +")"
+                strVal += "(@INVOICEID" + i + ")"
             } else {
-                strVal += "(@INVOICEID" + i +"),"
+                strVal += "(@INVOICEID" + i + "),"
             }
         });
-        request.input('DocumentSet' ,sql.VarChar, DocumentSet)
+        request.input('DocumentSet', sql.VarChar, DocumentSet)
         //console.log('str',strVal)
-        request.query('insert into [ConfirmBill] ([INVOICEID]) values '+ strVal  + 
-                        
-                            ' UPDATE '+
-                            ' ConfirmBill '+
-                        ' SET '+
-                            ' DocumentSet= @DocumentSet, '+
-                        ' CustomerID= [AX-ToWebTest2].CustomerID, '+
-                            ' CustomerName = [AX-ToWebTest2].CustomerName, '+
-                            ' AddressShipment = [AX-ToWebTest2].Customer_Address, '+
-                        ' SaleID= [AX-ToWebTest2].SaleID, '+
-                            ' Sale_Name = [AX-ToWebTest2].Sale_Name, '+
-                            ' StoreZone=[AX-ToWebTest2].StoreZone ,'+
-                            ' Status=1 , '+
-                            ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME '+
-                        ' FROM '+
-                            ' ConfirmBill '+
-                        ' INNER JOIN '+
-                            ' [AX-ToWebTest2] '+
-                        ' ON '+
-                            ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID '+
-                        ' WHERE '+
-                            ' ConfirmBill.CustomerID IS NULL '+  
-                        
-                        ' UPDATE [AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] IN ('+ strVal+') '+
-                        
-                        ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] , '+
-                        ' [Amount],[PriceOfUnit]) SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) '+         
-                        ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] IN ('+ strVal+') ')
+        request.query('insert into [ConfirmBill] ([INVOICEID]) values ' + strVal +
+
+            ' UPDATE ' +
+            ' ConfirmBill ' +
+            ' SET ' +
+            ' DocumentSet= @DocumentSet, ' +
+            ' CustomerID= [AX-ToWebTest2].CustomerID, ' +
+            ' CustomerName = [AX-ToWebTest2].CustomerName, ' +
+            ' AddressShipment = [AX-ToWebTest2].Customer_Address, ' +
+            ' SaleID= [AX-ToWebTest2].SaleID, ' +
+            ' Sale_Name = [AX-ToWebTest2].Sale_Name, ' +
+            ' StoreZone=[AX-ToWebTest2].StoreZone ,' +
+            ' Status=1 , ' +
+            ' DELIVERYNAME=[AX-ToWebTest2].DELIVERYNAME ' +
+            ' FROM ' +
+            ' ConfirmBill ' +
+            ' INNER JOIN ' +
+            ' [AX-ToWebTest2] ' +
+            ' ON ' +
+            ' ConfirmBill.INVOICEID = [AX-ToWebTest2].INVOICEID ' +
+            ' WHERE ' +
+            ' ConfirmBill.CustomerID IS NULL ' +
+
+            ' UPDATE [AX-ToWebTest2] SET [Stutas] = 1 WHERE [INVOICEID] IN (' + strVal + ') ' +
+
+            ' INSERT INTO [dbo].[ConfirmBillDetail] ([INVOICEID] ,[ItemID] ,[ItemName] ,[Qty] , ' +
+            ' [Amount],[PriceOfUnit]) SELECT [INVOICEID],ITEMID,ItemName,QTY,TotalAmount,(TotalAmount/QTY) ' +
+            ' from [AX-ToWebTest2] where [AX-ToWebTest2].[INVOICEID] IN (' + strVal + ') ')
             .then(res => {
                 // console.log(q.sql)
-                sql.close();              
-                    callback({ status: true })              
+                sql.close();
+                callback({ status: true })
             })
     })
 }
@@ -186,24 +186,24 @@ var DetailModal = new GraphQLObjectType({
 
 var selectDetailBill = {
     type: new GraphQLList(DetailModal),
-    args:{
+    args: {
         INVOICEID: { type: GraphQLString },
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject) {
-            console.log("ค่า",args)
-            fnselectDetailBill(args.INVOICEID,function(data){
+            console.log("ค่า", args)
+            fnselectDetailBill(args.INVOICEID, function (data) {
                 resolve(data)
             })
         })
     }
 }
 
-var fnselectDetailBill = function (INVOICEID,callback) {
+var fnselectDetailBill = function (INVOICEID, callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
         // console.log("DB Connected")
         return pool.request()
-        .input('INVOICEID',sql.VarChar,INVOICEID)
+            .input('INVOICEID', sql.VarChar, INVOICEID)
             .query('SELECT INVOICEID ,ITEMID ,ItemName ,QTY ,TotalAmount FROM [AX-ToWebTest2] WHERE INVOICEID = @INVOICEID')
     }).then(res => {
         console.log("Detail", res);
@@ -235,11 +235,11 @@ var fnData = function (callback) {
     sql.connect(dbConnect.dbConnect).then(pool => {
         // console.log("DB Connected")
         return pool.request()
-            .query('SELECT last FROM LastDocomentSet '+
-                   ' UPDATE LastDocomentSet SET last = last+1 ')
+            .query('SELECT last FROM LastDocomentSet ' +
+                ' UPDATE LastDocomentSet SET last = last+1 ')
     }).then(res => {
         sql.close()
-        console.log('res',res)
+        console.log('res', res)
         callback(res)
 
     })

@@ -16,6 +16,9 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { withApollo, gql, compose } from 'react-apollo';
 import Workbook from 'react-excel-workbook'//excel
 
@@ -27,6 +30,8 @@ var arrDataPDF = []
 var datePDF
 var datePDFend
 var sale
+var _dateStart
+var _dateEnd
 
 
 function buildTableBody(data, columns) {
@@ -92,9 +97,11 @@ class CNReport extends Component {
       showstartDate:'',
       showendDate:'',
       showTable:'',
-      
-      dropdownOpen: new Array(6).fill(false),
+      startDate: moment(),
+      endDate: moment(),
     };
+    this.choosestartDate = this.choosestartDate.bind(this);
+    this.chooseendDate = this.chooseendDate.bind(this);
   }
 
 //-----pdf-----//
@@ -124,88 +131,102 @@ printPDF(){
 
 
 
-  choosestartDate=(e)=>{
+  choosestartDate=(date)=>{
     this.setState({
-      showstartDate:e.target.value
+      startDate:date
     })
   }
 
-  chooseendDate=(e)=>{
+  chooseendDate=(date)=>{
     this.setState({
-      showendDate:e.target.value
+      endDate:date
     })
   }
 
   
   QueryCNReport = () => {
-    this.props.client.query({
-      query: QueryCNReport,
-      variables: {
-        "SaleID":this.state.showSale,
-        "DateStart":this.state.showstartDate,
-        "DateEnd":this.state.showendDate,
-      }
-    }).then((result) => {
-      console.log("result", result)
-      var arrData = []
-      var tblData
-      var arrDataPDF_
-      result.data.QueryCNReport.forEach(function (val, i) {
-        tblData = 
-        <tr>
-                        <td><center>{i+1}</center></td>
-                        <td><center>{val.SaleID}</center></td>
-                        <td><center>{val.INVOICEID}</center></td>
-                        <td><center>{val.CustomerID}</center></td>
-                        <td><center>{val.QtyBill}</center></td>
-                        <td><center>{val.AmountBill}</center></td>
-                        <td><center>{val.Datetime}</center></td>
-                        <td><center>{val.AmountActual}</center></td>
-                        <td><center>{(val.QtyBill)-(val.QtyActual)}</center></td>
-                        <td><center>{(val.AmountBill)-(val.AmountActual)}</center></td>
-                        <td><center>{(val.QtyBill)- ((val.QtyBill)-(val.QtyActual))}</center></td>
-                        <td><center>{val.ReasonCN}</center></td>
-                        
-                      </tr>
-        
+    if(this.state.showSale != ''){
+      var formatDate = moment(this.state.startDate).format("YYYY-MM-DD")
+      var formatDateEnd = moment(this.state.endDate).format("YYYY-MM-DD")
+      this.props.client.query({
+        query: QueryCNReport,
+        variables: {
+          "SaleID":this.state.showSale,
+          "DateStart":formatDate,
+          "DateEnd":formatDateEnd,
+        }
+      }).then((result) => {
+        _dateStart = moment(formatDate).format("DD-MM-YYYY")
+        _dateEnd = moment(formatDateEnd).format("DD-MM-YYYY")
+        if(result.data.QueryAccountReport.length != 0){
+          console.log("result", result)
+          var arrData = []
+          var tblData
+          var arrDataPDF_
+          result.data.QueryCNReport.forEach(function (val, i) {
+            tblData = 
+            <tr>
+                            <td><center>{i+1}</center></td>
+                            <td><center>{val.SaleID}</center></td>
+                            <td><center>{val.INVOICEID}</center></td>
+                            <td><center>{val.CustomerID}</center></td>
+                            <td><center>{val.QtyBill}</center></td>
+                            <td><center>{val.AmountBill}</center></td>
+                            <td><center>{val.Datetime}</center></td>
+                            <td><center>{val.AmountActual}</center></td>
+                            <td><center>{(val.QtyBill)-(val.QtyActual)}</center></td>
+                            <td><center>{(val.AmountBill)-(val.AmountActual)}</center></td>
+                            <td><center>{(val.QtyBill)- ((val.QtyBill)-(val.QtyActual))}</center></td>
+                            <td><center>{val.ReasonCN}</center></td>
+                            
+                          </tr>
+            
 
-        arrData.push(tblData)
-      },
-    result.data.QueryCNReport.forEach(function (val2, i) {
-        arrDataPDF_ =  {  
-          
-                         ลำดับ:i+1,
-                         Sale:val2.SaleID, 
-                         invoice: val2.INVOICEID,
-                         ลูกค้า:val2.CustomerID,
-                         Qtyยอดจริง:val2.QtyBill,
-                         ยอดเงินจริง:val2.AmountBill,
-                          วันที่เคลียร์บิล:val2.Datetime,
-                          ยอดเงินที่เก็บได้:val2.AmountActual,
-                          จำนวนCN:(val2.QtyBill)-(val2.QtyActual),
-                          ยอดCN:(val2.AmountBill)-(val2.AmountActual),
-                          จำนวนคงเหลือ:(val2.QtyBill)- ((val2.QtyBill)-(val2.QtyActual)),
-                          เหตุผล:val2.ReasonCN,
-                       
-        },
-                        
-                       
+            arrData.push(tblData)
+          },
+        result.data.QueryCNReport.forEach(function (val2, i) {
+            arrDataPDF_ =  {  
+              
+                            ลำดับ:i+1,
+                            Sale:val2.SaleID, 
+                            invoice: val2.INVOICEID,
+                            ลูกค้า:val2.CustomerID,
+                            Qtyยอดจริง:val2.QtyBill,
+                            ยอดเงินจริง:val2.AmountBill,
+                              วันที่เคลียร์บิล:val2.Datetime,
+                              ยอดเงินที่เก็บได้:val2.AmountActual,
+                              จำนวนCN:(val2.QtyBill)-(val2.QtyActual),
+                              ยอดCN:(val2.AmountBill)-(val2.AmountActual),
+                              จำนวนคงเหลือ:(val2.QtyBill)- ((val2.QtyBill)-(val2.QtyActual)),
+                              เหตุผล:val2.ReasonCN,
                           
-               
-        arrDataPDF.push(arrDataPDF_)
-       
-      },
-      datePDF=this.state.showstartDate,
-      datePDFend=this.state.showendDate
-      ));
+            },
+                            
+                          
+                              
+                  
+            arrDataPDF.push(arrDataPDF_)
+          
+          },
+          datePDF=_dateStart,
+          datePDFend=_dateEnd
+          ));
 
-      
-      this.setState({
-        showTable: arrData
-      })
-    }).catch((err) => {
+          
+          this.setState({
+            showTable: arrData,
+            showstartDate: _dateStart,
+            showendDate: _dateEnd
+          })
+        }else {
+          alert("กรุณากรอกข้อมูลให้ครบ")
+        }
+      }).catch((err) => {
 
-    });
+      });
+    }else {
+      alert("กรุณากรอกข้อมูลให้ครบ")
+    }
   }
 
 
@@ -297,11 +318,11 @@ printPDF(){
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                       <Label for="date" class="pr-1"><strong>วันที่เริ่ม</strong></Label>
-                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.choosestartDate} ></Input>
+                          &nbsp;&nbsp;<DatePicker selected={this.state.startDate} onChange={this.choosestartDate} tabIndex={1}/>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                       <Label for="date" class="pr-1"><strong>วันที่สิ้นสุด</strong></Label>
-                          &nbsp;&nbsp;<Input id="date" name="date" placeholder="" required="" type="date" class="form-control" onChange={this.chooseendDate} ></Input>
+                          &nbsp;&nbsp;<DatePicker selected={this.state.endDate} onChange={this.chooseendDate} tabIndex={1}/>
                       </div>
                       &nbsp;&nbsp;<div class="pr-1 form-group">
                       <button  type="button" class="btn btn-success" onClick={this.QueryCNReport}>ค้นหา</button>

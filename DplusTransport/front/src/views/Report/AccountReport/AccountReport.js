@@ -28,6 +28,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 var arrDataPDF = []
 var datePDF
+var date
 
 
 function buildTableBody(data, columns) {
@@ -144,6 +145,7 @@ class AccountReport extends Component {
 
         }
       }).then((result) => {
+        date = moment(formatDate).format("DD-MM-YYYY")
         if(result.data.QueryAccountReport.length != 0){
           console.log("result", result)
           var arrData = []
@@ -185,11 +187,11 @@ class AccountReport extends Component {
 
 
             },
-              datePDF = this.state.showDate
+              datePDF = date
 
             ));
 
-            var date = moment(formatDate).format("DD-MM-YYYY")
+            
           this.setState({
             showTable: arrData,
             showDate: date,

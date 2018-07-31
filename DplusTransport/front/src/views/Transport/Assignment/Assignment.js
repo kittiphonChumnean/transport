@@ -284,6 +284,7 @@ console.log("Status==>"+val.Status)
 //-----------------zone messenger--------------//
   queryAssingmentMess=()=>{
     //console.log("1234567890")
+    if(this.state.showMess != '' && this.state.itemtrip != ''){
       this.props.client.query({
         query:queryAssingmentMess,
         variables: {
@@ -302,6 +303,9 @@ console.log("Status==>"+val.Status)
     }).catch((err) => {
 
     });
+  }else {
+    alert("กรุณากรอกข้อมูลให้ครบ")
+  }
 }
 
 
@@ -351,22 +355,28 @@ ClickSave(e) {
 }
 
 setDataSave( self, props) {
-  console.log("setDataSave")
-  var arrData = []
-  console.log("row=="+ this.state.rows[0])
-  this.state.rows.forEach(function (val,idx) {
-    arrData.push({
-      INVOICEID:val.name,
-      MessengerID: self.itemIDmess,
-      Trip: self.itemtrip
-    })
-  });   
-  arrData.pop()
+  if(self.itemIDmess != '' && self.itemtrip != '' && this.state.rows != ''){
+    console.log("setDataSave")
+    var arrData = []
+    console.log("row=="+ this.state.rows[0])
+    this.state.rows.forEach(function (val,idx) {
+      arrData.push({
+        INVOICEID:val.name,
+        MessengerID: self.itemIDmess,
+        Trip: self.itemtrip
+      })
+    });   
+    arrData.pop()
 
-  console.log("arrData")
-  console.log(arrData)
-  this.saveData( props, arrData)
+    console.log("arrData")
+    console.log(arrData)
+    this.saveData( props, arrData)
+  }else {
+    alert("กรุณากรอกข้อมูลให้ครบ")
+  }
 }
+
+
 
 saveData( props, data) {
 

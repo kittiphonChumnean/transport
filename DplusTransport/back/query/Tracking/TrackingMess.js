@@ -60,7 +60,7 @@ var trackingMess = {
     },
     resolve: function (_, args) {
         return new Promise(function (resolve, reject) {
-            console.log("ค่า",args)
+            //console.log("ค่า",args)
             fnSelectData(args.MessengerID,args.DateTime,args.Trip,function(data){
                 resolve(data)
             })
@@ -83,7 +83,7 @@ var fnSelectData = function (MessengerID,DateTime,Trip,callback) {
                 ' AND datediff(day, Tracking.DateTime, @DateTime) = 0 '+
                 ' AND Tracking.Trip=@Trip ORDER BY DateTime ')
     }).then(res => {
-        console.log("555555555555", res);
+        //console.log("555555555555", res);
         sql.close()
         callback(res)
     })

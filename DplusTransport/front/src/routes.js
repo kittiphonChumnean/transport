@@ -115,6 +115,7 @@ const routes = [{
   { path: '/Manage/AddMas', name: 'AddMas', component: AddMas },
   { path: '/Manage/AssignmentDoc', name: 'AssignmentDoc', component: AssignmentDoc },
   { path: '/Manage/EditStatus', name: 'EditStatus', component: EditStatus },
+  { path: '/home', exact: true, name: 'Home', component: Home },
   ]
 }];
 
