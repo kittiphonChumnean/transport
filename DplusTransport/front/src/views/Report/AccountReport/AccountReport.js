@@ -105,6 +105,33 @@ class AccountReport extends Component {
   }
 
 
+   formatMoney(inum){  // ฟังก์ชันสำหรับแปลงค่าตัวเลขให้อยู่ในรูปแบบ เงิน
+    var s_inum=new String(inum);
+    var num2=s_inum.split(".");
+    var n_inum="";  
+    if(num2[0]!=undefined){
+        var l_inum=num2[0].length;  
+        for(var i=0;i<l_inum;i++){  
+            if(parseInt(l_inum-i)%3==0){  
+                if(i==0){  
+                    n_inum+=s_inum.charAt(i);         
+                }else{  
+                    n_inum+=","+s_inum.charAt(i);         
+                }     
+            }else{  
+                n_inum+=s_inum.charAt(i);  
+            }  
+        }  
+    }else{
+        n_inum=inum;
+    }
+    if(num2[1]!=undefined){
+        n_inum+="."+num2[1];
+    }
+    return n_inum;
+}
+
+
 
 
   //-----pdf-----//
@@ -145,6 +172,7 @@ class AccountReport extends Component {
 
         }
       }).then((result) => {
+        console.log("result")
         date = moment(formatDate).format("DD-MM-YYYY")
         if(result.data.QueryAccountReport.length != 0){
           console.log("result", result)
@@ -159,11 +187,11 @@ class AccountReport extends Component {
             tblData =
               <tr>
                 <td><center>{i + 1}</center></td>
-                <td><center>{val.INVOICEID}</center></td>
-                <td><center>{val.CustomerID}</center></td>
-                <td><center>{val.AmountBill}</center></td>
-                <td><center>{val.AmountActual}</center></td>
-                <td><center>{(val.AmountBill) - (val.AmountActual)}</center></td>
+                <td align="left">{val.INVOICEID}</td>
+                <td align="left">{val.CustomerID}</td>
+                <td align="right">{this.formatMoney(val.AmountBill)}</td>
+                <td align="right">{this.formatMoney(val.AmountActual)}</td>
+                <td align="right">{this.formatMoney((val.AmountBill) - (val.AmountActual))}</td>
 
               </tr>
 
@@ -171,7 +199,7 @@ class AccountReport extends Component {
             arrData.push(tblData)
 
 
-          },
+          },this,
             result.data.QueryAccountReport.forEach(function (val2, i) {
               arrDataPDF_ = {
 
@@ -299,17 +327,17 @@ class AccountReport extends Component {
                   </div>
                 </div>
                 <br />
-                <center>
+            
                   <Table responsive>
                     <thead>
                       <tr>
 
-                        <th><center>ลำดับ</center></th>
-                        <th><center>เลขที่ invoice</center></th>
-                        <th><center>รหัสลูกค้า</center></th>
-                        <th><center>จำนวนเงิน (invoice)</center></th>
-                        <th><center>เงินสดที่เก็บได้</center></th>
-                        <th><center>ค้างจ่าย</center></th>
+                        <th  width="2%"><center>ลำดับ</center></th>
+                        <th width="15%"><center>เลขที่ invoice</center></th>
+                        <th width="15%"><center>รหัสลูกค้า</center></th>
+                        <th    width="15%"><center>จำนวนเงิน (invoice)</center></th>
+                        <th   width="15%"><center>เงินสดที่เก็บได้</center></th>
+                        <th  width="15%"><center>ค้างจ่าย</center></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -318,7 +346,7 @@ class AccountReport extends Component {
 
                     </tbody>
                   </Table>
-                </center>
+               
               </CardBody>
             </Card>
           </Col>

@@ -63,7 +63,7 @@ const QueryType = new GraphQLObjectType({
 
 
         //nan query
-
+        queryGetteskDocomment:queryGettesk.selectDocoment,
 
 
 

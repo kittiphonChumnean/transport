@@ -4,13 +4,48 @@ var Request = require('tedious').Request;
 const graphql = require('graphql')
 const { GraphQLList, GraphQLFloat, GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString,GraphQLInputObjectType } = graphql
 
+var selectDocomentModel = new GraphQLObjectType({
+    name: 'DocomentModel',
+    fields: () => ({
+        DocumentSet: { type: GraphQLString },
+    })
+})
+
+var selectDocoment = {
+    type: new GraphQLList(selectDocomentModel),
+    resolve: function (_, args) {
+        return new Promise(function (resolve, reject) {
+            console.log("ค่า", args)
+            fnselectDocoment(function (data) {
+                resolve(data)
+            })
+        })
+    }
+}
+
+var fnselectDocoment = function (callback) {
+    sql.connect(dbConnect.dbConnect).then(pool => {
+        // console.log("DB Connected")
+        return pool.request()
+
+            .query('SELECT DISTINCT [DocumentSet]  FROM [ConfirmBill]')
+    }).then(res => {
+        console.log("555555555555", res);
+        sql.close()
+        callback(res)
+    })
+}
+
+
+
 var GetTeskModel = new GraphQLObjectType({
     name: 'GetTeskModel',
     fields: () => ({
         INVOICEID: { type: GraphQLString },
         QTYbox: { type: GraphQLInt },
         CustomerName: { type: GraphQLString },
-        Status:{type:GraphQLInt}
+        Status:{type:GraphQLInt},
+        SaleID:{ type: GraphQLString }
     })
 })
 
@@ -34,7 +69,7 @@ var fnSelectGetTesk = function (DocumentSet,callback) {
         // console.log("DB Connected")
         return pool.request()
         .input('DocumentSet',sql.VarChar,DocumentSet)
-            .query(' SELECT  [INVOICEID],[CustomerName],[QTYbox],Status FROM [ConfirmBill] WHERE DocumentSet=@DocumentSet ')
+            .query(' SELECT  [INVOICEID],[CustomerName],[QTYbox],Status,SaleID FROM [ConfirmBill] WHERE DocumentSet=@DocumentSet ')
     }).then(res => {
         console.log("555555555555", res);
         sql.close()
@@ -105,6 +140,7 @@ var fnUpDateStateGetTesk = function ( inData,callback) {
 module.exports = {
     selectGetTesk:selectGetTesk,
     upDateStateGetTesk:upDateStateGetTesk,
-    fnUpDateStateGetTesk:fnUpDateStateGetTesk
+    fnUpDateStateGetTesk:fnUpDateStateGetTesk,
+    selectDocoment,selectDocoment
     
 }

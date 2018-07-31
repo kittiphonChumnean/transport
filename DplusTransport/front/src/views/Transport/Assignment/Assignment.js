@@ -52,6 +52,14 @@ class Assignment extends React.Component {
     };
     this.ClickSave = this.ClickSave.bind(this)
   }
+
+
+
+
+
+
+
+  
 //----------addRow Table----------//
 handleChange = idx => e => {
   const { name, value } = e.target;
@@ -81,15 +89,17 @@ handleAddRow = () => {
 };
 
 
-handleRemoveRow= idx => e => { 
+handleRemoveRow= idx  => e => { 
   console.log("delete"+idx)
   console.log("rows1")
   console.log(this.state.rows)
 
 
   //console.log("=====>"+this.state.rows.findIndex(k => k==idx))
-
+ 
   this.state.rows.splice(idx,1)
+  arr.splice(idx,1)
+  //arr.splice((arr.findIndex(k => k==invoice)),1)
   this.setState({
     rows: this.state.rows
     //rows: this.state.rows.splice(this.state.rows.findIndex(k => k==idx),1)
@@ -102,14 +112,15 @@ handleRemoveRow= idx => e => {
 };
 
 handleRemoveRowOato(idx) { 
-  console.log("delete"+idx)
-  console.log("rows1")
+ 
   console.log(this.state.rows)
 
 
   //console.log("=====>"+this.state.rows.findIndex(k => k==idx))
 
   this.state.rows.splice(idx,1)
+  
+  console.log("arrdelete"+arr)
   this.setState({
     rows: this.state.rows
     //rows: this.state.rows.splice(this.state.rows.findIndex(k => k==idx),1)
@@ -138,6 +149,7 @@ Enterfn= idx => e => {
   if (e.key === 'Enter') {
     if (arr.findIndex(k => k==e.target.value)<0||arr.length==0){
       arr.push(e.target.value)
+      console.log("arr"+arr)
 
     this.handleAddRow()
     this.queryAssingmentInvoice2(idx,e)
@@ -391,7 +403,7 @@ saveData( props, data) {
       console.log("Client Res", res)
       this.queryAssingment2()
       if (res.data.queryAssingment.status === "2") {
-          alert("บันทึกข้อมูลเรียบร้อย")
+          alert("บันทึกข้อมูลเรียบร้อย จำนวน "+arr.length+" บิล")
           window.location.reload()
       } else {
         console.log(data)
@@ -488,7 +500,7 @@ queryAssingment2=()=>{
                     </div>
                   </div>
                  
-                  <h5><strong>จำนวนรวม {this.state.rows.length} บิล</strong></h5>
+                  <h5><strong>จำนวนรวม {arr.length} บิล</strong></h5>
                  
                  
                 
@@ -501,10 +513,10 @@ queryAssingment2=()=>{
                 <thead>
                   <tr>
                     <th width="2%" className="text-center"> ลำดับ </th>
-                    <th width="10%" className="text-center"> รหัส invoice </th>
-                    <th width="10%" className="text-center"> SaleID </th>
-                    <th width="40%" className="text-center"> ผู้รับ </th>
-                    <th width="40%" className="text-center"> ห้าง </th>
+                    <th align="right" width="10%" className=""> รหัส invoice </th>
+                    <th align="right" width="10%" className=""> SaleID </th>
+                    <th align="right" width="40%" className=""> ผู้รับ </th>
+                    <th align="right" width="40%" className=""> ห้าง </th>
                  
                     <th width="5%" ></th>
                   </tr>
@@ -512,20 +524,20 @@ queryAssingment2=()=>{
                 <tbody>
                   {this.state.rows.map((item, idx) => (
                     <tr id="addr0" key={idx}>
-                      <td>{idx+1}</td>
+                      <td align="center">{idx+1}</td>
                       <td>
                         
-                          {this.state.rows[idx].name }
+                       {this.state.rows[idx].name }
                         
                       </td>
                       <td>
-                    <center>{this.state.rows[idx].saleID } </center>
+                   {this.state.rows[idx].saleID } 
                       </td>
                       <td>
-                    <center>{this.state.rows[idx].customer } </center>
+                    {this.state.rows[idx].customer } 
                       </td>
                       <td>
-                    <center>{this.state.rows[idx].storezone } </center>
+                  {this.state.rows[idx].storezone } 
                       </td>
                       
                       <td>

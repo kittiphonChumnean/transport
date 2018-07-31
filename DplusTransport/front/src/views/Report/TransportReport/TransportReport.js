@@ -306,11 +306,11 @@ class TransportReport extends Component {
                   <thead>
                     <tr>
                       <th><center>ลำดับ</center></th>
-                      <th><center>เลขที่ invoice</center></th>
-                      <th><center>รหัสลูกค้า</center></th>
-                      <th><center>Sale</center></th>
-                      <th><center>Messenger</center></th>
-                      <th><center>สถานะ</center></th>
+                      <th align="right" >เลขที่ invoice</th>
+                      <th align="right" >รหัสลูกค้า</th>
+                      <th align="right" >Sale</th>
+                      <th align="right" >Messenger</th>
+                      <th align="right" >สถานะ</th>
                     </tr>
                   </thead>
                   {this.state.showTable}

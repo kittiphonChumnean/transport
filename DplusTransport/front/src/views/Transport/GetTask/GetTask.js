@@ -18,9 +18,36 @@ import {
 
 } from 'reactstrap';
 import { gql, withApollo, compose } from 'react-apollo'
+import Autosuggest from 'react-autosuggest';
 var arr = []
 var num = 0
-var invoicetem=[]
+var invoicetem = []
+
+const languages = [
+
+  
+];
+
+const getSuggestions = value => {
+  const inputValue = value.trim().toLowerCase();
+  const inputLength = inputValue.length;
+
+  return inputLength === 0 ? [] : languages.filter(lang =>
+    lang.name.toLowerCase().slice(0, inputLength) === inputValue
+  );
+};
+const getSuggestionValue = suggestion => suggestion.name;
+const renderSuggestion = suggestion => (
+  //<option value={suggestion.name}>{suggestion.name}</option>
+
+<div option={suggestion.name} tabindex="0" role="option" class="select-option no-outline" on="tap:autosuggest-list.hide" aria-selected="false">{suggestion.name}</div>
+
+
+  //<div>
+    //{suggestion.name}
+ // </div>
+);
+
 
 class GetTask extends Component {
   constructor(props) {
@@ -34,12 +61,53 @@ class GetTask extends Component {
       showinvoice: 0,
       invoiceData: [],
       color: '',
-      
+      value: '',
+      suggestions: []
+
     };
   }
 
+  queryGetteskDocomment=()=>{
+    this.props.client.query({
+        query:queryGetteskDocomment
+    }).then((result) => {
+        console.log("result",result)
+        
+        result.data.queryGetteskDocomment.forEach(function (val,i) {
+          languages.push({
+            name:val.DocumentSet
+           
+          })
+        });
+        console.log("languages"+languages)
+        this.setState({
+          
+        })
+    }).catch((err) => {
+
+    });
+  }
+
+
+  onChange = (event, { newValue }) => {
+    this.setState({
+      value: newValue
+    });
+  };
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.setState({
+      suggestions: getSuggestions(value)
+    });
+  };
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    });
+  };
+  
+
   queryGettesk = () => {
-    if(this.state.showText != ''){
+    if (this.state.showText != '') {
       console.log("queryGettesk")
       this.props.client.query({
         query: queryGettesk,
@@ -93,10 +161,11 @@ class GetTask extends Component {
 
             tblData = <tbody>
               <tr>
-                <td bgcolor={this.state.color}> <center>{i + 1}</center></td>
-                <td bgcolor={this.state.color}><center>{val.INVOICEID}</center></td>
-                <td bgcolor={this.state.color}><center>{val.QTYbox}</center></td>
-                <td bgcolor={this.state.color}><center>{val.CustomerName}</center></td>
+                <td  bgcolor={this.state.color}> {i + 1}</td>
+                <td bgcolor={this.state.color}>{val.SaleID}</td>
+                <td bgcolor={this.state.color}>{val.INVOICEID}</td>
+                <td align="right" bgcolor={this.state.color}>{val.QTYbox}</td>
+                <td bgcolor={this.state.color}>{val.CustomerName}</td>
               </tr>
             </tbody>
             arrData.push(tblData)
@@ -118,18 +187,23 @@ class GetTask extends Component {
 
       ).catch((err) => {
       });
-    }else {
+    } else {
       alert("กรุณากรอกข้อมูลให้ครบ")
     }
-  }
+    this.getfocus()
 
+  }
+ getfocus() {
+    document.getElementById("invoice").focus();
+}
 
 
   queryGetteskUpdate = () => {
-    if(this.state.invoiceData != ''){
+    if (this.state.invoiceData != '') {
       if (num > arr.length) {
         if (window.confirm("INVOICE ไม่ครบจะไปต่อหรือไม่")) {
           if (window.confirm("กรุณายืนยัน")) {
+            window.alert("รับงานสำเร็จ " + this.state.invoiceData.length + " รายการ")
             window.location.reload()
             console.log(this.state.invoiceData)
 
@@ -145,10 +219,11 @@ class GetTask extends Component {
             }).then(res => {
 
               this.queryGettesk()
+              //window.alert("รับงานสำเร็จ")
 
               if (res.data.queryGetteskUpdate.status == "2") {
                 console.log("result", res)
-                window.alert("รับงานสำเร็จ")
+                window.alert("รับงานสำเร็จ " + this.state.invoiceData.length + " รายการ")
 
                 window.location.reload()
               } else {
@@ -163,6 +238,7 @@ class GetTask extends Component {
         }
       } else {
         if (window.confirm("กรุณายืนยัน")) {
+          window.alert("รับงานสำเร็จ " + this.state.invoiceData.length + " รายการ")
           window.location.reload()
           console.log(this.state.invoiceData)
 
@@ -181,7 +257,7 @@ class GetTask extends Component {
 
             if (res.data.queryGetteskUpdate.status == "2") {
               console.log("result", res)
-              window.alert("รับงานสำเร็จ")
+              window.alert("รับงานสำเร็จ " + this.state.invoiceData.length + " รายการ")
 
               window.location.reload()
             } else {
@@ -194,7 +270,7 @@ class GetTask extends Component {
           });
         }
       }
-    }else {
+    } else {
       alert("กรุณากรอกข้อมูลให้ครบ")
     }
   }
@@ -217,37 +293,51 @@ class GetTask extends Component {
   Enterfn = e => {
 
     if (e.key === 'Enter') {
-console.log("-----"+e.target.value)
-console.log(arr)
-console.log("invoicetem"+invoicetem)
-console.log(invoicetem.findIndex(l => l==e.target.value))
-if (invoicetem.findIndex(l => l==e.target.value)>=0){
+      console.log("-----" + e.target.value)
+      console.log(arr)
+      console.log("invoicetem" + invoicetem)
+      console.log(invoicetem.findIndex(l => l == e.target.value))
+      if (invoicetem.findIndex(l => l == e.target.value) >= 0) {
 
-     if (arr.findIndex(k => k==e.target.value)<0||arr.length==0){
+        if (arr.findIndex(k => k == e.target.value) < 0 || arr.length == 0) {
 
-      arr.push(e.target.value)
-      this.state.invoiceData.push({
-        INVOICEID: e.target.value
-      })
-      this.inputTitle.value = "";
-      this.queryGettesk()
-    }else{
-      window.alert("invoice ซ้ำ")
-      this.inputTitle.value = "";
-    }
-  }else{
-    window.alert("invoice ไม่ใช่ของชุดเอกสารนี้ หรือ ได้รับไปแล้ว")
-    this.inputTitle.value = "";
-  }
+          arr.push(e.target.value)
+          this.state.invoiceData.push({
+            INVOICEID: e.target.value
+          })
+          this.inputTitle.value = "";
+          this.queryGettesk()
+        } else {
+          window.alert("invoice ซ้ำ")
+          this.inputTitle.value = "";
+        }
+      } else {
+        window.alert("invoice ไม่ใช่ของชุดเอกสารนี้ หรือ ได้รับไปแล้ว")
+        this.inputTitle.value = "";
+      }
+       
     }
     //console.log(this.state.invoiceData)
     //console.log("showNum" + num)
     //console.log("Enter")
   }
 
+  
+componentWillMount(){
+  this.queryGetteskDocomment()
+}
+  
   render() {
+    const { value, suggestions } = this.state;
+    const inputProps = {
+      placeholder: 'Type a programming language',
+      value,
+      onChange: this.onChange
+    };
     return (
+      
       <div className="animated fadeIn">
+     
         <Row>
           <Col xs="12" sm="12">
             <Card>
@@ -260,7 +350,18 @@ if (invoicetem.findIndex(l => l==e.target.value)>=0){
                     <div class="card-body">
                       <form action="" method="post" class="form-inline" margin="auto auto">
                         <div class="pr-1 form-group ">
-                          <label for="exampleInputName2" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>
+                          <label for="exampleInputName2" name="123" class="pr-1"><strong>เลขชุดเอกสาร</strong></label>
+                          <Autosuggest
+        onChange={this.queryGetteskDocomment}
+        suggestions={suggestions}
+        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        getSuggestionValue={getSuggestionValue}
+        renderSuggestion={renderSuggestion}
+        inputProps={inputProps}
+        class="form-control"
+         onChange={this.ChangeText}
+      />
                           &nbsp;&nbsp;<input id="exampleInputName2" placeholder="" required="" type="text" class="form-control" onChange={this.ChangeText}></input>
                         </div>
                         &nbsp;&nbsp;<div class="pr-1 form-group">
@@ -272,7 +373,7 @@ if (invoicetem.findIndex(l => l==e.target.value)>=0){
 
                           </input>
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>เลข INVOICE</strong></label>&nbsp;&nbsp;
-                          <input id="invoice" ref={el => this.inputTitle = el} required="required" onKeyPress={this.Enterfn} type="text" class="form-control"  ></input>
+                          <input id="invoice" Placeholder="กรุณา scan QR code" ref={el => this.inputTitle = el}  required="required" onKeyPress={this.Enterfn} type="text" class="form-control"  ></input>
                         </div>
                         <font color="red">&nbsp;&nbsp;<label for="exampleInputName2" class="pr-1"><strong>{this.state.msg}</strong></label>&nbsp;&nbsp;</font>
                       </form>
@@ -285,10 +386,11 @@ if (invoicetem.findIndex(l => l==e.target.value)>=0){
                   <Table responsive>
                     <thead>
                       <tr>
-                        <th width="15%"><center>ลำดับ</center></th>
-                        <th width="30%"><center>รหัส  invoice</center></th>
-                        <th width="15%"><center>จำนวนกล่อง</center></th>
-                        <th><center>ผู้รับ</center></th>
+                        <th width="5%">ลำดับ</th>
+                        <th width="10%">SaleID</th>
+                        <th width="15%">รหัส  invoice</th>
+                        <th width="10%">จำนวนกล่อง</th>
+                        <th>ผู้รับ</th>
                       </tr>
                     </thead>
                     {this.state.showTable}
@@ -304,6 +406,16 @@ if (invoicetem.findIndex(l => l==e.target.value)>=0){
   }
 }
 
+
+
+const queryGetteskDocomment = gql`
+  query queryGetteskDocomment{
+    queryGetteskDocomment{
+      DocumentSet
+    }
+  }
+`
+
 const queryGettesk = gql`
 query queryGettesk($DocumentSet:String!){
   queryGettesk(DocumentSet:$DocumentSet){
@@ -311,6 +423,7 @@ query queryGettesk($DocumentSet:String!){
     QTYbox
     CustomerName
     Status
+    SaleID
   }
 }
 `
